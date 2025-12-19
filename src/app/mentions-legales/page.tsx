@@ -43,9 +43,9 @@ export default function MentionsLegalesPage() {
                 <p><strong>Forme juridique :</strong> SARL</p>
                 <p><strong>Capital social :</strong> 10 000 €</p>
                 <p><strong>Siège social :</strong> 17 Av. Professeur Horatio Smith, 14000 Caen</p>
-                <p><strong>SIRET :</strong> À compléter</p>
-                <p><strong>RCS :</strong> Caen - À compléter</p>
-                <p><strong>TVA Intracommunautaire :</strong> À compléter</p>
+                <p><strong>SIRET :</strong> 949 495 204 00016</p>
+                <p><strong>RCS :</strong> 949 495 204 R.C.S. Caen</p>
+                <p><strong>TVA Intracommunautaire :</strong> FR17949495204</p>
                 <p><strong>Téléphone :</strong> 06 33 28 91 61</p>
                 <p><strong>Email :</strong> <a href="mailto:contact@tarandro.org" className="text-primary-600 hover:underline">contact@tarandro.org</a></p>
                 <p><strong>Directeur de la publication :</strong> Quentin TARANDRO</p>
