@@ -57,7 +57,7 @@ const authMiddleware = withAuth(
   }
 );
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   // D'abord vérifier le mode maintenance
   const maintenanceResponse = maintenanceMiddleware(request);
   if (maintenanceResponse.status !== 200 || maintenanceResponse.headers.get('x-middleware-rewrite')) {
@@ -67,7 +67,8 @@ export default function middleware(request: NextRequest) {
   // Ensuite appliquer l'auth pour les routes admin
   const path = request.nextUrl.pathname;
   if (path.startsWith('/admin') && path !== '/admin/login') {
-    return authMiddleware(request as any);
+    // @ts-ignore - withAuth type issue
+    return authMiddleware(request);
   }
   
   return NextResponse.next();
