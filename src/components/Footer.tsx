@@ -91,11 +91,11 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start">
                 <FaMapMarkerAlt className="mr-3 mt-1 flex-shrink-0" />
-                <span>Adresse à définir<br />Code postal Ville</span>
+                <span>17 Av. Professeur Horatio Smith<br />14000 Caen</span>
               </li>
               <li className="flex items-center">
                 <FaPhone className="mr-3 flex-shrink-0" />
-                <a href="tel:+33123456789" className="hover:text-primary-400 transition-colors">
+                <a href="tel:+33633289161" className="hover:text-primary-400 transition-colors">
                   06 33 28 91 61
                 </a>
               </li>

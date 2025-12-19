@@ -83,9 +83,9 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-4 border-t border-gray-200">
-                <a href="tel:+33000000000" className="flex items-center text-gray-600 hover:text-primary-600 transition-colors py-2">
+                <a href="tel:+33633289161" className="flex items-center text-gray-600 hover:text-primary-600 transition-colors py-2">
                   <FaPhone className="mr-2" />
-                  <span>01 XX XX XX XX</span>
+                  <span>06 33 28 91 61</span>
                 </a>
                 <Link
                   href="/contact"

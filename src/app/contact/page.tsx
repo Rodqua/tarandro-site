@@ -303,8 +303,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Adresse</div>
-                      <p>15 Avenue des Champs-Élysées</p>
-                      <p>75008 Paris</p>
+                      <p>17 Av. Professeur Horatio Smith</p>
+                      <p>14000 Caen</p>
                     </div>
                   </div>
                 </div>

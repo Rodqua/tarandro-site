@@ -140,7 +140,7 @@ export default function CertificationISOPage() {
                 className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-primary-600 transition-all font-semibold inline-flex items-center justify-center"
               >
                 <FaPhone className="mr-2" />
-                01 XX XX XX XX
+                06 33 28 91 61
               </a>
             </div>
           </div>

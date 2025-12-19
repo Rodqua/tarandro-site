@@ -42,11 +42,11 @@ export default function MentionsLegalesPage() {
                 <p><strong>Raison sociale :</strong> Tarandro</p>
                 <p><strong>Forme juridique :</strong> SARL</p>
                 <p><strong>Capital social :</strong> 10 000 €</p>
-                <p><strong>Siège social :</strong> 15 Avenue des Champs-Élysées, 75008 Paris</p>
-                <p><strong>SIRET :</strong> 123 456 789 00012</p>
-                <p><strong>RCS :</strong> Paris B 123 456 789</p>
-                <p><strong>TVA Intracommunautaire :</strong> FR12 123456789</p>
-                <p><strong>Téléphone :</strong> 01 23 45 67 89</p>
+                <p><strong>Siège social :</strong> 17 Av. Professeur Horatio Smith, 14000 Caen</p>
+                <p><strong>SIRET :</strong> À compléter</p>
+                <p><strong>RCS :</strong> Caen - À compléter</p>
+                <p><strong>TVA Intracommunautaire :</strong> À compléter</p>
+                <p><strong>Téléphone :</strong> 06 33 28 91 61</p>
                 <p><strong>Email :</strong> <a href="mailto:contact@tarandro.org" className="text-primary-600 hover:underline">contact@tarandro.org</a></p>
                 <p><strong>Directeur de la publication :</strong> Quentin TARANDRO</p>
               </div>
