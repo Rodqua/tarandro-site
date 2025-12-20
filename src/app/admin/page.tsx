@@ -13,6 +13,7 @@ import {
   FaArrowDown,
   FaGoogle,
   FaEye,
+  FaImage,
 } from "react-icons/fa";
 
 interface Stats {
@@ -487,6 +488,19 @@ export default function AdminDashboard() {
           <h3 className="text-lg font-bold mb-1">Gérer le blog</h3>
           <p className="text-sm text-primary-100">
             Créer et modifier des articles
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/images"
+          className="block bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <FaImage size={32} />
+          </div>
+          <h3 className="text-lg font-bold mb-1">Gérer les images</h3>
+          <p className="text-sm text-purple-100">
+            Télécharger et organiser les images
           </p>
         </Link>
 

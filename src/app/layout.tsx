@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import StructuredData from "@/components/StructuredData";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
       "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Tarandro - Expert Qualité & Formation",
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
     title: "Tarandro - Expert Qualité & Formation",
     description:
       "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,
@@ -72,9 +73,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "votre-code-google-search-console",
   },
 };
 
@@ -90,6 +88,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <GoogleTagManager />
+        <StructuredData />
         <AnalyticsProvider>
           <AuthProvider>
             <Header />
