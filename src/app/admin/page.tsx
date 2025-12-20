@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaBlog, FaUsers, FaChartLine, FaEnvelope, FaTrophy, FaClock, FaTrendUp, FaTrendDown } from "react-icons/fa";
+import { FaBlog, FaUsers, FaChartLine, FaEnvelope, FaTrophy, FaClock, FaTrendUp, FaTrendDown, FaGoogle, FaEye } from "react-icons/fa";
 
 interface Stats {
   totalContacts: number;
@@ -20,11 +20,40 @@ interface Stats {
   }>;
 }
 
+interface AnalyticsData {
+  overview: {
+    users: number;
+    sessions: number;
+    pageViews: number;
+    bounceRate: string;
+    avgSessionDuration: number;
+    conversionRate: string;
+  };
+  trafficSources: Array<{
+    source: string;
+    sessions: number;
+    users: number;
+  }>;
+  topPages: Array<{
+    title: string;
+    path: string;
+    views: number;
+    users: number;
+  }>;
+  events: Array<{
+    name: string;
+    count: number;
+  }>;
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
   useEffect(() => {
+    // Charger les stats de base
     fetch('/api/admin/stats')
       .then(res => res.json())
       .then(data => {
@@ -33,6 +62,21 @@ export default function AdminDashboard() {
       })
       .catch(error => {
         console.error('Error fetching stats:', error);
+        setLoading(false);
+      });
+
+    // Charger les stats Google Analytics
+    fetch('/api/admin/analytics')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.analytics) {
+          setAnalytics(data.analytics);
+          setAnalyticsEnabled(true);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching analytics:', error);
+      });
         setLoading(false);
       });
   }, []);
@@ -59,7 +103,15 @@ export default function AdminDashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
+          {analyticsEnabled && (
+            <div className="flex items-center mt-2 text-sm text-green-600">
+              <FaGoogle className="mr-1" />
+              Google Analytics connecté
+            </div>
+          )}
+        </div>
         <div className="text-sm text-gray-500">
           Dernière mise à jour: {new Date().toLocaleDateString('fr-FR', { 
             day: 'numeric', 
@@ -171,6 +223,111 @@ export default function AdminDashboard() {
             <p className="text-gray-500 text-center py-8">Aucune demande pour le moment</p>
           )}
         </div>
+
+        {/* Google Analytics Stats */}
+        {analyticsEnabled && analytics && (
+          <>
+            {/* Analytics Overview */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <FaEye className="text-green-500 mr-2" />
+                Trafic du site (30 jours)
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">Utilisateurs</p>
+                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.users.toLocaleString('fr-FR')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Sessions</p>
+                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.sessions.toLocaleString('fr-FR')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Pages vues</p>
+                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.pageViews.toLocaleString('fr-FR')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Taux rebond</p>
+                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.bounceRate.toFixed(1)}%</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Durée moyenne</p>
+                  <p className="text-2xl font-bold text-gray-900">{Math.round(analytics.overview.avgSessionDuration)}s</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Taux conversion</p>
+                  <p className="text-2xl font-bold text-green-600">{analytics.overview.conversionRate.toFixed(2)}%</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Traffic Sources */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Sources de trafic</h2>
+              {analytics.trafficSources.length > 0 ? (
+                <div className="space-y-3">
+                  {analytics.trafficSources.map((source, index) => {
+                    const total = analytics.trafficSources.reduce((sum, s) => sum + s.sessions, 0);
+                    const percentage = ((source.sessions / total) * 100).toFixed(0);
+                    return (
+                      <div key={index}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium text-gray-700 capitalize">{source.source}</span>
+                          <span className="text-sm text-gray-600">{source.sessions} sessions</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all"
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>
+              )}
+            </div>
+
+            {/* Top Pages */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Pages populaires</h2>
+              {analytics.topPages.length > 0 ? (
+                <div className="space-y-2">
+                  {analytics.topPages.slice(0, 10).map((page, index) => (
+                    <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{page.title || page.path}</p>
+                        <p className="text-xs text-gray-500 truncate">{page.path}</p>
+                      </div>
+                      <div className="text-sm text-gray-600 ml-2">{page.views.toLocaleString('fr-FR')} vues</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>
+              )}
+            </div>
+
+            {/* Custom Events */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Événements trackés</h2>
+              {analytics.events.length > 0 ? (
+                <div className="space-y-3">
+                  {analytics.events.map((event, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm font-medium text-gray-700">{event.name}</span>
+                      <span className="text-lg font-bold text-primary-600">{event.count.toLocaleString('fr-FR')}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">Aucun événement tracké</p>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Derniers contacts */}
         <div className="bg-white rounded-lg shadow-md p-6">
