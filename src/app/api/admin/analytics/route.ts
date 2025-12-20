@@ -7,6 +7,13 @@ export async function GET() {
     const propertyId = process.env.GA4_PROPERTY_ID;
     const credentials = process.env.GA4_CREDENTIALS;
 
+    console.log("🔍 Vérification GA4 config:", {
+      hasPropertyId: !!propertyId,
+      hasCredentials: !!credentials,
+      propertyId: propertyId || "manquant",
+      credentialsLength: credentials?.length || 0,
+    });
+
     if (!propertyId || !credentials) {
       console.log(
         "⚠️ Google Analytics non configuré - utilisation des stats de base"
@@ -19,7 +26,19 @@ export async function GET() {
     }
 
     // Parser les credentials JSON
-    const credentialsJson = JSON.parse(credentials);
+    let credentialsJson;
+    try {
+      credentialsJson = JSON.parse(credentials);
+      console.log("✅ Credentials JSON parsés avec succès");
+    } catch (parseError: any) {
+      console.error("❌ Erreur parsing credentials JSON:", parseError.message);
+      return NextResponse.json({
+        success: false,
+        message: "Credentials JSON invalides",
+        error: parseError.message,
+        useBasicStats: true,
+      }, { status: 500 });
+    }
 
     // Initialiser le client Google Analytics
     const analyticsDataClient = new BetaAnalyticsDataClient({
@@ -183,14 +202,21 @@ export async function GET() {
       },
     });
   } catch (error: any) {
-    console.error("❌ Erreur Google Analytics API:", error);
+    console.error("❌ Erreur Google Analytics API:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      stack: error.stack?.split('\n').slice(0, 3).join('\n'),
+    });
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
+        error: error.message || "Erreur inconnue",
+        errorCode: error.code,
+        errorDetails: error.details,
         useBasicStats: true,
       },
-      { status: 500 }
+      { status: 200 } // Changer à 200 pour ne pas bloquer le frontend
     );
   }
 }

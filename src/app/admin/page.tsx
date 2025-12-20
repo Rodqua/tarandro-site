@@ -62,6 +62,7 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
   useEffect(() => {
     // Charger les stats de base
@@ -80,13 +81,19 @@ export default function AdminDashboard() {
     fetch("/api/admin/analytics")
       .then((res) => res.json())
       .then((data) => {
+        console.log("📊 Réponse API Analytics:", data);
         if (data.success && data.analytics) {
           setAnalytics(data.analytics);
           setAnalyticsEnabled(true);
+          setAnalyticsError(null);
+        } else if (data.error) {
+          setAnalyticsError(data.error);
+          console.error("Erreur GA4:", data);
         }
       })
       .catch((error) => {
         console.error("Error fetching analytics:", error);
+        setAnalyticsError(error.message);
       });
   }, []);
 
@@ -118,6 +125,16 @@ export default function AdminDashboard() {
             <div className="flex items-center mt-2 text-sm text-green-600">
               <FaGoogle className="mr-1" />
               Google Analytics connecté
+            </div>
+          )}
+          {!analyticsEnabled && analyticsError && (
+            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>⚠️ Google Analytics non disponible:</strong> {analyticsError}
+              </p>
+              <p className="text-xs text-yellow-600 mt-1">
+                Consultez <a href="/GOOGLE_ANALYTICS_CONFIG.md" className="underline">GOOGLE_ANALYTICS_CONFIG.md</a> pour la configuration
+              </p>
             </div>
           )}
         </div>
