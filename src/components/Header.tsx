@@ -21,7 +21,10 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            className="flex items-center hover:opacity-80 transition-opacity"
+          >
             <Image
               src="/logo.svg"
               alt="Tarandro - Qualité & Formation"
@@ -46,7 +49,10 @@ export default function Header() {
 
           {/* Contact Info Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
-            <a href="tel:+33633289161" className="flex items-center text-gray-600 hover:text-primary-600 transition-colors">
+            <a
+              href="tel:+33633289161"
+              className="flex items-center text-gray-600 hover:text-primary-600 transition-colors"
+            >
               <FaPhone className="mr-2" />
               <span className="text-sm">06 33 28 91 61</span>
             </a>
@@ -83,7 +89,10 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-4 border-t border-gray-200">
-                <a href="tel:+33633289161" className="flex items-center text-gray-600 hover:text-primary-600 transition-colors py-2">
+                <a
+                  href="tel:+33633289161"
+                  className="flex items-center text-gray-600 hover:text-primary-600 transition-colors py-2"
+                >
                   <FaPhone className="mr-2" />
                   <span>06 33 28 91 61</span>
                 </a>

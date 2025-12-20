@@ -2,7 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaBlog, FaUsers, FaChartLine, FaEnvelope, FaTrophy, FaClock, FaArrowUp, FaArrowDown, FaGoogle, FaEye } from "react-icons/fa";
+import {
+  FaBlog,
+  FaUsers,
+  FaChartLine,
+  FaEnvelope,
+  FaTrophy,
+  FaClock,
+  FaArrowUp,
+  FaArrowDown,
+  FaGoogle,
+  FaEye,
+} from "react-icons/fa";
 
 interface Stats {
   totalContacts: number;
@@ -54,28 +65,28 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Charger les stats de base
-    fetch('/api/admin/stats')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/admin/stats")
+      .then((res) => res.json())
+      .then((data) => {
         setStats(data.stats);
         setLoading(false);
       })
-      .catch(error => {
-        console.error('Error fetching stats:', error);
+      .catch((error) => {
+        console.error("Error fetching stats:", error);
         setLoading(false);
       });
 
     // Charger les stats Google Analytics
-    fetch('/api/admin/analytics')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/admin/analytics")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success && data.analytics) {
           setAnalytics(data.analytics);
           setAnalyticsEnabled(true);
         }
       })
-      .catch(error => {
-        console.error('Error fetching analytics:', error);
+      .catch((error) => {
+        console.error("Error fetching analytics:", error);
       });
   }, []);
 
@@ -90,12 +101,12 @@ export default function AdminDashboard() {
   }
 
   const serviceLabels: { [key: string]: string } = {
-    iso: 'Certification ISO',
-    has: 'Certification HAS',
-    psad: 'PSAD',
-    bureautique: 'Formation Bureautique',
-    sst: 'Formation SST',
-    autre: 'Autre'
+    iso: "Certification ISO",
+    has: "Certification HAS",
+    psad: "PSAD",
+    bureautique: "Formation Bureautique",
+    sst: "Formation SST",
+    autre: "Autre",
   };
 
   return (
@@ -111,12 +122,13 @@ export default function AdminDashboard() {
           )}
         </div>
         <div className="text-sm text-gray-500">
-          Dernière mise à jour: {new Date().toLocaleDateString('fr-FR', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+          Dernière mise à jour:{" "}
+          {new Date().toLocaleDateString("fr-FR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </div>
       </div>
@@ -127,7 +139,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-2">
             <div>
               <p className="text-sm text-gray-600 mb-1">Messages reçus</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalContacts || 0}</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats?.totalContacts || 0}
+              </p>
               <p className="text-xs text-gray-500 mt-1">
                 {stats?.contactsThisMonth || 0} ce mois
               </p>
@@ -137,8 +151,16 @@ export default function AdminDashboard() {
             </div>
           </div>
           {stats && stats.trend !== 0 && (
-            <div className={`flex items-center text-sm mt-2 ${stats.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.trend > 0 ? <FaArrowUp className="mr-1" /> : <FaArrowDown className="mr-1" />}
+            <div
+              className={`flex items-center text-sm mt-2 ${
+                stats.trend > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {stats.trend > 0 ? (
+                <FaArrowUp className="mr-1" />
+              ) : (
+                <FaArrowDown className="mr-1" />
+              )}
               {Math.abs(stats.trend)}% vs mois dernier
             </div>
           )}
@@ -148,7 +170,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Articles publiés</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.blogPosts || 0}</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats?.blogPosts || 0}
+              </p>
               <p className="text-xs text-gray-500 mt-1">Sur le blog</p>
             </div>
             <div className="bg-primary-100 text-primary-600 p-4 rounded-lg">
@@ -161,7 +185,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Visiteurs (est.)</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.estimatedVisitors || 0}</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats?.estimatedVisitors || 0}
+              </p>
               <p className="text-xs text-gray-500 mt-1">Ce mois</p>
             </div>
             <div className="bg-green-100 text-green-600 p-4 rounded-lg">
@@ -174,7 +200,9 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Taux de conversion</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.conversionRate || '0.0'}%</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {stats?.conversionRate || "0.0"}%
+              </p>
               <p className="text-xs text-gray-500 mt-1">Messages / Visites</p>
             </div>
             <div className="bg-blue-100 text-blue-600 p-4 rounded-lg">
@@ -197,7 +225,10 @@ export default function AdminDashboard() {
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 5)
                 .map(([service, count]) => {
-                  const total = Object.values(stats.serviceStats).reduce((a, b) => a + b, 0);
+                  const total = Object.values(stats.serviceStats).reduce(
+                    (a, b) => a + b,
+                    0
+                  );
                   const percentage = ((count / total) * 100).toFixed(0);
                   return (
                     <div key={service}>
@@ -205,7 +236,9 @@ export default function AdminDashboard() {
                         <span className="text-sm font-medium text-gray-700">
                           {serviceLabels[service] || service}
                         </span>
-                        <span className="text-sm text-gray-600">{count} demandes</span>
+                        <span className="text-sm text-gray-600">
+                          {count} demandes
+                        </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
@@ -218,7 +251,9 @@ export default function AdminDashboard() {
                 })}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">Aucune demande pour le moment</p>
+            <p className="text-gray-500 text-center py-8">
+              Aucune demande pour le moment
+            </p>
           )}
         </div>
 
@@ -234,44 +269,68 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Utilisateurs</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.users.toLocaleString('fr-FR')}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analytics.overview.users.toLocaleString("fr-FR")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Sessions</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.sessions.toLocaleString('fr-FR')}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analytics.overview.sessions.toLocaleString("fr-FR")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Pages vues</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.pageViews.toLocaleString('fr-FR')}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analytics.overview.pageViews.toLocaleString("fr-FR")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Taux rebond</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics.overview.bounceRate.toFixed(1)}%</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {analytics.overview.bounceRate.toFixed(1)}%
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Durée moyenne</p>
-                  <p className="text-2xl font-bold text-gray-900">{Math.round(analytics.overview.avgSessionDuration)}s</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {Math.round(analytics.overview.avgSessionDuration)}s
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Taux conversion</p>
-                  <p className="text-2xl font-bold text-green-600">{analytics.overview.conversionRate.toFixed(2)}%</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {analytics.overview.conversionRate.toFixed(2)}%
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Traffic Sources */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Sources de trafic</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Sources de trafic
+              </h2>
               {analytics.trafficSources.length > 0 ? (
                 <div className="space-y-3">
                   {analytics.trafficSources.map((source, index) => {
-                    const total = analytics.trafficSources.reduce((sum, s) => sum + s.sessions, 0);
-                    const percentage = ((source.sessions / total) * 100).toFixed(0);
+                    const total = analytics.trafficSources.reduce(
+                      (sum, s) => sum + s.sessions,
+                      0
+                    );
+                    const percentage = (
+                      (source.sessions / total) *
+                      100
+                    ).toFixed(0);
                     return (
                       <div key={index}>
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm font-medium text-gray-700 capitalize">{source.source}</span>
-                          <span className="text-sm text-gray-600">{source.sessions} sessions</span>
+                          <span className="text-sm font-medium text-gray-700 capitalize">
+                            {source.source}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {source.sessions} sessions
+                          </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
@@ -284,44 +343,70 @@ export default function AdminDashboard() {
                   })}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>
+                <p className="text-gray-500 text-center py-4">
+                  Aucune donnée disponible
+                </p>
               )}
             </div>
 
             {/* Top Pages */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Pages populaires</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Pages populaires
+              </h2>
               {analytics.topPages.length > 0 ? (
                 <div className="space-y-2">
                   {analytics.topPages.slice(0, 10).map((page, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                    <div
+                      key={index}
+                      className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0"
+                    >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{page.title || page.path}</p>
-                        <p className="text-xs text-gray-500 truncate">{page.path}</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {page.title || page.path}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {page.path}
+                        </p>
                       </div>
-                      <div className="text-sm text-gray-600 ml-2">{page.views.toLocaleString('fr-FR')} vues</div>
+                      <div className="text-sm text-gray-600 ml-2">
+                        {page.views.toLocaleString("fr-FR")} vues
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">Aucune donnée disponible</p>
+                <p className="text-gray-500 text-center py-4">
+                  Aucune donnée disponible
+                </p>
               )}
             </div>
 
             {/* Custom Events */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Événements trackés</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Événements trackés
+              </h2>
               {analytics.events.length > 0 ? (
                 <div className="space-y-3">
                   {analytics.events.map((event, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">{event.name}</span>
-                      <span className="text-lg font-bold text-primary-600">{event.count.toLocaleString('fr-FR')}</span>
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-sm font-medium text-gray-700">
+                        {event.name}
+                      </span>
+                      <span className="text-lg font-bold text-primary-600">
+                        {event.count.toLocaleString("fr-FR")}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">Aucun événement tracké</p>
+                <p className="text-gray-500 text-center py-4">
+                  Aucun événement tracké
+                </p>
               )}
             </div>
           </>
@@ -336,19 +421,26 @@ export default function AdminDashboard() {
           {stats && stats.recentContacts.length > 0 ? (
             <div className="space-y-3">
               {stats.recentContacts.map((contact, index) => (
-                <div key={index} className="flex items-start border-b border-gray-100 pb-3 last:border-0">
+                <div
+                  key={index}
+                  className="flex items-start border-b border-gray-100 pb-3 last:border-0"
+                >
                   <div className="bg-primary-100 text-primary-600 p-2 rounded-lg mr-3 flex-shrink-0">
                     <FaEnvelope />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
-                    <p className="text-xs text-gray-600">{serviceLabels[contact.service] || contact.service}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {contact.name}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {serviceLabels[contact.service] || contact.service}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(contact.date).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                      {new Date(contact.date).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </p>
                   </div>
@@ -356,7 +448,9 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">Aucun contact récent</p>
+            <p className="text-gray-500 text-center py-8">
+              Aucun contact récent
+            </p>
           )}
         </div>
       </div>
@@ -374,7 +468,9 @@ export default function AdminDashboard() {
             </span>
           </div>
           <h3 className="text-lg font-bold mb-1">Gérer le blog</h3>
-          <p className="text-sm text-primary-100">Créer et modifier des articles</p>
+          <p className="text-sm text-primary-100">
+            Créer et modifier des articles
+          </p>
         </Link>
 
         <Link
@@ -385,7 +481,9 @@ export default function AdminDashboard() {
             <FaUsers size={32} />
           </div>
           <h3 className="text-lg font-bold mb-1">Voir le site</h3>
-          <p className="text-sm text-green-100">Consulter la version publique</p>
+          <p className="text-sm text-green-100">
+            Consulter la version publique
+          </p>
         </Link>
 
         <button

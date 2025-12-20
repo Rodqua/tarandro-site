@@ -1,37 +1,55 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FaCheckCircle, FaArrowRight, FaPhone, FaHospital } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaArrowRight,
+  FaPhone,
+  FaHospital,
+} from "react-icons/fa";
 
 export const metadata: Metadata = {
-  title: "Certification HAS - Accompagnement Établissements de Santé et Médico-sociaux",
-  description: "Expert certification HAS pour établissements de santé et médico-sociaux. Préparation complète à la visite de certification. Méthodologie éprouvée, taux de réussite élevé.",
-  keywords: ["certification HAS", "Haute Autorité de Santé", "établissement de santé", "médico-social", "qualité santé", "visite de certification HAS"],
+  title:
+    "Certification HAS - Accompagnement Établissements de Santé et Médico-sociaux",
+  description:
+    "Expert certification HAS pour établissements de santé et médico-sociaux. Préparation complète à la visite de certification. Méthodologie éprouvée, taux de réussite élevé.",
+  keywords: [
+    "certification HAS",
+    "Haute Autorité de Santé",
+    "établissement de santé",
+    "médico-social",
+    "qualité santé",
+    "visite de certification HAS",
+  ],
   alternates: {
-    canonical: 'https://tarandro.org/services/certification-has',
+    canonical: "https://tarandro.org/services/certification-has",
   },
 };
 
 const hasFeatures = [
   {
     title: "Préparation Visite de Certification",
-    description: "Accompagnement complet pour préparer sereinement la visite des experts-visiteurs HAS",
-    icon: "🎯"
+    description:
+      "Accompagnement complet pour préparer sereinement la visite des experts-visiteurs HAS",
+    icon: "🎯",
   },
   {
     title: "Gestion Documentaire",
-    description: "Organisation et structuration de votre documentation qualité et gestion des risques",
-    icon: "📋"
+    description:
+      "Organisation et structuration de votre documentation qualité et gestion des risques",
+    icon: "📋",
   },
   {
     title: "Formation des Équipes",
-    description: "Formation de vos professionnels aux exigences HAS et aux bonnes pratiques",
-    icon: "👥"
+    description:
+      "Formation de vos professionnels aux exigences HAS et aux bonnes pratiques",
+    icon: "👥",
   },
   {
     title: "Accompagnement Continu",
-    description: "Suivi régulier de votre démarche qualité entre les évaluations",
-    icon: "🔄"
-  }
+    description:
+      "Suivi régulier de votre démarche qualité entre les évaluations",
+    icon: "🔄",
+  },
 ];
 
 const hasChapters = [
@@ -42,58 +60,63 @@ const hasChapters = [
   "Gestion des risques",
   "Système d'information",
   "Ressources humaines",
-  "Gestion des fonctions logistiques"
+  "Gestion des fonctions logistiques",
 ];
 
 const processSteps = [
   {
     step: "1",
     title: "Diagnostic Initial",
-    description: "Évaluation de votre niveau de conformité par rapport au référentiel HAS",
-    duration: "2-3 jours"
+    description:
+      "Évaluation de votre niveau de conformité par rapport au référentiel HAS",
+    duration: "2-3 jours",
   },
   {
     step: "2",
     title: "Plan d'Actions Priorisé",
-    description: "Identification des axes d'amélioration prioritaires et planification",
-    duration: "1 semaine"
+    description:
+      "Identification des axes d'amélioration prioritaires et planification",
+    duration: "1 semaine",
   },
   {
     step: "3",
     title: "Mise en Conformité",
-    description: "Accompagnement dans la mise en place des actions correctives et préventives",
-    duration: "6-12 mois"
+    description:
+      "Accompagnement dans la mise en place des actions correctives et préventives",
+    duration: "6-12 mois",
   },
   {
     step: "4",
     title: "Organisation Documentaire",
     description: "Structuration et mise à jour de votre documentation qualité",
-    duration: "Continu"
+    duration: "Continu",
   },
   {
     step: "5",
     title: "Formation des Professionnels",
-    description: "Sensibilisation et formation de vos équipes aux exigences HAS",
-    duration: "2-4 mois"
+    description:
+      "Sensibilisation et formation de vos équipes aux exigences HAS",
+    duration: "2-4 mois",
   },
   {
     step: "6",
     title: "Visite Blanc",
-    description: "Simulation de la visite de certification pour identifier les derniers ajustements",
-    duration: "2-3 jours"
+    description:
+      "Simulation de la visite de certification pour identifier les derniers ajustements",
+    duration: "2-3 jours",
   },
   {
     step: "7",
     title: "Préparation à la Visite",
     description: "Préparation logistique et psychologique de l'établissement",
-    duration: "1 mois"
+    duration: "1 mois",
   },
   {
     step: "8",
     title: "Accompagnement Visite",
     description: "Présence et support pendant la visite des experts-visiteurs",
-    duration: "3-4 jours"
-  }
+    duration: "3-4 jours",
+  },
 ];
 
 export default function CertificationHASPage() {
@@ -103,9 +126,12 @@ export default function CertificationHASPage() {
       <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-300 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-300 rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1s" }}
+          ></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl">
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
@@ -116,7 +142,8 @@ export default function CertificationHASPage() {
               Certification HAS : Préparez Votre Visite avec Succès
             </h1>
             <p className="text-xl text-blue-100 mb-8 animate-fadeInUp animate-delay-100">
-              Accompagnement expert des établissements de santé et médico-sociaux dans leur démarche de certification HAS. 
+              Accompagnement expert des établissements de santé et
+              médico-sociaux dans leur démarche de certification HAS.
               Méthodologie éprouvée pour une préparation sereine et efficace.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
@@ -147,7 +174,8 @@ export default function CertificationHASPage() {
               Notre Accompagnement Certification HAS
             </h2>
             <p className="text-lg text-gray-600">
-              Une expertise reconnue au service de la qualité et de la sécurité des soins
+              Une expertise reconnue au service de la qualité et de la sécurité
+              des soins
             </p>
           </div>
 
@@ -158,7 +186,9 @@ export default function CertificationHASPage() {
                 className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
               >
                 <div className="text-5xl mb-4">{feature.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
                 <p className="text-gray-700">{feature.description}</p>
               </div>
             ))}
@@ -173,7 +203,7 @@ export default function CertificationHASPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Les Chapitres du Référentiel HAS
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {hasChapters.map((chapter, index) => (
                 <div
@@ -192,9 +222,13 @@ export default function CertificationHASPage() {
 
             <div className="mt-12 bg-blue-50 border border-blue-200 rounded-xl p-6">
               <p className="text-gray-700 leading-relaxed">
-                <strong>Notre expertise couvre l'ensemble du référentiel HAS</strong>, que vous soyez un établissement 
-                de santé (MCO, SSR, PSY, HAD), un établissement médico-social (EHPAD, handicap), ou une structure ambulatoire. 
-                Nous adaptons notre accompagnement à votre spécificité et à vos enjeux.
+                <strong>
+                  Notre expertise couvre l'ensemble du référentiel HAS
+                </strong>
+                , que vous soyez un établissement de santé (MCO, SSR, PSY, HAD),
+                un établissement médico-social (EHPAD, handicap), ou une
+                structure ambulatoire. Nous adaptons notre accompagnement à
+                votre spécificité et à vos enjeux.
               </p>
             </div>
           </div>
@@ -209,7 +243,8 @@ export default function CertificationHASPage() {
               Notre Méthodologie en 8 Étapes
             </h2>
             <p className="text-lg text-gray-600">
-              Un accompagnement structuré pour préparer sereinement votre visite de certification
+              Un accompagnement structuré pour préparer sereinement votre visite
+              de certification
             </p>
           </div>
 
@@ -225,7 +260,9 @@ export default function CertificationHASPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {step.title}
+                      </h3>
                       <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                         {step.duration}
                       </span>
@@ -246,39 +283,71 @@ export default function CertificationHASPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Pourquoi nous choisir ?
             </h2>
-            
+
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">10+</div>
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    10+
+                  </div>
                   <div className="text-gray-600">Années d'expérience HAS</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>
-                  <div className="text-gray-600">Établissements accompagnés</div>
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    50+
+                  </div>
+                  <div className="text-gray-600">
+                    Établissements accompagnés
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">100%</div>
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    100%
+                  </div>
                   <div className="text-gray-600">Satisfaction client</div>
                 </div>
               </div>
 
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <FaCheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span className="text-gray-700"><strong>Connaissance approfondie du référentiel HAS</strong> et de ses évolutions</span>
+                  <FaCheckCircle
+                    className="text-green-500 mr-3 mt-1 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-700">
+                    <strong>Connaissance approfondie du référentiel HAS</strong>{" "}
+                    et de ses évolutions
+                  </span>
                 </li>
                 <li className="flex items-start">
-                  <FaCheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span className="text-gray-700"><strong>Expérience terrain</strong> dans tous types d'établissements de santé</span>
+                  <FaCheckCircle
+                    className="text-green-500 mr-3 mt-1 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-700">
+                    <strong>Expérience terrain</strong> dans tous types
+                    d'établissements de santé
+                  </span>
                 </li>
                 <li className="flex items-start">
-                  <FaCheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span className="text-gray-700"><strong>Méthode pragmatique</strong> adaptée à vos contraintes opérationnelles</span>
+                  <FaCheckCircle
+                    className="text-green-500 mr-3 mt-1 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-700">
+                    <strong>Méthode pragmatique</strong> adaptée à vos
+                    contraintes opérationnelles
+                  </span>
                 </li>
                 <li className="flex items-start">
-                  <FaCheckCircle className="text-green-500 mr-3 mt-1 flex-shrink-0" size={20} />
-                  <span className="text-gray-700"><strong>Disponibilité et réactivité</strong> tout au long de l'accompagnement</span>
+                  <FaCheckCircle
+                    className="text-green-500 mr-3 mt-1 flex-shrink-0"
+                    size={20}
+                  />
+                  <span className="text-gray-700">
+                    <strong>Disponibilité et réactivité</strong> tout au long de
+                    l'accompagnement
+                  </span>
                 </li>
               </ul>
             </div>

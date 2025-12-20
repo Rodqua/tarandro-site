@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FaCheckCircle, FaArrowRight, FaPhone, FaLaptop, FaCertificate } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaArrowRight,
+  FaPhone,
+  FaLaptop,
+  FaCertificate,
+} from "react-icons/fa";
 
 export const metadata: Metadata = {
   title: "Formation Bureautique - Excel, Word, PowerPoint, Outlook | Tarandro",
-  description: "Formation bureautique professionnelle : Microsoft Office (Excel, Word, PowerPoint, Outlook), Google Workspace. Tous niveaux. Inter et intra-entreprise. Formateurs certifiés.",
-  keywords: ["formation bureautique", "formation Excel", "formation Word", "formation PowerPoint", "formation Outlook", "Microsoft Office", "Google Workspace"],
+  description:
+    "Formation bureautique professionnelle : Microsoft Office (Excel, Word, PowerPoint, Outlook), Google Workspace. Tous niveaux. Inter et intra-entreprise. Formateurs certifiés.",
+  keywords: [
+    "formation bureautique",
+    "formation Excel",
+    "formation Word",
+    "formation PowerPoint",
+    "formation Outlook",
+    "Microsoft Office",
+    "Google Workspace",
+  ],
   alternates: {
-    canonical: 'https://tarandro.org/services/formation-bureautique',
+    canonical: "https://tarandro.org/services/formation-bureautique",
   },
 };
 
@@ -22,8 +37,8 @@ const formations = [
       "Tableaux croisés dynamiques",
       "Graphiques et visualisations",
       "Macros et VBA",
-      "Power Query et Power Pivot"
-    ]
+      "Power Query et Power Pivot",
+    ],
   },
   {
     name: "Microsoft Word",
@@ -35,8 +50,8 @@ const formations = [
       "Styles et modèles",
       "Table des matières",
       "Publipostage",
-      "Documents longs"
-    ]
+      "Documents longs",
+    ],
   },
   {
     name: "Microsoft PowerPoint",
@@ -48,8 +63,8 @@ const formations = [
       "Animations et transitions",
       "Masques de diapositives",
       "Présentations interactives",
-      "Storytelling visuel"
-    ]
+      "Storytelling visuel",
+    ],
   },
   {
     name: "Microsoft Outlook",
@@ -61,8 +76,8 @@ const formations = [
       "Calendrier et rendez-vous",
       "Contacts et distribution",
       "Tâches et organisation",
-      "Règles et automatisation"
-    ]
+      "Règles et automatisation",
+    ],
   },
   {
     name: "Google Workspace",
@@ -74,8 +89,8 @@ const formations = [
       "Google Sheets",
       "Google Docs",
       "Google Slides",
-      "Collaboration en temps réel"
-    ]
+      "Collaboration en temps réel",
+    ],
   },
   {
     name: "Teams & Collaboration",
@@ -87,9 +102,9 @@ const formations = [
       "SharePoint",
       "OneDrive",
       "Travail collaboratif",
-      "Bonnes pratiques"
-    ]
-  }
+      "Bonnes pratiques",
+    ],
+  },
 ];
 
 const trainingFormats = [
@@ -101,9 +116,9 @@ const trainingFormats = [
       "Dans vos locaux ou à distance",
       "Groupes de 4 à 12 personnes",
       "Dates et horaires flexibles",
-      "Support de cours personnalisé"
+      "Support de cours personnalisé",
     ],
-    icon: "🏢"
+    icon: "🏢",
   },
   {
     title: "Formation Inter-entreprises",
@@ -113,9 +128,9 @@ const trainingFormats = [
       "Partage d'expériences",
       "Groupes restreints (max 8)",
       "Tarif attractif",
-      "Certification incluse"
+      "Certification incluse",
     ],
-    icon: "🎓"
+    icon: "🎓",
   },
   {
     title: "Formation à Distance",
@@ -125,9 +140,9 @@ const trainingFormats = [
       "Interaction en temps réel",
       "Enregistrement des sessions",
       "Suivi post-formation",
-      "Flexibilité maximale"
+      "Flexibilité maximale",
     ],
-    icon: "💻"
+    icon: "💻",
   },
   {
     title: "Coaching Individuel",
@@ -137,10 +152,10 @@ const trainingFormats = [
       "Rythme adapté",
       "Focus sur vos problématiques",
       "Résultats rapides",
-      "Suivi individualisé"
+      "Suivi individualisé",
     ],
-    icon: "🎯"
-  }
+    icon: "🎯",
+  },
 ];
 
 const advantages = [
@@ -151,7 +166,7 @@ const advantages = [
   "Attestation de formation délivrée",
   "Éligible au financement CPF",
   "Passage de la certification TOSA possible",
-  "Suivi post-formation (email, téléphone)"
+  "Suivi post-formation (email, téléphone)",
 ];
 
 export default function FormationBureautiquePage() {
@@ -161,9 +176,12 @@ export default function FormationBureautiquePage() {
       <section className="relative bg-gradient-to-br from-green-600 via-teal-600 to-cyan-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1s" }}
+          ></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl">
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
@@ -175,8 +193,9 @@ export default function FormationBureautiquePage() {
               Formation Bureautique Professionnelle
             </h1>
             <p className="text-xl text-green-100 mb-8 animate-fadeInUp animate-delay-100">
-              Maîtrisez Excel, Word, PowerPoint, Outlook et Google Workspace. 
-              Formations tous niveaux, inter ou intra-entreprise, avec formateurs certifiés.
+              Maîtrisez Excel, Word, PowerPoint, Outlook et Google Workspace.
+              Formations tous niveaux, inter ou intra-entreprise, avec
+              formateurs certifiés.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
               <Link
@@ -217,8 +236,10 @@ export default function FormationBureautiquePage() {
                 className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-green-500 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
               >
                 <div className="text-5xl mb-4">{formation.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{formation.name}</h3>
-                
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {formation.name}
+                </h3>
+
                 <div className="flex flex-wrap gap-2 mb-4">
                   {formation.levels.map((level, idx) => (
                     <span
@@ -263,9 +284,11 @@ export default function FormationBureautiquePage() {
                 className="bg-white rounded-xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300"
               >
                 <div className="text-5xl mb-4">{format.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{format.title}</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {format.title}
+                </h3>
                 <p className="text-gray-600 mb-6">{format.description}</p>
-                
+
                 <ul className="space-y-3">
                   {format.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
@@ -287,14 +310,17 @@ export default function FormationBureautiquePage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Pourquoi choisir nos formations ?
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
               {advantages.map((advantage, index) => (
                 <div
                   key={index}
                   className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg p-6 flex items-start hover:shadow-lg transition-shadow"
                 >
-                  <FaCheckCircle className="text-green-600 mr-4 mt-1 flex-shrink-0" size={20} />
+                  <FaCheckCircle
+                    className="text-green-600 mr-4 mt-1 flex-shrink-0"
+                    size={20}
+                  />
                   <span className="text-gray-700 font-medium">{advantage}</span>
                 </div>
               ))}
@@ -303,13 +329,18 @@ export default function FormationBureautiquePage() {
             <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-2xl p-8 text-center">
               <h3 className="text-2xl font-bold mb-4">Financement Formation</h3>
               <p className="text-lg text-green-100 mb-6">
-                Nos formations sont éligibles aux financements OPCO, CPF et Plan de Développement des Compétences
+                Nos formations sont éligibles aux financements OPCO, CPF et Plan
+                de Développement des Compétences
               </p>
               <div className="flex flex-wrap justify-center gap-4 text-sm">
                 <span className="bg-white/20 px-4 py-2 rounded-full">OPCO</span>
                 <span className="bg-white/20 px-4 py-2 rounded-full">CPF</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full">FNE Formation</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full">Plan de formation</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">
+                  FNE Formation
+                </span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">
+                  Plan de formation
+                </span>
               </div>
             </div>
           </div>
@@ -326,24 +357,33 @@ export default function FormationBureautiquePage() {
                 Certification TOSA
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Validez vos compétences avec la certification TOSA, reconnue par les entreprises 
-                et inscrite au Répertoire Spécifique de France Compétences.
+                Validez vos compétences avec la certification TOSA, reconnue par
+                les entreprises et inscrite au Répertoire Spécifique de France
+                Compétences.
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-green-600 mb-1">Excel</div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    Excel
+                  </div>
                   <div className="text-sm text-gray-600">Certification</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-600 mb-1">Word</div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    Word
+                  </div>
                   <div className="text-sm text-gray-600">Certification</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-600 mb-1">PowerPoint</div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    PowerPoint
+                  </div>
                   <div className="text-sm text-gray-600">Certification</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-green-600 mb-1">Outlook</div>
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    Outlook
+                  </div>
                   <div className="text-sm text-gray-600">Certification</div>
                 </div>
               </div>
@@ -356,7 +396,10 @@ export default function FormationBureautiquePage() {
       <section className="py-20 bg-gradient-to-r from-green-600 via-teal-600 to-cyan-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div
+            className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1.5s" }}
+          ></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">

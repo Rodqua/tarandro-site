@@ -2,43 +2,58 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowRight, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
-import { trackFormSubmit, trackPhoneClick, trackEmailClick } from "@/lib/analytics";
+import {
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaArrowRight,
+  FaCheckCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
+import {
+  trackFormSubmit,
+  trackPhoneClick,
+  trackEmailClick,
+} from "@/lib/analytics";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
-    service: '',
-    message: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    company: "",
+    service: "",
+    message: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{
-    type: 'success' | 'error' | null;
+    type: "success" | "error" | null;
     message: string;
-  }>({ type: null, message: '' });
+  }>({ type: null, message: "" });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: '' });
+    setSubmitStatus({ type: null, message: "" });
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
+      const response = await fetch("/api/contact", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -47,36 +62,36 @@ export default function ContactPage() {
 
       if (response.ok) {
         // Tracker la conversion
-        trackFormSubmit('contact_form', {
+        trackFormSubmit("contact_form", {
           service: formData.service,
           has_company: !!formData.company,
-          conversion_value: 1
+          conversion_value: 1,
         });
-        
+
         setSubmitStatus({
-          type: 'success',
-          message: data.message || 'Votre message a été envoyé avec succès !'
+          type: "success",
+          message: data.message || "Votre message a été envoyé avec succès !",
         });
         // Réinitialiser le formulaire
         setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: '',
-          message: ''
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          company: "",
+          service: "",
+          message: "",
         });
       } else {
         setSubmitStatus({
-          type: 'error',
-          message: data.error || 'Une erreur est survenue'
+          type: "error",
+          message: data.error || "Une erreur est survenue",
         });
       }
     } catch (error) {
       setSubmitStatus({
-        type: 'error',
-        message: 'Impossible d\'envoyer le message. Veuillez réessayer.'
+        type: "error",
+        message: "Impossible d'envoyer le message. Veuillez réessayer.",
       });
     } finally {
       setIsSubmitting(false);
@@ -93,7 +108,8 @@ export default function ContactPage() {
               Contactez-nous
             </h1>
             <p className="text-xl text-primary-100">
-              Parlons de votre projet qualité ou formation. Nous vous répondons sous 24h.
+              Parlons de votre projet qualité ou formation. Nous vous répondons
+              sous 24h.
             </p>
           </div>
         </div>
@@ -111,26 +127,43 @@ export default function ContactPage() {
 
               {/* Message de statut */}
               {submitStatus.type && (
-                <div className={`p-4 rounded-lg flex items-start mb-6 animate-fadeIn ${
-                  submitStatus.type === 'success' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-red-50 border border-red-200'
-                }`}>
-                  {submitStatus.type === 'success' ? (
-                    <FaCheckCircle className="text-green-500 mr-3 mt-0.5 flex-shrink-0" size={20} />
+                <div
+                  className={`p-4 rounded-lg flex items-start mb-6 animate-fadeIn ${
+                    submitStatus.type === "success"
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-red-50 border border-red-200"
+                  }`}
+                >
+                  {submitStatus.type === "success" ? (
+                    <FaCheckCircle
+                      className="text-green-500 mr-3 mt-0.5 flex-shrink-0"
+                      size={20}
+                    />
                   ) : (
-                    <FaExclamationCircle className="text-red-500 mr-3 mt-0.5 flex-shrink-0" size={20} />
+                    <FaExclamationCircle
+                      className="text-red-500 mr-3 mt-0.5 flex-shrink-0"
+                      size={20}
+                    />
                   )}
-                  <p className={submitStatus.type === 'success' ? 'text-green-800' : 'text-red-800'}>
+                  <p
+                    className={
+                      submitStatus.type === "success"
+                        ? "text-green-800"
+                        : "text-red-800"
+                    }
+                  >
                     {submitStatus.message}
                   </p>
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Prénom *
                     </label>
                     <input
@@ -143,9 +176,12 @@ export default function ContactPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Nom *
                     </label>
                     <input
@@ -161,7 +197,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Email *
                   </label>
                   <input
@@ -176,7 +215,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Téléphone *
                   </label>
                   <input
@@ -191,7 +233,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="company"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Entreprise
                   </label>
                   <input
@@ -205,7 +250,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="service"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Service concerné *
                   </label>
                   <select
@@ -227,7 +275,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Votre message *
                   </label>
                   <textarea
@@ -249,9 +300,25 @@ export default function ContactPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Envoi en cours...
                     </>
@@ -272,8 +339,10 @@ export default function ContactPage() {
             {/* Contact Info */}
             <div>
               <div className="bg-gradient-to-br from-primary-500 to-secondary-500 text-white rounded-xl p-8 mb-8">
-                <h3 className="text-2xl font-bold mb-6">Informations de contact</h3>
-                
+                <h3 className="text-2xl font-bold mb-6">
+                  Informations de contact
+                </h3>
+
                 <div className="space-y-6">
                   <div className="flex items-start">
                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
@@ -281,10 +350,10 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Téléphone</div>
-                      <a 
-                        href="tel:+33633289161" 
+                      <a
+                        href="tel:+33633289161"
                         className="hover:underline"
-                        onClick={() => trackPhoneClick('06 33 28 91 61')}
+                        onClick={() => trackPhoneClick("06 33 28 91 61")}
                       >
                         06 33 28 91 61
                       </a>
@@ -300,10 +369,10 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Email</div>
-                      <a 
-                        href="mailto:contact@tarandro.org" 
+                      <a
+                        href="mailto:contact@tarandro.org"
                         className="hover:underline"
-                        onClick={() => trackEmailClick('contact@tarandro.org')}
+                        onClick={() => trackEmailClick("contact@tarandro.org")}
                       >
                         contact@tarandro.org
                       </a>
@@ -333,23 +402,33 @@ export default function ContactPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <span className="text-primary-600 mr-2 mt-1">✓</span>
-                    <span className="text-gray-700">Devis gratuit et sans engagement</span>
+                    <span className="text-gray-700">
+                      Devis gratuit et sans engagement
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary-600 mr-2 mt-1">✓</span>
-                    <span className="text-gray-700">Réponse rapide sous 24-48h</span>
+                    <span className="text-gray-700">
+                      Réponse rapide sous 24-48h
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary-600 mr-2 mt-1">✓</span>
-                    <span className="text-gray-700">Accompagnement personnalisé</span>
+                    <span className="text-gray-700">
+                      Accompagnement personnalisé
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary-600 mr-2 mt-1">✓</span>
-                    <span className="text-gray-700">Experts certifiés et expérimentés</span>
+                    <span className="text-gray-700">
+                      Experts certifiés et expérimentés
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-primary-600 mr-2 mt-1">✓</span>
-                    <span className="text-gray-700">Solutions adaptées à votre budget</span>
+                    <span className="text-gray-700">
+                      Solutions adaptées à votre budget
+                    </span>
                   </li>
                 </ul>
               </div>

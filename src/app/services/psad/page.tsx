@@ -1,13 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FaCheckCircle, FaArrowRight, FaPhone, FaClipboardList } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaArrowRight,
+  FaPhone,
+  FaClipboardList,
+} from "react-icons/fa";
 
 export const metadata: Metadata = {
   title: "PSAD - Programme d'Actions et Amélioration Continue de la Qualité",
-  description: "Expert en élaboration et suivi de PSAD (Programme d'Actions). Accompagnement qualité, gestion des risques et amélioration continue pour établissements de santé et entreprises.",
-  keywords: ["PSAD", "programme d'actions", "amélioration continue", "gestion des risques", "qualité santé", "plan d'amélioration"],
+  description:
+    "Expert en élaboration et suivi de PSAD (Programme d'Actions). Accompagnement qualité, gestion des risques et amélioration continue pour établissements de santé et entreprises.",
+  keywords: [
+    "PSAD",
+    "programme d'actions",
+    "amélioration continue",
+    "gestion des risques",
+    "qualité santé",
+    "plan d'amélioration",
+  ],
   alternates: {
-    canonical: 'https://tarandro.org/services/psad',
+    canonical: "https://tarandro.org/services/psad",
   },
 };
 
@@ -20,8 +33,8 @@ const psadComponents = [
       "Analyse des processus critiques",
       "Évaluation de la criticité",
       "Priorisation des risques",
-      "Cartographie des risques"
-    ]
+      "Cartographie des risques",
+    ],
   },
   {
     title: "Plan d'Actions",
@@ -31,8 +44,8 @@ const psadComponents = [
       "Définition des actions correctives",
       "Actions préventives ciblées",
       "Planification réaliste",
-      "Attribution des responsabilités"
-    ]
+      "Attribution des responsabilités",
+    ],
   },
   {
     title: "Suivi & Pilotage",
@@ -42,8 +55,8 @@ const psadComponents = [
       "Indicateurs de performance",
       "Tableau de bord dynamique",
       "Revues périodiques",
-      "Ajustements en continu"
-    ]
+      "Ajustements en continu",
+    ],
   },
   {
     title: "Amélioration Continue",
@@ -53,9 +66,9 @@ const psadComponents = [
       "Culture d'amélioration continue",
       "Analyse des évènements indésirables",
       "Capitalisation des bonnes pratiques",
-      "Veille et benchmarking"
-    ]
-  }
+      "Veille et benchmarking",
+    ],
+  },
 ];
 
 const psadBenefits = [
@@ -66,7 +79,7 @@ const psadBenefits = [
   "Culture qualité renforcée",
   "Performance organisationnelle optimisée",
   "Traçabilité et transparence des actions",
-  "Préparation facilitée aux certifications"
+  "Préparation facilitée aux certifications",
 ];
 
 const implementationSteps = [
@@ -78,8 +91,8 @@ const implementationSteps = [
       "Diagnostic de l'organisation",
       "Analyse des risques existants",
       "Revue documentaire",
-      "Entretiens avec les équipes"
-    ]
+      "Entretiens avec les équipes",
+    ],
   },
   {
     phase: "Phase 2",
@@ -89,8 +102,8 @@ const implementationSteps = [
       "Identification des actions prioritaires",
       "Définition des objectifs SMART",
       "Planification des actions",
-      "Validation avec la direction"
-    ]
+      "Validation avec la direction",
+    ],
   },
   {
     phase: "Phase 3",
@@ -100,8 +113,8 @@ const implementationSteps = [
       "Déploiement des actions",
       "Formation des équipes",
       "Suivi régulier de l'avancement",
-      "Communication interne"
-    ]
+      "Communication interne",
+    ],
   },
   {
     phase: "Phase 4",
@@ -111,9 +124,9 @@ const implementationSteps = [
       "Mesure de l'efficacité",
       "Analyse des résultats",
       "Ajustements nécessaires",
-      "Bilan et perspectives"
-    ]
-  }
+      "Bilan et perspectives",
+    ],
+  },
 ];
 
 export default function PSADPage() {
@@ -123,9 +136,12 @@ export default function PSADPage() {
       <section className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-900 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-300 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-pink-300 rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1s" }}
+          ></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl">
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
@@ -136,8 +152,9 @@ export default function PSADPage() {
               PSAD : Pilotez Votre Amélioration Continue
             </h1>
             <p className="text-xl text-purple-100 mb-8 animate-fadeInUp animate-delay-100">
-              Élaboration et suivi de votre Programme d'Actions pour l'amélioration continue 
-              de la qualité et la gestion des risques. Démarche structurée et efficace.
+              Élaboration et suivi de votre Programme d'Actions pour
+              l'amélioration continue de la qualité et la gestion des risques.
+              Démarche structurée et efficace.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
               <Link
@@ -166,17 +183,25 @@ export default function PSADPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
               Qu'est-ce qu'un PSAD ?
             </h2>
-            
+
             <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 md:p-12 mb-12">
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                Le <strong>Programme d'Actions pour l'Amélioration continue de la Qualité (PSAD)</strong> est un outil 
-                de pilotage stratégique qui structure votre démarche qualité. Il permet d'identifier, prioriser 
-                et suivre les actions d'amélioration au sein de votre organisation.
+                Le{" "}
+                <strong>
+                  Programme d'Actions pour l'Amélioration continue de la Qualité
+                  (PSAD)
+                </strong>{" "}
+                est un outil de pilotage stratégique qui structure votre
+                démarche qualité. Il permet d'identifier, prioriser et suivre
+                les actions d'amélioration au sein de votre organisation.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Particulièrement adapté aux <strong>établissements de santé</strong> (dans le cadre de la certification HAS) 
-                et aux <strong>entreprises engagées dans une démarche qualité</strong>, le PSAD constitue la colonne 
-                vertébrale de votre système d'amélioration continue.
+                Particulièrement adapté aux{" "}
+                <strong>établissements de santé</strong> (dans le cadre de la
+                certification HAS) et aux{" "}
+                <strong>entreprises engagées dans une démarche qualité</strong>,
+                le PSAD constitue la colonne vertébrale de votre système
+                d'amélioration continue.
               </p>
             </div>
 
@@ -187,7 +212,9 @@ export default function PSADPage() {
                   className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-purple-500 hover:shadow-xl transition-all duration-300"
                 >
                   <div className="text-5xl mb-4">{component.icon}</div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{component.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {component.title}
+                  </h3>
                   <p className="text-gray-600 mb-4">{component.description}</p>
                   <ul className="space-y-2">
                     {component.points.map((point, idx) => (
@@ -211,14 +238,17 @@ export default function PSADPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Les Bénéfices d'un PSAD Structuré
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {psadBenefits.map((benefit, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-lg p-6 flex items-start shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
                 >
-                  <FaCheckCircle className="text-green-500 mr-4 mt-1 flex-shrink-0" size={20} />
+                  <FaCheckCircle
+                    className="text-green-500 mr-4 mt-1 flex-shrink-0"
+                    size={20}
+                  />
                   <span className="text-gray-700 font-medium">{benefit}</span>
                 </div>
               ))}
@@ -226,7 +256,8 @@ export default function PSADPage() {
 
             <div className="mt-12 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl p-8 text-center">
               <p className="text-xl font-semibold">
-                Un PSAD bien conçu et suivi = Une organisation performante et résiliente
+                Un PSAD bien conçu et suivi = Une organisation performante et
+                résiliente
               </p>
             </div>
           </div>
@@ -240,7 +271,7 @@ export default function PSADPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Notre Méthodologie de Mise en Place
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {implementationSteps.map((step, index) => (
                 <div
@@ -255,9 +286,11 @@ export default function PSADPage() {
                       {step.duration}
                     </span>
                   </div>
-                  
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{step.title}</h3>
-                  
+
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {step.title}
+                  </h3>
+
                   <ul className="space-y-2">
                     {step.activities.map((activity, idx) => (
                       <li key={idx} className="flex items-start">
@@ -280,7 +313,7 @@ export default function PSADPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Notre Approche
             </h2>
-            
+
             <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
               <div className="space-y-6">
                 <div className="flex items-start">
@@ -288,9 +321,12 @@ export default function PSADPage() {
                     1
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Approche Participative</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Approche Participative
+                    </h3>
                     <p className="text-gray-700">
-                      Nous impliquons vos équipes dès le début pour garantir l'adhésion et la pertinence des actions.
+                      Nous impliquons vos équipes dès le début pour garantir
+                      l'adhésion et la pertinence des actions.
                     </p>
                   </div>
                 </div>
@@ -300,9 +336,12 @@ export default function PSADPage() {
                     2
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Priorisation Intelligente</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Priorisation Intelligente
+                    </h3>
                     <p className="text-gray-700">
-                      Nous vous aidons à identifier les quick wins et les actions à fort impact pour des résultats rapides.
+                      Nous vous aidons à identifier les quick wins et les
+                      actions à fort impact pour des résultats rapides.
                     </p>
                   </div>
                 </div>
@@ -312,9 +351,12 @@ export default function PSADPage() {
                     3
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Outils Pragmatiques</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Outils Pragmatiques
+                    </h3>
                     <p className="text-gray-700">
-                      Tableaux de bord, indicateurs, outils de suivi : nous fournissons des outils simples et efficaces.
+                      Tableaux de bord, indicateurs, outils de suivi : nous
+                      fournissons des outils simples et efficaces.
                     </p>
                   </div>
                 </div>
@@ -324,9 +366,12 @@ export default function PSADPage() {
                     4
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Accompagnement Continu</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Accompagnement Continu
+                    </h3>
                     <p className="text-gray-700">
-                      Suivi régulier, points d'avancement, ajustements : nous restons à vos côtés tout au long du projet.
+                      Suivi régulier, points d'avancement, ajustements : nous
+                      restons à vos côtés tout au long du projet.
                     </p>
                   </div>
                 </div>
@@ -340,7 +385,10 @@ export default function PSADPage() {
       <section className="py-20 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div
+            className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1.5s" }}
+          ></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">

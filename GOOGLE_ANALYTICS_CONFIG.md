@@ -3,6 +3,7 @@
 ## Vue d'ensemble
 
 Votre dashboard admin est maintenant prêt à afficher les statistiques Google Analytics 4 en temps réel ! Vous aurez :
+
 - **Trafic du site** : utilisateurs, sessions, pages vues, taux de rebond, durée moyenne, taux de conversion
 - **Sources de trafic** : d'où viennent vos visiteurs (Google, direct, social, etc.)
 - **Pages populaires** : les 10 pages les plus visitées
@@ -61,16 +62,19 @@ Votre dashboard admin est maintenant prêt à afficher les statistiques Google A
 4. Ajoutez ces 2 variables :
 
 #### Variable 1 : GA4_PROPERTY_ID
+
 - **Name** : `GA4_PROPERTY_ID`
 - **Value** : votre Property ID (ex: `123456789`)
 - **Environments** : cochez Production, Preview, et Development
 
 #### Variable 2 : GA4_CREDENTIALS
+
 - **Name** : `GA4_CREDENTIALS`
 - **Value** : Le contenu COMPLET de votre fichier JSON téléchargé, **sur une seule ligne**
 - **Environments** : cochez Production, Preview, et Development
 
 ⚠️ **IMPORTANT** : Le JSON doit être sur une seule ligne. Exemple :
+
 ```
 {"type":"service_account","project_id":"xxx","private_key_id":"xxx","private_key":"-----BEGIN PRIVATE KEY-----\nXXX\n-----END PRIVATE KEY-----\n","client_email":"tarandro-analytics@xxx.iam.gserviceaccount.com","client_id":"xxx","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"xxx"}
 ```
@@ -87,6 +91,7 @@ Votre dashboard admin est maintenant prêt à afficher les statistiques Google A
 ## Vérification
 
 Une fois configuré, vous verrez dans votre dashboard admin :
+
 - Un indicateur vert "Google Analytics connecté" en haut à droite
 - 4 nouvelles sections avec les statistiques en temps réel :
   - **Trafic du site** : statistiques globales sur 30 jours
@@ -97,6 +102,7 @@ Une fois configuré, vous verrez dans votre dashboard admin :
 ## Événements trackés automatiquement
 
 Le système track automatiquement :
+
 - `page_view` : chaque page visitée
 - `form_submit` : envoi du formulaire de contact
 - `phone_click` : clic sur le numéro de téléphone
@@ -107,6 +113,7 @@ Le système track automatiquement :
 ## Dépannage
 
 ### Le dashboard n'affiche pas les stats GA4
+
 - Vérifiez que les 2 variables d'environnement sont bien configurées sur Vercel
 - Vérifiez que le Property ID est correct (sans espaces)
 - Vérifiez que le JSON est sur une seule ligne
@@ -114,10 +121,12 @@ Le système track automatiquement :
 - Attendez 5 minutes après le redéploiement
 
 ### Erreur "Permission denied"
+
 - Vérifiez que le compte de service a bien le rôle **Viewer** dans Google Analytics
 - Vérifiez que l'email du compte de service est correct
 
 ### Pas de données dans GA4
+
 - Les événements peuvent prendre 24-48h avant d'apparaître dans GA4
 - Utilisez le **DebugView** dans GA4 pour voir les événements en temps réel
 - Vérifiez que Google Tag Manager est bien installé (GTM-TV8DZL37)
@@ -125,5 +134,6 @@ Le système track automatiquement :
 ## Support
 
 Si vous avez des questions ou des problèmes, référez-vous à :
+
 - [Documentation Google Analytics Data API](https://developers.google.com/analytics/devguides/reporting/data/v1)
 - [Documentation Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)

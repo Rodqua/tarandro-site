@@ -1,7 +1,7 @@
-import Script from 'next/script';
+import Script from "next/script";
 
 export default function GoogleTagManager() {
-  const GTM_ID = 'GTM-TV8DZL37';
+  const GTM_ID = "GTM-TV8DZL37";
 
   return (
     <>
@@ -22,7 +22,7 @@ export default function GoogleTagManager() {
           src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
           height="0"
           width="0"
-          style={{ display: 'none', visibility: 'hidden' }}
+          style={{ display: "none", visibility: "hidden" }}
         />
       </noscript>
     </>

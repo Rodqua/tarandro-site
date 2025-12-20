@@ -10,12 +10,14 @@ import AnalyticsProvider from "@/components/AnalyticsProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tarandro.org'),
+  metadataBase: new URL("https://tarandro.org"),
   title: {
-    default: "Tarandro - Accompagnement Qualité ISO, HAS, PSAD & Formation Professionnelle",
-    template: "%s | Tarandro"
+    default:
+      "Tarandro - Accompagnement Qualité ISO, HAS, PSAD & Formation Professionnelle",
+    template: "%s | Tarandro",
   },
-  description: "Expert en accompagnement qualité (certifications ISO, HAS, PSAD) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
+  description:
+    "Expert en accompagnement qualité (certifications ISO, HAS, PSAD) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
   keywords: [
     "accompagnement qualité",
     "certification ISO",
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
     "consultant qualité",
     "audit qualité",
     "management qualité",
-    "formation professionnelle"
+    "formation professionnelle",
   ],
   authors: [{ name: "Tarandro" }],
   creator: "Tarandro",
@@ -37,26 +39,28 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    type: 'website',
-    locale: 'fr_FR',
-    url: 'https://tarandro.org',
-    siteName: 'Tarandro',
-    title: 'Tarandro - Expert Qualité & Formation',
-    description: 'Accompagnement qualité ISO, HAS, PSAD et formation professionnelle',
+    type: "website",
+    locale: "fr_FR",
+    url: "https://tarandro.org",
+    siteName: "Tarandro",
+    title: "Tarandro - Expert Qualité & Formation",
+    description:
+      "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
     images: [
       {
-        url: '/og-image.jpg',
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: 'Tarandro - Expert Qualité & Formation',
+        alt: "Tarandro - Expert Qualité & Formation",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Tarandro - Expert Qualité & Formation',
-    description: 'Accompagnement qualité ISO, HAS, PSAD et formation professionnelle',
-    images: ['/og-image.jpg'],
+    card: "summary_large_image",
+    title: "Tarandro - Expert Qualité & Formation",
+    description:
+      "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -64,13 +68,13 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
-    google: 'votre-code-google-search-console',
+    google: "votre-code-google-search-console",
   },
 };
 
@@ -89,9 +93,7 @@ export default function RootLayout({
         <AnalyticsProvider>
           <AuthProvider>
             <Header />
-            <main className="min-h-screen">
-              {children}
-            </main>
+            <main className="min-h-screen">{children}</main>
             <Footer />
           </AuthProvider>
         </AnalyticsProvider>

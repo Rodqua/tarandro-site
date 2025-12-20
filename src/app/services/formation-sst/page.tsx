@@ -1,49 +1,69 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FaCheckCircle, FaArrowRight, FaPhone, FaFirstAid, FaCertificate, FaUsers } from "react-icons/fa";
+import {
+  FaCheckCircle,
+  FaArrowRight,
+  FaPhone,
+  FaFirstAid,
+  FaCertificate,
+  FaUsers,
+} from "react-icons/fa";
 
 export const metadata: Metadata = {
   title: "Formation SST - Sauveteur Secouriste du Travail Certifié INRS",
-  description: "Formation SST certifiée INRS : initial, recyclage MAC SST. Formateurs certifiés, sessions inter/intra-entreprise. Sauvez des vies, respectez vos obligations légales.",
-  keywords: ["formation SST", "sauveteur secouriste du travail", "INRS", "MAC SST", "recyclage SST", "formation secourisme", "premiers secours entreprise"],
+  description:
+    "Formation SST certifiée INRS : initial, recyclage MAC SST. Formateurs certifiés, sessions inter/intra-entreprise. Sauvez des vies, respectez vos obligations légales.",
+  keywords: [
+    "formation SST",
+    "sauveteur secouriste du travail",
+    "INRS",
+    "MAC SST",
+    "recyclage SST",
+    "formation secourisme",
+    "premiers secours entreprise",
+  ],
   alternates: {
-    canonical: 'https://tarandro.org/services/formation-sst',
+    canonical: "https://tarandro.org/services/formation-sst",
   },
 };
 
 const sstBenefits = [
   {
     title: "Conformité Légale",
-    description: "Respectez vos obligations en matière de secourisme en entreprise",
-    icon: "⚖️"
+    description:
+      "Respectez vos obligations en matière de secourisme en entreprise",
+    icon: "⚖️",
   },
   {
     title: "Sécurité des Salariés",
     description: "Protégez vos collaborateurs en cas d'accident ou de malaise",
-    icon: "🛡️"
+    icon: "🛡️",
   },
   {
     title: "Réduction des Risques",
-    description: "Développez une culture de prévention des risques professionnels",
-    icon: "📉"
+    description:
+      "Développez une culture de prévention des risques professionnels",
+    icon: "📉",
   },
   {
     title: "Image de l'Entreprise",
-    description: "Démontrez votre engagement pour la santé et la sécurité au travail",
-    icon: "⭐"
-  }
+    description:
+      "Démontrez votre engagement pour la santé et la sécurité au travail",
+    icon: "⭐",
+  },
 ];
 
 const sstProgram = {
   initial: {
     title: "Formation SST Initiale",
     duration: "2 jours (14 heures)",
-    description: "Formation complète pour devenir Sauveteur Secouriste du Travail",
+    description:
+      "Formation complète pour devenir Sauveteur Secouriste du Travail",
     objectives: [
       "Protéger la victime et les témoins",
       "Examiner la victime",
       "Faire alerter ou alerter les secours",
-      "Secourir la victime jusqu'à l'arrivée des secours"
+      "Secourir la victime jusqu'à l'arrivée des secours",
     ],
     content: [
       "Le cadre juridique du SST",
@@ -54,8 +74,8 @@ const sstProgram = {
       "Gestes de secours : hémorragie, étouffement, malaise",
       "Perte de connaissance, arrêt cardiaque (RCP + DAE)",
       "Traumatismes (plaies, brûlures, fractures)",
-      "Situations inhérentes aux risques spécifiques de l'entreprise"
-    ]
+      "Situations inhérentes aux risques spécifiques de l'entreprise",
+    ],
   },
   mac: {
     title: "Recyclage MAC SST",
@@ -64,7 +84,7 @@ const sstProgram = {
     objectives: [
       "Réviser les gestes de secours",
       "Actualiser ses connaissances",
-      "Maintenir sa certification SST"
+      "Maintenir sa certification SST",
     ],
     content: [
       "Révision des techniques d'intervention",
@@ -72,9 +92,9 @@ const sstProgram = {
       "Retour d'expérience et cas vécus",
       "Mise à jour des procédures",
       "Mise en situation pratique",
-      "Évaluation certificative"
-    ]
-  }
+      "Évaluation certificative",
+    ],
+  },
 };
 
 const practicalInfo = [
@@ -83,8 +103,8 @@ const practicalInfo = [
     items: [
       "Tout salarié souhaitant devenir SST",
       "Aucun prérequis nécessaire",
-      "Effectif : 4 à 10 participants"
-    ]
+      "Effectif : 4 à 10 participants",
+    ],
   },
   {
     title: "Méthode Pédagogique",
@@ -92,8 +112,8 @@ const practicalInfo = [
       "Formation pratique et interactive",
       "Mises en situation réelles",
       "Utilisation de mannequins et défibrillateur",
-      "Études de cas concrets"
-    ]
+      "Études de cas concrets",
+    ],
   },
   {
     title: "Validation",
@@ -101,8 +121,8 @@ const practicalInfo = [
       "Évaluation continue",
       "Épreuves certificatives",
       "Certificat SST INRS valable 2 ans",
-      "Carte de SST remise"
-    ]
+      "Carte de SST remise",
+    ],
   },
   {
     title: "Obligations Légales",
@@ -110,9 +130,9 @@ const practicalInfo = [
       "Code du Travail (Art. R4224-15)",
       "Au moins 1 SST dans chaque atelier",
       "1 SST pour 20 salariés minimum",
-      "Recyclage obligatoire tous les 2 ans"
-    ]
-  }
+      "Recyclage obligatoire tous les 2 ans",
+    ],
+  },
 ];
 
 const formationFormats = [
@@ -124,9 +144,9 @@ const formationFormats = [
       "Dans vos locaux",
       "Dates à votre convenance",
       "Contenu adapté à vos risques",
-      "Matériel pédagogique fourni"
+      "Matériel pédagogique fourni",
     ],
-    recommended: true
+    recommended: true,
   },
   {
     type: "Inter-entreprises",
@@ -136,10 +156,10 @@ const formationFormats = [
       "Groupes restreints",
       "Centre de formation équipé",
       "Partage d'expériences",
-      "Tarif attractif"
+      "Tarif attractif",
     ],
-    recommended: false
-  }
+    recommended: false,
+  },
 ];
 
 export default function FormationSSTPage() {
@@ -149,9 +169,12 @@ export default function FormationSSTPage() {
       <section className="relative bg-gradient-to-br from-red-600 via-red-700 to-orange-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div
+            className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1s" }}
+          ></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl">
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
@@ -163,8 +186,9 @@ export default function FormationSSTPage() {
               Formation SST : Sauveteur Secouriste du Travail
             </h1>
             <p className="text-xl text-red-100 mb-8 animate-fadeInUp animate-delay-100">
-              Formation certifiée INRS pour devenir Sauveteur Secouriste du Travail. 
-              Apprenez les gestes qui sauvent et répondez à vos obligations légales.
+              Formation certifiée INRS pour devenir Sauveteur Secouriste du
+              Travail. Apprenez les gestes qui sauvent et répondez à vos
+              obligations légales.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
               <Link
@@ -205,7 +229,9 @@ export default function FormationSSTPage() {
                 className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
               >
                 <div className="text-5xl mb-4">{benefit.icon}</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {benefit.title}
+                </h3>
                 <p className="text-gray-700">{benefit.description}</p>
               </div>
             ))}
@@ -217,12 +243,16 @@ export default function FormationSSTPage() {
                 <FaUsers size={32} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Obligation Légale</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Obligation Légale
+                </h3>
                 <p className="text-gray-700 mb-4">
-                  <strong>Code du Travail (Art. R4224-15) :</strong> "Un membre du personnel reçoit la formation 
-                  de secouriste nécessaire pour donner les premiers secours en cas d'urgence dans chaque atelier 
-                  où sont accomplis des travaux dangereux et dans chaque chantier employant 20 travailleurs au 
-                  moins pendant plus de quinze jours où sont réalisés des travaux dangereux."
+                  <strong>Code du Travail (Art. R4224-15) :</strong> "Un membre
+                  du personnel reçoit la formation de secouriste nécessaire pour
+                  donner les premiers secours en cas d'urgence dans chaque
+                  atelier où sont accomplis des travaux dangereux et dans chaque
+                  chantier employant 20 travailleurs au moins pendant plus de
+                  quinze jours où sont réalisés des travaux dangereux."
                 </p>
                 <p className="text-red-700 font-semibold">
                   ⚠️ Recommandation : 10 à 15% de l'effectif formé SST
@@ -251,9 +281,13 @@ export default function FormationSSTPage() {
               <div className="bg-red-100 text-red-600 px-4 py-2 rounded-lg inline-block mb-4 font-bold">
                 {sstProgram.initial.duration}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">{sstProgram.initial.title}</h3>
-              <p className="text-gray-600 mb-6">{sstProgram.initial.description}</p>
-              
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {sstProgram.initial.title}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {sstProgram.initial.description}
+              </p>
+
               <h4 className="font-bold text-gray-900 mb-3">Objectifs :</h4>
               <ul className="space-y-2 mb-6">
                 {sstProgram.initial.objectives.map((obj, idx) => (
@@ -280,9 +314,11 @@ export default function FormationSSTPage() {
               <div className="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg inline-block mb-4 font-bold">
                 {sstProgram.mac.duration}
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">{sstProgram.mac.title}</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {sstProgram.mac.title}
+              </h3>
               <p className="text-gray-600 mb-6">{sstProgram.mac.description}</p>
-              
+
               <h4 className="font-bold text-gray-900 mb-3">Objectifs :</h4>
               <ul className="space-y-2 mb-6">
                 {sstProgram.mac.objectives.map((obj, idx) => (
@@ -305,8 +341,9 @@ export default function FormationSSTPage() {
 
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <p className="text-sm text-orange-800">
-                  <strong>⏰ Rappel :</strong> Le recyclage MAC SST doit être effectué avant la date de fin 
-                  de validité du certificat (tous les 24 mois maximum).
+                  <strong>⏰ Rappel :</strong> Le recyclage MAC SST doit être
+                  effectué avant la date de fin de validité du certificat (tous
+                  les 24 mois maximum).
                 </p>
               </div>
             </div>
@@ -321,14 +358,16 @@ export default function FormationSSTPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Informations Pratiques
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {practicalInfo.map((info, index) => (
                 <div
                   key={index}
                   className="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition-shadow"
                 >
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">{info.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    {info.title}
+                  </h3>
                   <ul className="space-y-3">
                     {info.items.map((item, idx) => (
                       <li key={idx} className="flex items-start">
@@ -351,13 +390,13 @@ export default function FormationSSTPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
               Formats de Formation
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {formationFormats.map((format, index) => (
                 <div
                   key={index}
                   className={`bg-white rounded-xl p-8 shadow-lg relative ${
-                    format.recommended ? 'border-2 border-red-500' : ''
+                    format.recommended ? "border-2 border-red-500" : ""
                   }`}
                 >
                   {format.recommended && (
@@ -367,10 +406,12 @@ export default function FormationSSTPage() {
                       </span>
                     </div>
                   )}
-                  
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{format.type}</h3>
+
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    {format.type}
+                  </h3>
                   <p className="text-gray-600 mb-6">{format.description}</p>
-                  
+
                   <ul className="space-y-3">
                     {format.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start">
@@ -390,7 +431,10 @@ export default function FormationSSTPage() {
       <section className="py-20 bg-gradient-to-r from-red-600 via-red-700 to-orange-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+          <div
+            className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"
+            style={{ animationDelay: "1.5s" }}
+          ></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -418,7 +462,8 @@ export default function FormationSSTPage() {
               </a>
             </div>
             <p className="mt-6 text-red-100 text-sm">
-              🎖️ Formateurs SST certifiés INRS • 📋 Conformité garantie • ⭐ Sessions régulières
+              🎖️ Formateurs SST certifiés INRS • 📋 Conformité garantie • ⭐
+              Sessions régulières
             </p>
           </div>
         </div>

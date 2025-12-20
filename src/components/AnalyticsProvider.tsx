@@ -1,10 +1,25 @@
 "use client";
 
+import { Suspense } from "react";
 import { usePageTracking, useScrollTracking } from "@/lib/analytics";
 
-export default function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+function AnalyticsTracking() {
   usePageTracking();
   useScrollTracking();
-  
-  return <>{children}</>;
+  return null;
+}
+
+export default function AnalyticsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <AnalyticsTracking />
+      </Suspense>
+      {children}
+    </>
+  );
 }

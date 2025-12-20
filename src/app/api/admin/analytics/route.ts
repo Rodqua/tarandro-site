@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import { NextResponse } from "next/server";
+import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 export async function GET() {
   try {
@@ -8,11 +8,13 @@ export async function GET() {
     const credentials = process.env.GA4_CREDENTIALS;
 
     if (!propertyId || !credentials) {
-      console.log('⚠️ Google Analytics non configuré - utilisation des stats de base');
+      console.log(
+        "⚠️ Google Analytics non configuré - utilisation des stats de base"
+      );
       return NextResponse.json({
         success: false,
-        message: 'Google Analytics API non configuré',
-        useBasicStats: true
+        message: "Google Analytics API non configuré",
+        useBasicStats: true,
       });
     }
 
@@ -32,7 +34,7 @@ export async function GET() {
     sevenDaysAgo.setDate(today.getDate() - 7);
 
     const formatDate = (date: Date) => {
-      return date.toISOString().split('T')[0];
+      return date.toISOString().split("T")[0];
     };
 
     // Requête 1: Statistiques générales (30 derniers jours)
@@ -44,13 +46,13 @@ export async function GET() {
           endDate: formatDate(today),
         },
       ],
-      dimensions: [{ name: 'date' }],
+      dimensions: [{ name: "date" }],
       metrics: [
-        { name: 'activeUsers' },
-        { name: 'sessions' },
-        { name: 'screenPageViews' },
-        { name: 'bounceRate' },
-        { name: 'averageSessionDuration' },
+        { name: "activeUsers" },
+        { name: "sessions" },
+        { name: "screenPageViews" },
+        { name: "bounceRate" },
+        { name: "averageSessionDuration" },
       ],
     });
 
@@ -63,12 +65,9 @@ export async function GET() {
           endDate: formatDate(today),
         },
       ],
-      dimensions: [{ name: 'sessionDefaultChannelGroup' }],
-      metrics: [
-        { name: 'sessions' },
-        { name: 'activeUsers' },
-      ],
-      orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+      dimensions: [{ name: "sessionDefaultChannelGroup" }],
+      metrics: [{ name: "sessions" }, { name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
       limit: 10,
     });
 
@@ -81,12 +80,9 @@ export async function GET() {
           endDate: formatDate(today),
         },
       ],
-      dimensions: [{ name: 'pageTitle' }, { name: 'pagePath' }],
-      metrics: [
-        { name: 'screenPageViews' },
-        { name: 'activeUsers' },
-      ],
-      orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+      dimensions: [{ name: "pageTitle" }, { name: "pagePath" }],
+      metrics: [{ name: "screenPageViews" }, { name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
       limit: 10,
     });
 
@@ -99,19 +95,22 @@ export async function GET() {
           endDate: formatDate(today),
         },
       ],
-      dimensions: [{ name: 'eventName' }],
-      metrics: [
-        { name: 'eventCount' },
-      ],
+      dimensions: [{ name: "eventName" }],
+      metrics: [{ name: "eventCount" }],
       dimensionFilter: {
         filter: {
-          fieldName: 'eventName',
+          fieldName: "eventName",
           inListFilter: {
-            values: ['form_submit', 'phone_click', 'email_click', 'button_click'],
+            values: [
+              "form_submit",
+              "phone_click",
+              "email_click",
+              "button_click",
+            ],
           },
         },
       },
-      orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+      orderBys: [{ metric: { metricName: "eventCount" }, desc: true }],
     });
 
     // Calculer les totaux
@@ -123,43 +122,48 @@ export async function GET() {
     let dataPoints = 0;
 
     generalReport.rows?.forEach((row) => {
-      totalUsers += parseInt(row.metricValues?.[0]?.value || '0');
-      totalSessions += parseInt(row.metricValues?.[1]?.value || '0');
-      totalPageViews += parseInt(row.metricValues?.[2]?.value || '0');
-      totalBounceRate += parseFloat(row.metricValues?.[3]?.value || '0');
-      totalSessionDuration += parseFloat(row.metricValues?.[4]?.value || '0');
+      totalUsers += parseInt(row.metricValues?.[0]?.value || "0");
+      totalSessions += parseInt(row.metricValues?.[1]?.value || "0");
+      totalPageViews += parseInt(row.metricValues?.[2]?.value || "0");
+      totalBounceRate += parseFloat(row.metricValues?.[3]?.value || "0");
+      totalSessionDuration += parseFloat(row.metricValues?.[4]?.value || "0");
       dataPoints++;
     });
 
-    const avgBounceRate = dataPoints > 0 ? (totalBounceRate / dataPoints * 100) : 0;
-    const avgSessionDuration = dataPoints > 0 ? Math.round(totalSessionDuration / dataPoints) : 0;
+    const avgBounceRate =
+      dataPoints > 0 ? (totalBounceRate / dataPoints) * 100 : 0;
+    const avgSessionDuration =
+      dataPoints > 0 ? Math.round(totalSessionDuration / dataPoints) : 0;
 
     // Parser les sources de trafic
-    const trafficSources = trafficReport.rows?.map((row) => ({
-      source: row.dimensionValues?.[0]?.value || 'Unknown',
-      sessions: parseInt(row.metricValues?.[0]?.value || '0'),
-      users: parseInt(row.metricValues?.[1]?.value || '0'),
-    })) || [];
+    const trafficSources =
+      trafficReport.rows?.map((row) => ({
+        source: row.dimensionValues?.[0]?.value || "Unknown",
+        sessions: parseInt(row.metricValues?.[0]?.value || "0"),
+        users: parseInt(row.metricValues?.[1]?.value || "0"),
+      })) || [];
 
     // Parser les pages populaires
-    const topPages = pagesReport.rows?.map((row) => ({
-      title: row.dimensionValues?.[0]?.value || 'Unknown',
-      path: row.dimensionValues?.[1]?.value || '/',
-      views: parseInt(row.metricValues?.[0]?.value || '0'),
-      users: parseInt(row.metricValues?.[1]?.value || '0'),
-    })) || [];
+    const topPages =
+      pagesReport.rows?.map((row) => ({
+        title: row.dimensionValues?.[0]?.value || "Unknown",
+        path: row.dimensionValues?.[1]?.value || "/",
+        views: parseInt(row.metricValues?.[0]?.value || "0"),
+        users: parseInt(row.metricValues?.[1]?.value || "0"),
+      })) || [];
 
     // Parser les événements
-    const events = eventsReport.rows?.map((row) => ({
-      name: row.dimensionValues?.[0]?.value || 'Unknown',
-      count: parseInt(row.metricValues?.[0]?.value || '0'),
-    })) || [];
+    const events =
+      eventsReport.rows?.map((row) => ({
+        name: row.dimensionValues?.[0]?.value || "Unknown",
+        count: parseInt(row.metricValues?.[0]?.value || "0"),
+      })) || [];
 
     // Calculer le taux de conversion (form_submit / sessions)
-    const formSubmits = events.find(e => e.name === 'form_submit')?.count || 0;
-    const conversionRate = totalSessions > 0 
-      ? ((formSubmits / totalSessions) * 100)
-      : 0;
+    const formSubmits =
+      events.find((e) => e.name === "form_submit")?.count || 0;
+    const conversionRate =
+      totalSessions > 0 ? (formSubmits / totalSessions) * 100 : 0;
 
     return NextResponse.json({
       success: true,
@@ -175,16 +179,18 @@ export async function GET() {
         trafficSources,
         topPages,
         events,
-        period: '30 derniers jours',
+        period: "30 derniers jours",
       },
     });
-
   } catch (error: any) {
-    console.error('❌ Erreur Google Analytics API:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message,
-      useBasicStats: true,
-    }, { status: 500 });
+    console.error("❌ Erreur Google Analytics API:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message,
+        useBasicStats: true,
+      },
+      { status: 500 }
+    );
   }
 }
