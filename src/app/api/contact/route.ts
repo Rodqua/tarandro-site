@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import fs from 'fs';
+import path from 'path';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -62,6 +64,43 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('✅ Email envoyé avec succès:', emailData);
+
+    // Logger le contact dans un fichier JSON
+    try {
+      const dataDir = path.join(process.cwd(), 'data');
+      const contactsFile = path.join(dataDir, 'contacts.json');
+      
+      // Créer le dossier data s'il n'existe pas
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      
+      // Lire les contacts existants
+      let contacts = [];
+      if (fs.existsSync(contactsFile)) {
+        const fileContent = fs.readFileSync(contactsFile, 'utf-8');
+        contacts = JSON.parse(fileContent);
+      }
+      
+      // Ajouter le nouveau contact
+      contacts.push({
+        firstName,
+        lastName,
+        email,
+        phone,
+        company: company || 'Non renseigné',
+        service,
+        message,
+        date: new Date().toISOString(),
+      });
+      
+      // Sauvegarder
+      fs.writeFileSync(contactsFile, JSON.stringify(contacts, null, 2));
+      console.log('📝 Contact enregistré dans le fichier de log');
+    } catch (logError) {
+      console.error('⚠️ Erreur lors de l\'enregistrement du contact:', logError);
+      // Ne pas bloquer si le log échoue
+    }
 
     // Réponse de succès
     return NextResponse.json(
