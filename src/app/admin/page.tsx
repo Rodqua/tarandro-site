@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FaBlog, FaUsers, FaChartLine, FaEnvelope, FaTrophy, FaClock, FaTrendUp, FaTrendDown, FaGoogle, FaEye } from "react-icons/fa";
+import { FaBlog, FaUsers, FaChartLine, FaEnvelope, FaTrophy, FaClock, FaArrowUp, FaArrowDown, FaGoogle, FaEye } from "react-icons/fa";
 
 interface Stats {
   totalContacts: number;
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           </div>
           {stats && stats.trend !== 0 && (
             <div className={`flex items-center text-sm mt-2 ${stats.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.trend > 0 ? <FaTrendUp className="mr-1" /> : <FaTrendDown className="mr-1" />}
+              {stats.trend > 0 ? <FaArrowUp className="mr-1" /> : <FaArrowDown className="mr-1" />}
               {Math.abs(stats.trend)}% vs mois dernier
             </div>
           )}
