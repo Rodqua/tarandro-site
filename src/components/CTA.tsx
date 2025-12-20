@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { FaArrowRight, FaPhone } from "react-icons/fa";
+import { trackButtonClick, trackPhoneClick } from "@/lib/analytics";
 
 export default function CTA() {
   return (
@@ -24,6 +27,7 @@ export default function CTA() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/contact"
+              onClick={() => trackButtonClick('Demander un devis', 'CTA Section')}
               className="bg-white text-primary-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all transform hover:scale-110 shadow-lg hover:shadow-2xl font-semibold inline-flex items-center group"
             >
               Demander un devis gratuit
@@ -31,7 +35,8 @@ export default function CTA() {
             </Link>
             
             <a
-              href="tel:+33000000000"
+              href="tel:+33633289161"
+              onClick={() => trackPhoneClick('06 33 28 91 61')}
               className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-primary-600 transition-all font-semibold inline-flex items-center transform hover:scale-110 shadow-lg hover:shadow-2xl"
             >
               <FaPhone className="mr-2" />

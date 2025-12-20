@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
 import GoogleTagManager from "@/components/GoogleTagManager";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -85,13 +86,15 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <GoogleTagManager />
-        <AuthProvider>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <AnalyticsProvider>
+          <AuthProvider>
+            <Header />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        </AnalyticsProvider>
       </body>
     </html>
   );

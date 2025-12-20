@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowRight, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { trackFormSubmit, trackPhoneClick, trackEmailClick } from "@/lib/analytics";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -45,6 +46,13 @@ export default function ContactPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // Tracker la conversion
+        trackFormSubmit('contact_form', {
+          service: formData.service,
+          has_company: !!formData.company,
+          conversion_value: 1
+        });
+        
         setSubmitStatus({
           type: 'success',
           message: data.message || 'Votre message a été envoyé avec succès !'
@@ -273,7 +281,11 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Téléphone</div>
-                      <a href="tel:+33633289161" className="hover:underline">
+                      <a 
+                        href="tel:+33633289161" 
+                        className="hover:underline"
+                        onClick={() => trackPhoneClick('06 33 28 91 61')}
+                      >
                         06 33 28 91 61
                       </a>
                       <p className="text-sm text-primary-100 mt-1">
@@ -288,7 +300,11 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="font-semibold mb-1">Email</div>
-                      <a href="mailto:contact@tarandro.org" className="hover:underline">
+                      <a 
+                        href="mailto:contact@tarandro.org" 
+                        className="hover:underline"
+                        onClick={() => trackEmailClick('contact@tarandro.org')}
+                      >
                         contact@tarandro.org
                       </a>
                       <p className="text-sm text-primary-100 mt-1">
