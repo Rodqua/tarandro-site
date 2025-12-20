@@ -77,8 +77,6 @@ export default function AdminDashboard() {
       .catch(error => {
         console.error('Error fetching analytics:', error);
       });
-        setLoading(false);
-      });
   }, []);
 
   if (loading) {
