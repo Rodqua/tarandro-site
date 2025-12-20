@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     // Envoi de l'email avec Resend
     const emailData = await resend.emails.send({
-      from: 'Tarandro Contact <onboarding@resend.dev>',
+      from: 'Tarandro Contact <contact@tarandro.org>',
       to: process.env.EMAIL_TO || 'contact@tarandro.org',
       replyTo: email,
       subject: `Nouveau contact : ${firstName} ${lastName} - ${service}`,
