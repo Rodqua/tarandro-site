@@ -25,9 +25,9 @@ interface AnalyticsData {
     users: number;
     sessions: number;
     pageViews: number;
-    bounceRate: string;
+    bounceRate: number;
     avgSessionDuration: number;
-    conversionRate: string;
+    conversionRate: number;
   };
   trafficSources: Array<{
     source: string;

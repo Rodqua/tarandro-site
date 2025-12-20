@@ -131,7 +131,7 @@ export async function GET() {
       dataPoints++;
     });
 
-    const avgBounceRate = dataPoints > 0 ? (totalBounceRate / dataPoints * 100).toFixed(1) : '0.0';
+    const avgBounceRate = dataPoints > 0 ? (totalBounceRate / dataPoints * 100) : 0;
     const avgSessionDuration = dataPoints > 0 ? Math.round(totalSessionDuration / dataPoints) : 0;
 
     // Parser les sources de trafic
@@ -158,8 +158,8 @@ export async function GET() {
     // Calculer le taux de conversion (form_submit / sessions)
     const formSubmits = events.find(e => e.name === 'form_submit')?.count || 0;
     const conversionRate = totalSessions > 0 
-      ? ((formSubmits / totalSessions) * 100).toFixed(2)
-      : '0.00';
+      ? ((formSubmits / totalSessions) * 100)
+      : 0;
 
     return NextResponse.json({
       success: true,
