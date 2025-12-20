@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleTagManager from "@/components/GoogleTagManager";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -84,7 +84,7 @@ export default function RootLayout({
         <link rel="canonical" href="https://tarandro.org" />
       </head>
       <body className={inter.className}>
-        <GoogleAnalytics />
+        <GoogleTagManager />
         <AuthProvider>
           <Header />
           <main className="min-h-screen">
