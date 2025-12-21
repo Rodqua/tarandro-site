@@ -46,7 +46,7 @@ export default function About() {
 
             <p className="text-gray-600 mb-8 leading-relaxed">
               Que vous soyez une entreprise en quête de certification ISO, un
-              établissement de santé préparant votre évaluation HAS, ou une
+              établissement préparant votre certification HAS, ou une
               organisation souhaitant développer les compétences de vos
               collaborateurs, nous concevons des solutions pragmatiques et
               efficaces adaptées à vos besoins.
@@ -99,7 +99,7 @@ export default function About() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 cursor-default">
                   <div className="text-3xl font-bold mb-2">Multi-secteurs</div>
                   <p className="text-primary-100">
-                    Industrie, Santé, Services, BTP,Tertiaire
+                    Industrie, Santé, Services, BTP, Tertiaire
                   </p>
                 </div>
               </div>

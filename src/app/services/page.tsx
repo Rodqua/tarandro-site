@@ -44,7 +44,8 @@ const servicesData = [
           "Sécurité sanitaire",
           "Formation des équipes",
         ],
-        image: null,
+        image:
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766347561396-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png",
       },
       {
         title: "Certification Qualiopi",

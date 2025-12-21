@@ -26,7 +26,8 @@ const services = [
       "Expert en certification HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Sécurité sanitaire et qualité des soins.",
     href: "/services/certification-has",
     color: "secondary",
-    image: null, // À remplacer par l'URL uploadée
+    image:
+      "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766347561396-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png",
   },
   {
     icon: FaLaptop,
