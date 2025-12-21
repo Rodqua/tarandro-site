@@ -15,42 +15,48 @@ const services = [
     title: "Certification ISO",
     description: "Accompagnement complet pour obtenir vos certifications ISO (9001, 14001, 45001, 27001...). Audit, mise en conformité et suivi.",
     href: "/services/certification-iso",
-    color: "primary"
+    color: "primary",
+    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
   },
   {
     icon: FaHospital,
     title: "Certification HAS",
     description: "Expert en certification Haute Autorité de Santé pour établissements de santé et médico-sociaux. Préparation à la visite de certification.",
     href: "/services/certification-has",
-    color: "secondary"
+    color: "secondary",
+    image: null // À remplacer par l'URL uploadée
   },
   {
     icon: FaFileAlt,
     title: "PSAD (Programme d'Actions)",
     description: "Élaboration et suivi de votre Programme d'Actions pour l'amélioration continue de la qualité et la gestion des risques.",
     href: "/services/psad",
-    color: "primary"
+    color: "primary",
+    image: null // À remplacer par l'URL uploadée
   },
   {
     icon: FaLaptop,
     title: "Formation Bureautique",
     description: "Formations Microsoft Office (Word, Excel, PowerPoint, Outlook), Google Workspace et outils collaboratifs. Tous niveaux.",
     href: "/services/formation-bureautique",
-    color: "secondary"
+    color: "secondary",
+    image: null // À remplacer par l'URL uploadée
   },
   {
     icon: FaFirstAid,
     title: "Formation SST",
     description: "Formation Sauveteur Secouriste du Travail certifiée INRS. Initial, recyclage et maintien des compétences. Sessions inter et intra-entreprise.",
     href: "/services/formation-sst",
-    color: "primary"
+    color: "primary",
+    image: null // À remplacer par l'URL uploadée
   },
   {
     icon: FaAward,
     title: "Certification Qualiopi",
     description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi. Accédez aux financements publics et mutualisés.",
     href: "/services/certification-qualiopi",
-    color: "secondary"
+    color: "secondary",
+    image: null // À remplacer par l'URL uploadée
   },
 ];
 
@@ -84,15 +90,29 @@ export default function Services() {
               <Link
                 key={index}
                 href={service.href}
-                className="group bg-white p-8 rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-gray-100 relative overflow-hidden"
+                className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 border border-gray-100 relative overflow-hidden"
               >
+                {/* Image d'illustration en arrière-plan si disponible */}
+                {service.image && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
+                  </div>
+                )}
+
                 {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-secondary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <div className="relative z-10">
-                  <div className={`w-16 h-16 ${colorClass} ${hoverClass} rounded-lg flex items-center justify-center mb-6 transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:rotate-3`}>
-                    <Icon size={32} />
-                  </div>
+                <div className={`relative z-10 ${service.image ? 'p-6' : 'p-8'}`}>
+                  {!service.image && (
+                    <div className={`w-16 h-16 ${colorClass} ${hoverClass} rounded-lg flex items-center justify-center mb-6 transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:rotate-3`}>
+                      <Icon size={32} />
+                    </div>
+                  )}
                 
                   <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
                     {service.title}
