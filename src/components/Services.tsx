@@ -4,7 +4,8 @@ import {
   FaHospital, 
   FaFileAlt, 
   FaLaptop, 
-  FaFirstAid, 
+  FaFirstAid,
+  FaAward,
   FaArrowRight 
 } from "react-icons/fa";
 
@@ -43,6 +44,13 @@ const services = [
     description: "Formation Sauveteur Secouriste du Travail certifiée INRS. Initial, recyclage et maintien des compétences. Sessions inter et intra-entreprise.",
     href: "/services/formation-sst",
     color: "primary"
+  },
+  {
+    icon: FaAward,
+    title: "Certification Qualiopi",
+    description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi. Accédez aux financements publics et mutualisés.",
+    href: "/services/certification-qualiopi",
+    color: "secondary"
   },
 ];
 

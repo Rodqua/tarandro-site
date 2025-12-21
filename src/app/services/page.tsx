@@ -32,6 +32,12 @@ const servicesData = [
         slug: "psad",
         description: "Élaboration et suivi du Programme d'Actions pour l'amélioration continue",
         features: ["Diagnostic qualité", "Élaboration du programme", "Gestion des risques", "Indicateurs de suivi", "Amélioration continue"]
+      },
+      {
+        title: "Certification Qualiopi",
+        slug: "certification-qualiopi",
+        description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi",
+        features: ["Diagnostic Qualiopi", "Mise en conformité RNQ", "Constitution des preuves", "Audit à blanc", "Suivi post-certification"]
       }
     ]
   },
