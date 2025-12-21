@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { del } from "@vercel/blob";
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -14,27 +13,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Sécurité : vérifier que le chemin est bien dans /images/
-    if (!imagePath.startsWith("/images/")) {
-      return NextResponse.json(
-        { success: false, error: "Chemin invalide" },
-        { status: 400 }
-      );
-    }
-
-    const filename = path.basename(imagePath);
-    const filepath = path.join(process.cwd(), "public", "images", filename);
-
-    // Vérifier que le fichier existe
-    if (!fs.existsSync(filepath)) {
-      return NextResponse.json(
-        { success: false, error: "Fichier introuvable" },
-        { status: 404 }
-      );
-    }
-
-    // Supprimer le fichier
-    fs.unlinkSync(filepath);
+    // Supprimer depuis Vercel Blob avec l'URL complète
+    await del(imagePath);
 
     return NextResponse.json({
       success: true,

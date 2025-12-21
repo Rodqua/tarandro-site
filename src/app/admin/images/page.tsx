@@ -54,7 +54,7 @@ export default function ImagesManager() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setUploadStatus(`${data.uploaded} image(s) uploadée(s) avec succès !`);
         loadImages();
@@ -79,7 +79,7 @@ export default function ImagesManager() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         loadImages();
       }
@@ -93,7 +93,7 @@ export default function ImagesManager() {
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   if (loading) {
@@ -112,8 +112,12 @@ export default function ImagesManager() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestion des images</h1>
-            <p className="text-gray-600 mt-2">Téléchargez et gérez les images du site</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Gestion des images
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Téléchargez et gérez les images du site
+            </p>
           </div>
           <Link
             href="/admin"
@@ -129,8 +133,12 @@ export default function ImagesManager() {
             <div className="flex items-center">
               <FaUpload className="text-primary-600 text-2xl mr-3" />
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Télécharger des images</h2>
-                <p className="text-sm text-gray-600">PNG, JPG, WebP, SVG (max 5MB par fichier)</p>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Télécharger des images
+                </h2>
+                <p className="text-sm text-gray-600">
+                  PNG, JPG, WebP, SVG (max 5MB par fichier)
+                </p>
               </div>
             </div>
             <label className="cursor-pointer bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center">
@@ -159,7 +167,9 @@ export default function ImagesManager() {
           <div className="col-span-full text-center py-12 bg-white rounded-lg shadow-md">
             <FaImage className="mx-auto text-6xl text-gray-300 mb-4" />
             <p className="text-gray-500 text-lg">Aucune image pour le moment</p>
-            <p className="text-gray-400 text-sm mt-2">Téléchargez vos premières images ci-dessus</p>
+            <p className="text-gray-400 text-sm mt-2">
+              Téléchargez vos premières images ci-dessus
+            </p>
           </div>
         ) : (
           images.map((image, index) => (
@@ -176,8 +186,12 @@ export default function ImagesManager() {
                 />
               </div>
               <div className="p-4">
-                <p className="font-medium text-gray-900 truncate mb-1">{image.name}</p>
-                <p className="text-sm text-gray-500 mb-3">{formatFileSize(image.size)}</p>
+                <p className="font-medium text-gray-900 truncate mb-1">
+                  {image.name}
+                </p>
+                <p className="text-sm text-gray-500 mb-3">
+                  {formatFileSize(image.size)}
+                </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSelectedImage(image.path)}
@@ -219,7 +233,9 @@ export default function ImagesManager() {
               className="max-w-full max-h-[85vh] rounded-lg"
               onClick={(e) => e.stopPropagation()}
             />
-            <p className="text-white text-center mt-4 text-sm">{selectedImage}</p>
+            <p className="text-white text-center mt-4 text-sm">
+              {selectedImage}
+            </p>
           </div>
         </div>
       )}

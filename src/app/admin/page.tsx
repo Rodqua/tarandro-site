@@ -131,10 +131,15 @@ export default function AdminDashboard() {
           {!analyticsEnabled && analyticsError && (
             <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-800">
-                <strong>⚠️ Google Analytics non disponible:</strong> {analyticsError}
+                <strong>⚠️ Google Analytics non disponible:</strong>{" "}
+                {analyticsError}
               </p>
               <p className="text-xs text-yellow-600 mt-1">
-                Consultez <a href="/GOOGLE_ANALYTICS_CONFIG.md" className="underline">GOOGLE_ANALYTICS_CONFIG.md</a> pour la configuration
+                Consultez{" "}
+                <a href="/GOOGLE_ANALYTICS_CONFIG.md" className="underline">
+                  GOOGLE_ANALYTICS_CONFIG.md
+                </a>{" "}
+                pour la configuration
               </p>
             </div>
           )}

@@ -32,12 +32,15 @@ export async function GET() {
       console.log("✅ Credentials JSON parsés avec succès");
     } catch (parseError: any) {
       console.error("❌ Erreur parsing credentials JSON:", parseError.message);
-      return NextResponse.json({
-        success: false,
-        message: "Credentials JSON invalides",
-        error: parseError.message,
-        useBasicStats: true,
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Credentials JSON invalides",
+          error: parseError.message,
+          useBasicStats: true,
+        },
+        { status: 500 }
+      );
     }
 
     // Initialiser le client Google Analytics
@@ -206,7 +209,7 @@ export async function GET() {
       message: error.message,
       code: error.code,
       details: error.details,
-      stack: error.stack?.split('\n').slice(0, 3).join('\n'),
+      stack: error.stack?.split("\n").slice(0, 3).join("\n"),
     });
     return NextResponse.json(
       {
