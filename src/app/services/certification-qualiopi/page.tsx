@@ -211,7 +211,7 @@ export default function CertificationQualiopi() {
           <img
             src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png"
             alt="Certification Qualiopi"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary-800"></div>
         </div>

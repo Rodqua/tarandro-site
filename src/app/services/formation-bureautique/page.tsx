@@ -179,7 +179,7 @@ export default function FormationBureautiquePage() {
           <img
             src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png"
             alt="Formation Bureautique"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-700"></div>
         </div>

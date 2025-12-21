@@ -12,27 +12,15 @@ export const size = {
 export const contentType = 'image/png';
 
 // Image generation
-export default function Icon() {
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          fontSize: 24,
-          background: 'linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%)',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          borderRadius: '8px',
-        }}
-      >
-        T
-      </div>
-    ),
-    {
-      ...size,
-    }
-  );
+export default async function Icon() {
+  // Fetch the logo image
+  const imageData = await fetch(
+    'https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/partenaire/1766341574545-Logo_miniatureweb.png'
+  ).then((res) => res.arrayBuffer());
+
+  return new Response(imageData, {
+    headers: {
+      'Content-Type': 'image/png',
+    },
+  });
 }

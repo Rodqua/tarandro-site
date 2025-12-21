@@ -136,7 +136,7 @@ export default function CertificationISOPage() {
           <img
             src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334590968-freepik__the-style-is-candid-image-photography-with-natural__48008.png"
             alt="Certification ISO"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-800"></div>
         </div>
@@ -194,17 +194,6 @@ export default function CertificationISOPage() {
             <p className="text-lg text-gray-600">
               Expertise reconnue sur les principales normes ISO de management
             </p>
-          </div>
-
-          {/* Image de certification */}
-          <div className="max-w-3xl mx-auto mb-16">
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
-                alt="Certification ISO 9001"
-                className="w-full h-full object-cover"
-              />
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

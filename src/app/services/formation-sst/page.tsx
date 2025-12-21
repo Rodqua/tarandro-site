@@ -172,7 +172,7 @@ export default function FormationSSTPage() {
           <img
             src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg"
             alt="Formation SST"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-700"></div>
         </div>
