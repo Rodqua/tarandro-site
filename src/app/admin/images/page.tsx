@@ -62,8 +62,19 @@ export default function ImagesManager() {
         setUploadStatus(`${data.uploaded} image(s) uploadée(s) avec succès !`);
         // Reset input pour permettre de réuploader le même fichier
         e.target.value = "";
-        // Force le rechargement des images
-        await loadImages();
+        
+        // Ajouter les nouvelles images à la liste sans tout recharger
+        if (data.files && data.files.length > 0) {
+          const newImages = data.files.map((file: any) => ({
+            name: file.filename,
+            path: file.url,
+            size: 0, // Taille non disponible immédiatement
+            type: file.filename.split('.').pop() || '',
+            lastModified: new Date().toISOString(),
+          }));
+          setImages(prevImages => [...newImages, ...prevImages]);
+        }
+        
         setTimeout(() => setUploadStatus(""), 3000);
       } else {
         setUploadStatus("Erreur lors de l'upload: " + (data.error || "Inconnue"));
@@ -92,11 +103,8 @@ export default function ImagesManager() {
       console.log("Réponse suppression:", data);
 
       if (data.success) {
-        // Optimistic update: retirer l'image immédiatement de l'UI
+        // Retirer l'image immédiatement de l'UI sans recharger
         setImages(prevImages => prevImages.filter(img => img.path !== imagePath));
-        
-        // Recharger après 1 seconde pour confirmer
-        setTimeout(() => loadImages(), 1000);
       } else {
         alert("Erreur lors de la suppression: " + (data.error || "Inconnue"));
       }
