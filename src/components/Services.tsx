@@ -10,6 +10,16 @@ import {
 
 const services = [
   {
+    icon: FaAward,
+    title: "Certification Qualiopi",
+    description:
+      "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi. Accédez aux financements publics et mutualisés.",
+    href: "/services/certification-qualiopi",
+    color: "secondary",
+    image:
+      "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766343145236-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__25071b.png",
+  },
+  {
     icon: FaCertificate,
     title: "Certification ISO",
     description:
@@ -30,16 +40,6 @@ const services = [
       "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766347561396-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png",
   },
   {
-    icon: FaLaptop,
-    title: "Formation Bureautique",
-    description:
-      "Formations Microsoft Office (Word, Excel, PowerPoint, Outlook), Google Workspace et outils collaboratifs. Tous niveaux.",
-    href: "/services/formation-bureautique",
-    color: "secondary",
-    image:
-      "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png",
-  },
-  {
     icon: FaFirstAid,
     title: "Formation SST",
     description:
@@ -50,14 +50,14 @@ const services = [
       "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/pexels-shox-28271058b.png",
   },
   {
-    icon: FaAward,
-    title: "Certification Qualiopi",
+    icon: FaLaptop,
+    title: "Formation Bureautique",
     description:
-      "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi. Accédez aux financements publics et mutualisés.",
-    href: "/services/certification-qualiopi",
+      "Formations Microsoft Office (Word, Excel, PowerPoint, Outlook), Google Workspace et outils collaboratifs. Tous niveaux.",
+    href: "/services/formation-bureautique",
     color: "secondary",
     image:
-      "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766343145236-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__25071b.png",
+      "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png",
   },
 ];
 
