@@ -25,12 +25,10 @@ export default function Header() {
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <Image
-              src="/logo.svg"
+            <img
+              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/partenaire/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
               alt="Tarandro - Qualité & Formation"
-              width={180}
-              height={50}
-              priority
+              className="h-12 w-auto"
             />
           </Link>
 

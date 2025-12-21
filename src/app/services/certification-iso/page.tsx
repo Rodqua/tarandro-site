@@ -129,8 +129,19 @@ const processSteps = [
 export default function CertificationISOPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white py-20 overflow-hidden">
+      {/* Hero Section with Image */}
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
+        {/* Image d'illustration */}
+        <div className="relative h-64 md:h-80 overflow-hidden">
+          <img
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334590968-freepik__the-style-is-candid-image-photography-with-natural__48008.png"
+            alt="Certification ISO"
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-800"></div>
+        </div>
+        
+        <div className="relative -mt-32 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
           <div
@@ -169,6 +180,7 @@ export default function CertificationISOPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

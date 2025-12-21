@@ -165,8 +165,19 @@ const formationFormats = [
 export default function FormationSSTPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-red-600 via-red-700 to-orange-700 text-white py-20 overflow-hidden">
+      {/* Hero Section with Image */}
+      <section className="relative bg-gradient-to-br from-red-600 via-red-700 to-orange-600 text-white overflow-hidden">
+        {/* Image d'illustration */}
+        <div className="relative h-64 md:h-80 overflow-hidden">
+          <img
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg"
+            alt="Formation SST"
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-700"></div>
+        </div>
+        
+        <div className="relative -mt-32 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
           <div
@@ -207,6 +218,7 @@ export default function FormationSSTPage() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

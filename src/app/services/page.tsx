@@ -114,7 +114,6 @@ export default function ServicesPage() {
                           alt={service.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
                       </div>
                     )}
 

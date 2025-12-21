@@ -204,8 +204,19 @@ const faq = [
 export default function CertificationQualiopi() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
+      {/* Hero Section with Image */}
+      <section className="relative bg-gradient-to-br from-primary-600 to-primary-800 text-white overflow-hidden">
+        {/* Image d'illustration */}
+        <div className="relative h-64 md:h-80 overflow-hidden">
+          <img
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png"
+            alt="Certification Qualiopi"
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary-800"></div>
+        </div>
+        
+        <div className="relative -mt-32 py-20">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
@@ -236,6 +247,7 @@ export default function CertificationQualiopi() {
               </a>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

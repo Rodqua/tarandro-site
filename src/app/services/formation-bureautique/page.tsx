@@ -172,8 +172,19 @@ const advantages = [
 export default function FormationBureautiquePage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-green-600 via-teal-600 to-cyan-700 text-white py-20 overflow-hidden">
+      {/* Hero Section with Image */}
+      <section className="relative bg-gradient-to-br from-green-600 via-blue-600 to-purple-700 text-white overflow-hidden">
+        {/* Image d'illustration */}
+        <div className="relative h-64 md:h-80 overflow-hidden">
+          <img
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png"
+            alt="Formation Bureautique"
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-700"></div>
+        </div>
+        
+        <div className="relative -mt-32 py-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
           <div
@@ -214,8 +225,7 @@ export default function FormationBureautiquePage() {
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </div>        </div>      </section>
 
       {/* Formations Grid */}
       <section className="py-20 bg-white">
