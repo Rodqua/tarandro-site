@@ -163,7 +163,7 @@ export default function ImagesManager() {
                   Télécharger des images
                 </h2>
                 <p className="text-sm text-gray-600">
-                  PNG, JPG, WebP, SVG (max 5MB par fichier)
+                  PNG, JPG, WebP, SVG (max 10MB par fichier)
                 </p>
               </div>
             </div>

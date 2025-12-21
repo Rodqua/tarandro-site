@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const uploadedFiles = [];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 10 * 1024 * 1024; // 10MB
 
     for (const file of files) {
       // Vérifier la taille
