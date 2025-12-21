@@ -29,6 +29,12 @@ export default function Footer() {
                 <FaLinkedin size={24} />
               </a>
             </div>
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <p>
+                &copy; {new Date().getFullYear()} Tarandro. Tous droits
+                réservés.
+              </p>
+            </div>
           </div>
 
           {/* Services */}
@@ -48,6 +54,14 @@ export default function Footer() {
               <li>
                 <Link
                   href="/services/certification-has"
+                  className="hover:text-primary-400 transition-colors"
+                >
+                  Certification QUALIOPI
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services/certification-qualiopi"
                   className="hover:text-primary-400 transition-colors"
                 >
                   Certification HAS
@@ -119,11 +133,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start">
                 <FaMapMarkerAlt className="mr-3 mt-1 flex-shrink-0" />
-                <span>
-                  17 Av. Professeur Horatio Smith
-                  <br />
-                  14000 Caen
-                </span>
+                <span>Caen (Normandie)</span>
               </li>
               <li className="flex items-center">
                 <FaPhone className="mr-3 flex-shrink-0" />

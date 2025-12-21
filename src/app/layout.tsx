@@ -59,8 +59,7 @@ export const metadata: Metadata = {
     url: "https://tarandro.org",
     siteName: "Tarandro",
     title: "Tarandro - Expert Qualité & Formation",
-    description:
-      "Qualité et formation",
+    description: "Qualité et formation",
     images: [
       {
         url: "/og-image.svg",
@@ -73,8 +72,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tarandro - Expert Qualité & Formation",
-    description:
-      "Qualité et formation",
+    description: "Qualité et formation",
     images: ["/og-image.svg"],
   },
   robots: {
