@@ -19,25 +19,29 @@ const servicesData = [
         title: "Certification ISO",
         slug: "certification-iso",
         description: "ISO 9001 (qualité), ISO 14001 (environnement), ISO 45001 (santé/sécurité), ISO 27001 (sécurité de l'information)",
-        features: ["Audit de préparation", "Mise en conformité", "Documentation", "Accompagnement à la certification", "Suivi post-certification"]
+        features: ["Audit de préparation", "Mise en conformité", "Documentation", "Accompagnement à la certification", "Suivi post-certification"],
+        image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
       },
       {
         title: "Certification HAS",
         slug: "certification-has",
         description: "Accompagnement des établissements de santé et médico-sociaux dans leur démarche de certification HAS",
-        features: ["Diagnostic initial", "Plan d'actions", "Préparation à la visite", "Gestion documentaire", "Formation des équipes"]
+        features: ["Diagnostic initial", "Plan d'actions", "Préparation à la visite", "Gestion documentaire", "Formation des équipes"],
+        image: null
       },
       {
         title: "PSAD",
         slug: "psad",
         description: "Élaboration et suivi du Programme d'Actions pour l'amélioration continue",
-        features: ["Diagnostic qualité", "Élaboration du programme", "Gestion des risques", "Indicateurs de suivi", "Amélioration continue"]
+        features: ["Diagnostic qualité", "Élaboration du programme", "Gestion des risques", "Indicateurs de suivi", "Amélioration continue"],
+        image: null
       },
       {
         title: "Certification Qualiopi",
         slug: "certification-qualiopi",
         description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi",
-        features: ["Diagnostic Qualiopi", "Mise en conformité RNQ", "Constitution des preuves", "Audit à blanc", "Suivi post-certification"]
+        features: ["Diagnostic Qualiopi", "Mise en conformité RNQ", "Constitution des preuves", "Audit à blanc", "Suivi post-certification"],
+        image: null
       }
     ]
   },
@@ -49,13 +53,15 @@ const servicesData = [
         title: "Formation Bureautique",
         slug: "formation-bureautique",
         description: "Maîtrise des outils Microsoft Office, Google Workspace et logiciels collaboratifs",
-        features: ["Word, Excel, PowerPoint", "Outlook et gestion emails", "Google Workspace", "Tous niveaux (débutant à expert)", "Inter et intra-entreprise"]
+        features: ["Word, Excel, PowerPoint", "Outlook et gestion emails", "Google Workspace", "Tous niveaux (débutant à expert)", "Inter et intra-entreprise"],
+        image: null
       },
       {
         title: "Formation SST",
         slug: "formation-sst",
         description: "Formation Sauveteur Secouriste du Travail certifiée INRS",
-        features: ["Formation initiale (2 jours)", "Recyclage MAC SST", "Certification officielle INRS", "Pratique et mise en situation", "Formateurs certifiés"]
+        features: ["Formation initiale (2 jours)", "Recyclage MAC SST", "Certification officielle INRS", "Pratique et mise en situation", "Formateurs certifiés"],
+        image: null
       }
     ]
   }
@@ -95,34 +101,46 @@ export default function ServicesPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {category.services.map((service, serviceIdx) => (
-                  <div
+                  <Link
                     key={serviceIdx}
-                    className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
+                    href={`/services/${service.slug}`}
+                    className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
                   >
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                      {service.title}
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                      {service.description}
-                    </p>
-                    
-                    <ul className="space-y-2 mb-6">
-                      {service.features.map((feature, featureIdx) => (
-                        <li key={featureIdx} className="flex items-start text-sm text-gray-700">
-                          <span className="text-primary-600 mr-2">✓</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                    {/* Image d'illustration si disponible */}
+                    {service.image && (
+                      <div className="relative h-48 overflow-hidden">
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
+                      </div>
+                    )}
 
-                    <Link
-                      href={`/services/${service.slug}`}
-                      className="inline-flex items-center text-primary-600 font-semibold hover:text-primary-700 group"
-                    >
-                      En savoir plus
-                      <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={14} />
-                    </Link>
-                  </div>
+                    <div className="p-8">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        {service.description}
+                      </p>
+                      
+                      <ul className="space-y-2 mb-6">
+                        {service.features.map((feature, featureIdx) => (
+                          <li key={featureIdx} className="flex items-start text-sm text-gray-700">
+                            <span className="text-primary-600 mr-2">✓</span>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="inline-flex items-center text-primary-600 font-semibold group-hover:text-primary-700 group-hover:translate-x-2 transition-all">
+                        En savoir plus
+                        <FaArrowRight className="ml-2 group-hover:ml-3 transition-all" size={14} />
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
