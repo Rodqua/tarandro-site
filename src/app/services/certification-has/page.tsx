@@ -9,15 +9,18 @@ import {
 
 export const metadata: Metadata = {
   title:
-    "Certification HAS - Accompagnement Établissements de Santé et Médico-sociaux",
+    "Certification HAS-PSDM - Plan de Maîtrise Sanitaire Dynamique & Qualité",
   description:
-    "Expert certification HAS pour établissements de santé et médico-sociaux. Préparation complète à la visite de certification. Méthodologie éprouvée, taux de réussite élevé.",
+    "Expert certification HAS et PSDM (Plan de Maîtrise Sanitaire Dynamique) pour établissements de santé et médico-sociaux. Accompagnement qualité, sécurité sanitaire et préparation visite de certification.",
   keywords: [
     "certification HAS",
+    "PSDM",
+    "plan de maîtrise sanitaire",
     "Haute Autorité de Santé",
     "établissement de santé",
     "médico-social",
     "qualité santé",
+    "sécurité sanitaire",
     "visite de certification HAS",
   ],
   alternates: {
@@ -27,27 +30,33 @@ export const metadata: Metadata = {
 
 const hasFeatures = [
   {
-    title: "Préparation Visite de Certification",
+    title: "Plan de Maîtrise Sanitaire Dynamique (PSDM)",
+    description:
+      "Élaboration et mise en œuvre du PSDM pour garantir la sécurité sanitaire des soins et prestations",
+    icon: "🛡️",
+  },
+  {
+    title: "Préparation Certification HAS",
     description:
       "Accompagnement complet pour préparer sereinement la visite des experts-visiteurs HAS",
     icon: "🎯",
   },
   {
-    title: "Gestion Documentaire",
+    title: "Gestion des Risques",
     description:
-      "Organisation et structuration de votre documentation qualité et gestion des risques",
-    icon: "📋",
+      "Cartographie des risques, événements indésirables et mise en place d'actions préventives",
+    icon: "⚠️",
   },
   {
     title: "Formation des Équipes",
     description:
-      "Formation de vos professionnels aux exigences HAS et aux bonnes pratiques",
+      "Formation de vos professionnels aux exigences HAS, PSDM et bonnes pratiques sanitaires",
     icon: "👥",
   },
   {
     title: "Accompagnement Continu",
     description:
-      "Suivi régulier de votre démarche qualité entre les évaluations",
+      "Suivi régulier de votre démarche qualité et sécurité sanitaire entre les évaluations",
     icon: "🔄",
   },
 ];
@@ -136,22 +145,21 @@ export default function CertificationHASPage() {
           <div className="max-w-4xl">
             <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
               <FaHospital className="mr-2" />
-              Expert Certification HAS
+              Expert Certification HAS & PSDM
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
-              Certification HAS : Préparez Votre Visite avec Succès
+              Certification HAS & Plan de Maîtrise Sanitaire Dynamique
             </h1>
             <p className="text-xl text-blue-100 mb-8 animate-fadeInUp animate-delay-100">
-              Accompagnement expert des établissements de santé et
-              médico-sociaux dans leur démarche de certification HAS.
-              Méthodologie éprouvée pour une préparation sereine et efficace.
+              Accompagnement expert pour votre certification HAS et la mise en œuvre de votre PSDM. 
+              Garantissez la qualité et la sécurité sanitaire de vos soins et prestations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
               <Link
                 href="/contact"
                 className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
               >
-                Demander un diagnostic HAS
+                Demander un diagnostic HAS & PSDM
                 <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
               </Link>
               <a
@@ -171,11 +179,11 @@ export default function CertificationHASPage() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Notre Accompagnement Certification HAS
+              Notre Accompagnement HAS & PSDM
             </h2>
             <p className="text-lg text-gray-600">
-              Une expertise reconnue au service de la qualité et de la sécurité
-              des soins
+              Une expertise reconnue au service de la qualité, de la sécurité des soins
+              et de la maîtrise sanitaire
             </p>
           </div>
 
@@ -364,7 +372,7 @@ export default function CertificationHASPage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Préparez votre certification HAS en toute sérénité
+              Préparez votre certification HAS et votre PSDM en toute sérénité
             </h2>
             <p className="text-xl text-blue-100 mb-8">
               Diagnostic gratuit et devis personnalisé sous 48h

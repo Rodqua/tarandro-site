@@ -23,10 +23,10 @@ const servicesData = [
         image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
       },
       {
-        title: "Certification HAS",
+        title: "Certification HAS-PSDM",
         slug: "certification-has",
-        description: "Accompagnement des établissements de santé et médico-sociaux dans leur démarche de certification HAS",
-        features: ["Diagnostic initial", "Plan d'actions", "Préparation à la visite", "Gestion documentaire", "Formation des équipes"],
+        description: "Accompagnement HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Qualité et sécurité sanitaire.",
+        features: ["Élaboration du PSDM", "Gestion des risques", "Préparation visite HAS", "Sécurité sanitaire", "Formation des équipes"],
         image: null
       },
       {

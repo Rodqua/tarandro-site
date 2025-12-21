@@ -20,8 +20,8 @@ const services = [
   },
   {
     icon: FaHospital,
-    title: "Certification HAS",
-    description: "Expert en certification Haute Autorité de Santé pour établissements de santé et médico-sociaux. Préparation à la visite de certification.",
+    title: "Certification HAS-PSDM",
+    description: "Expert en certification HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Sécurité sanitaire et qualité des soins.",
     href: "/services/certification-has",
     color: "secondary",
     image: null // À remplacer par l'URL uploadée
