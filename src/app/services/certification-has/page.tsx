@@ -138,7 +138,7 @@ export default function CertificationHASPage() {
           <img
             src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766347561396-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png"
             alt="Certification HAS-PSDM"
-            className="w-full h-full object-cover opacity-60"
+            className="w-full h-full object-cover object-top opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-900"></div>
         </div>
