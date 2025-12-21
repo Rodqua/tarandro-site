@@ -10,6 +10,7 @@ interface ImageFile {
   size: number;
   type: string;
   lastModified: string;
+  category?: string;
 }
 
 export default function ImagesManager() {
@@ -17,15 +18,27 @@ export default function ImagesManager() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [uploadCategory, setUploadCategory] = useState<string>("general");
+
+  const categories = [
+    { value: "all", label: "Toutes les catégories" },
+    { value: "general", label: "Général" },
+    { value: "blog", label: "Blog" },
+    { value: "partenaire", label: "Partenaires" },
+    { value: "service", label: "Services" },
+    { value: "team", label: "Équipe" },
+  ];
 
   useEffect(() => {
     loadImages();
-  }, []);
+  }, [selectedCategory]);
 
   const loadImages = async () => {
     try {
       // Ajouter un timestamp pour éviter le cache
-      const response = await fetch(`/api/admin/images?t=${Date.now()}`);
+      const categoryParam = selectedCategory !== "all" ? `&category=${selectedCategory}` : "";
+      const response = await fetch(`/api/admin/images?t=${Date.now()}${categoryParam}`);
       const data = await response.json();
       console.log("Images chargées:", data);
       if (data.success) {
@@ -46,6 +59,7 @@ export default function ImagesManager() {
     Array.from(files).forEach((file) => {
       formData.append("files", file);
     });
+    formData.append("category", uploadCategory);
 
     setUploadStatus("Upload en cours...");
 
@@ -70,6 +84,7 @@ export default function ImagesManager() {
             path: file.url,
             size: 0, // Taille non disponible immédiatement
             type: file.filename.split('.').pop() || '',
+            category: file.category || uploadCategory,
             lastModified: new Date().toISOString(),
           }));
           setImages(prevImages => [...newImages, ...prevImages]);
@@ -155,7 +170,7 @@ export default function ImagesManager() {
 
         {/* Upload Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center">
               <FaUpload className="text-primary-600 text-2xl mr-3" />
               <div>
@@ -167,13 +182,31 @@ export default function ImagesManager() {
                 </p>
               </div>
             </div>
-            <label className="cursor-pointer bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center">
-              <FaUpload className="mr-2" />
-              Sélectionner des fichiers
-              <input
-                type="file"
-                multiple
-                accept="image/*"
+            <div className="flex items-center gap-4">
+              <select
+                value={uploadCategory}
+                onChange={(e) => setUploadCategory(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+              >
+                {categories.filter(c => c.value !== "all").map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+              <label className="cursor-pointer bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center">
+                <FaUpload className="mr-2" />
+                Sélectionner des fichiers
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
                 onChange={handleUpload}
                 className="hidden"
               />
@@ -184,6 +217,28 @@ export default function ImagesManager() {
               {uploadStatus}
             </div>
           )}
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-gray-700">Filtrer par catégorie :</span>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.value}
+                  onClick={() => setSelectedCategory(cat.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCategory === cat.value
+                      ? "bg-primary-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

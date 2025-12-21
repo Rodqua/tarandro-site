@@ -1,6 +1,7 @@
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import About from "@/components/About";
+import Partners from "@/components/Partners";
 import CTA from "@/components/CTA";
 import type { Metadata } from "next";
 
@@ -18,6 +19,7 @@ export default function Home() {
       <Hero />
       <Services />
       <About />
+      <Partners />
       <CTA />
     </>
   );

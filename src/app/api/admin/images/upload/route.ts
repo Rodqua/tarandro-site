@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
+    const category = formData.get("category") as string || "general";
 
     if (!files || files.length === 0) {
       return NextResponse.json(
@@ -34,14 +35,16 @@ export async function POST(request: NextRequest) {
         "_"
       )}`;
 
-      // Upload vers Vercel Blob
-      const blob = await put(`images/${filename}`, file, {
+      // Upload vers Vercel Blob avec métadonnées de catégorie
+      const blob = await put(`images/${category}/${filename}`, file, {
         access: "public",
+        addRandomSuffix: false,
       });
 
       uploadedFiles.push({
         filename,
         url: blob.url,
+        category,
       });
     }
 
