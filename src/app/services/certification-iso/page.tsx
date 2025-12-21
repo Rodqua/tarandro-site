@@ -184,6 +184,17 @@ export default function CertificationISOPage() {
             </p>
           </div>
 
+          {/* Image de certification */}
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
+                alt="Certification ISO 9001"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {isoNorms.map((norm, index) => (
               <div
