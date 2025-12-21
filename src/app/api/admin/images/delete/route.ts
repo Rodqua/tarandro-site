@@ -6,6 +6,8 @@ export async function DELETE(request: NextRequest) {
     const body = await request.json();
     const { path: imagePath } = body;
 
+    console.log("Tentative de suppression:", imagePath);
+
     if (!imagePath) {
       return NextResponse.json(
         { success: false, error: "Chemin d'image manquant" },
@@ -15,6 +17,8 @@ export async function DELETE(request: NextRequest) {
 
     // Supprimer depuis Vercel Blob avec l'URL complète
     await del(imagePath);
+
+    console.log("Image supprimée avec succès:", imagePath);
 
     return NextResponse.json({
       success: true,

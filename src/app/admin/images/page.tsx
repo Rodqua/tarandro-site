@@ -80,6 +80,8 @@ export default function ImagesManager() {
     if (!confirm("Êtes-vous sûr de vouloir supprimer cette image ?")) return;
 
     try {
+      console.log("Suppression de:", imagePath);
+      
       const response = await fetch("/api/admin/images/delete", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -87,12 +89,16 @@ export default function ImagesManager() {
       });
 
       const data = await response.json();
+      console.log("Réponse suppression:", data);
 
       if (data.success) {
-        loadImages();
+        await loadImages();
+      } else {
+        alert("Erreur lors de la suppression: " + (data.error || "Inconnue"));
       }
     } catch (error) {
       console.error("Erreur suppression:", error);
+      alert("Erreur lors de la suppression de l'image");
     }
   };
 
