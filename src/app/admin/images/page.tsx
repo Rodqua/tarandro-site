@@ -69,11 +69,31 @@ export default function ImagesManager() {
         body: formData,
       });
 
+      // Gérer l'erreur 413 (fichier trop volumineux)
+      if (response.status === 413) {
+        setUploadStatus("Erreur: Fichier trop volumineux (max 50MB)");
+        e.target.value = "";
+        setTimeout(() => setUploadStatus(""), 5000);
+        return;
+      }
+
+      // Gérer les autres erreurs HTTP
+      if (!response.ok) {
+        setUploadStatus(`Erreur HTTP ${response.status}: ${response.statusText}`);
+        e.target.value = "";
+        setTimeout(() => setUploadStatus(""), 5000);
+        return;
+      }
+
       const data = await response.json();
       console.log("Réponse upload:", data);
 
       if (data.success) {
-        setUploadStatus(`${data.uploaded} image(s) uploadée(s) avec succès !`);
+        let message = `${data.uploaded} image(s) uploadée(s) avec succès !`;
+        if (data.errors && data.errors.length > 0) {
+          message += ` Avertissements: ${data.errors.join(", ")}`;
+        }
+        setUploadStatus(message);
         // Reset input pour permettre de réuploader le même fichier
         e.target.value = "";
         

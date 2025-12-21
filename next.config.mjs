@@ -4,6 +4,13 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   
+  // Configuration API
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+  
   // Images optimization
   images: {
     formats: ['image/avif', 'image/webp'],

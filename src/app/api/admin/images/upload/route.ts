@@ -15,16 +15,19 @@ export async function POST(request: NextRequest) {
     }
 
     const uploadedFiles = [];
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    const errors = [];
 
     for (const file of files) {
       // Vérifier la taille
       if (file.size > maxSize) {
+        errors.push(`${file.name}: Fichier trop volumineux (max 50MB)`);
         continue;
       }
 
       // Vérifier le type
       if (!file.type.startsWith("image/")) {
+        errors.push(`${file.name}: Type de fichier non supporté`);
         continue;
       }
 
@@ -52,6 +55,7 @@ export async function POST(request: NextRequest) {
       success: true,
       uploaded: uploadedFiles.length,
       files: uploadedFiles,
+      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error: any) {
     console.error("Erreur upload images:", error);
