@@ -16,7 +16,7 @@ const services = [
     description: "Accompagnement complet pour obtenir vos certifications ISO (9001, 14001, 45001, 27001...). Audit, mise en conformité et suivi.",
     href: "/services/certification-iso",
     color: "primary",
-    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334201147-freepik__elegant-iso-9001-certificate-with-professional-gol__48007.png"
+    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334590968-freepik__the-style-is-candid-image-photography-with-natural__48008.png"
   },
   {
     icon: FaHospital,
@@ -40,7 +40,7 @@ const services = [
     description: "Formations Microsoft Office (Word, Excel, PowerPoint, Outlook), Google Workspace et outils collaboratifs. Tous niveaux.",
     href: "/services/formation-bureautique",
     color: "secondary",
-    image: null // À remplacer par l'URL uploadée
+    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png"
   },
   {
     icon: FaFirstAid,
@@ -48,7 +48,7 @@ const services = [
     description: "Formation Sauveteur Secouriste du Travail certifiée INRS. Initial, recyclage et maintien des compétences. Sessions inter et intra-entreprise.",
     href: "/services/formation-sst",
     color: "primary",
-    image: null // À remplacer par l'URL uploadée
+    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg"
   },
   {
     icon: FaAward,
@@ -56,7 +56,7 @@ const services = [
     description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi. Accédez aux financements publics et mutualisés.",
     href: "/services/certification-qualiopi",
     color: "secondary",
-    image: null // À remplacer par l'URL uploadée
+    image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png"
   },
 ];
 
@@ -100,14 +100,10 @@ export default function Services() {
                       alt={service.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/50 to-transparent"></div>
                   </div>
                 )}
-
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-secondary-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <div className={`relative z-10 ${service.image ? 'p-6' : 'p-8'}`}>
+                <div className={`relative ${service.image ? 'p-6' : 'p-8'}`}>
                   {!service.image && (
                     <div className={`w-16 h-16 ${colorClass} ${hoverClass} rounded-lg flex items-center justify-center mb-6 transition-all duration-300 group-hover:text-white group-hover:scale-110 group-hover:rotate-3`}>
                       <Icon size={32} />

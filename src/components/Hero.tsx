@@ -11,6 +11,15 @@ export default function Hero() {
 
       <div className="container mx-auto px-4 py-20 lg:py-32 relative">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Logo bannière */}
+          <div className="mb-8 animate-scaleIn">
+            <img
+              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/partenaire/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
+              alt="Tarandro - Qualité et Formation"
+              className="mx-auto h-20 md:h-24 w-auto"
+            />
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center bg-white px-4 py-2 rounded-full shadow-lg mb-8 animate-scaleIn hover:scale-105 transition-transform duration-300">
             <FaStar className="text-yellow-400 mr-2 animate-pulse" />
