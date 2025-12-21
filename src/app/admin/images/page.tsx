@@ -207,11 +207,6 @@ export default function ImagesManager() {
               </label>
             </div>
           </div>
-                onChange={handleUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
           {uploadStatus && (
             <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
               {uploadStatus}
