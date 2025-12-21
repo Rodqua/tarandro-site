@@ -156,34 +156,6 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-
-        <div className="border-t border-gray-800 mt-8 pt-8 text-sm">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p>
-              &copy; {new Date().getFullYear()} Tarandro. Tous droits réservés.
-            </p>
-            <div className="flex items-center space-x-6">
-              <Link
-                href="/mentions-legales"
-                className="hover:text-primary-400 transition-colors"
-              >
-                Mentions légales
-              </Link>
-              <Link
-                href="/mentions-legales#rgpd"
-                className="hover:text-primary-400 transition-colors"
-              >
-                RGPD
-              </Link>
-              <Link
-                href="/mentions-legales#cookies"
-                className="hover:text-primary-400 transition-colors"
-              >
-                Cookies
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </footer>
   );
