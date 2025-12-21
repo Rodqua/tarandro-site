@@ -92,7 +92,11 @@ export default function ImagesManager() {
       console.log("Réponse suppression:", data);
 
       if (data.success) {
-        await loadImages();
+        // Optimistic update: retirer l'image immédiatement de l'UI
+        setImages(prevImages => prevImages.filter(img => img.path !== imagePath));
+        
+        // Recharger après 1 seconde pour confirmer
+        setTimeout(() => loadImages(), 1000);
       } else {
         alert("Erreur lors de la suppression: " + (data.error || "Inconnue"));
       }
