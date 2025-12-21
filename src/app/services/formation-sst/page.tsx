@@ -170,55 +170,55 @@ export default function FormationSSTPage() {
         {/* Image d'illustration */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           <img
-            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg"
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/pexels-shox-28271058b.png"
             alt="Formation SST"
             className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-700"></div>
         </div>
-        
-        <div className="relative -mt-32 py-20">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div
-            className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
-            style={{ animationDelay: "1s" }}
-          ></div>
-        </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
-              <FaFirstAid className="mr-2" />
-              <FaCertificate className="mr-2" />
-              Formation Certifiée INRS
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
-              Formation SST : Sauveteur Secouriste du Travail
-            </h1>
-            <p className="text-xl text-red-100 mb-8 animate-fadeInUp animate-delay-100">
-              Formation certifiée INRS pour devenir Sauveteur Secouriste du
-              Travail. Apprenez les gestes qui sauvent et répondez à vos
-              obligations légales.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
-              <Link
-                href="/contact"
-                className="bg-white text-red-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
-              >
-                Inscrire mes équipes
-                <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
-              </Link>
-              <a
-                href="tel:+33000000000"
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-red-600 transition-all font-semibold inline-flex items-center justify-center"
-              >
-                <FaPhone className="mr-2" />
-                06 33 28 91 61
-              </a>
+        <div className="relative -mt-32 py-20">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
+            <div
+              className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
+              style={{ animationDelay: "1s" }}
+            ></div>
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
+                <FaFirstAid className="mr-2" />
+                <FaCertificate className="mr-2" />
+                Formation Certifiée INRS
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
+                Formation SST : Sauveteur Secouriste du Travail
+              </h1>
+              <p className="text-xl text-red-100 mb-8 animate-fadeInUp animate-delay-100">
+                Formation certifiée INRS pour devenir Sauveteur Secouriste du
+                Travail. Apprenez les gestes qui sauvent et répondez à vos
+                obligations légales.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
+                <Link
+                  href="/contact"
+                  className="bg-white text-red-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
+                >
+                  Inscrire mes équipes
+                  <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
+                </Link>
+                <a
+                  href="tel:+33000000000"
+                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-red-600 transition-all font-semibold inline-flex items-center justify-center"
+                >
+                  <FaPhone className="mr-2" />
+                  06 33 28 91 61
+                </a>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </section>
 

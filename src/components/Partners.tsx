@@ -42,7 +42,8 @@ export default function Partners() {
             Nos Partenaires
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ils nous font confiance pour leur accompagnement qualité et leurs formations
+            Ils nous font confiance pour leur accompagnement qualité et leurs
+            formations
           </p>
         </div>
 

@@ -215,39 +215,39 @@ export default function CertificationQualiopi() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary-800"></div>
         </div>
-        
+
         <div className="relative -mt-32 py-20">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-block bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm font-semibold mb-6">
-              Certification Qualité Formation
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Certification Qualiopi
-            </h1>
-            <p className="text-xl md:text-2xl text-primary-100 mb-8">
-              Obtenez et maintenez votre certification qualité pour accéder aux
-              financements publics
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/contact"
-                className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-primary-50 transition-all shadow-lg hover:shadow-xl inline-flex items-center group"
-              >
-                Demander un accompagnement
-                <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a
-                href="tel:+33633289161"
-                className="bg-primary-700/50 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-700 transition-all border-2 border-white/20 inline-flex items-center"
-              >
-                <FaPhone className="mr-2" />
-                06 33 28 91 61
-              </a>
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="inline-block bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full text-sm font-semibold mb-6">
+                Certification Qualité Formation
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                Certification Qualiopi
+              </h1>
+              <p className="text-xl md:text-2xl text-primary-100 mb-8">
+                Obtenez et maintenez votre certification qualité pour accéder
+                aux financements publics
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link
+                  href="/contact"
+                  className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold hover:bg-primary-50 transition-all shadow-lg hover:shadow-xl inline-flex items-center group"
+                >
+                  Demander un accompagnement
+                  <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <a
+                  href="tel:+33633289161"
+                  className="bg-primary-700/50 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-700 transition-all border-2 border-white/20 inline-flex items-center"
+                >
+                  <FaPhone className="mr-2" />
+                  06 33 28 91 61
+                </a>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </section>
 
@@ -260,11 +260,12 @@ export default function CertificationQualiopi() {
             </h2>
             <div className="prose prose-lg max-w-none text-gray-600">
               <p>
-                Depuis le 1er janvier 2022, la <strong>certification Qualiopi</strong> est
-                obligatoire pour tous les organismes de formation souhaitant
-                accéder aux fonds publics et mutualisés. Cette certification
-                atteste de la qualité du processus mis en œuvre et constitue un
-                véritable atout commercial.
+                Depuis le 1er janvier 2022, la{" "}
+                <strong>certification Qualiopi</strong> est obligatoire pour
+                tous les organismes de formation souhaitant accéder aux fonds
+                publics et mutualisés. Cette certification atteste de la qualité
+                du processus mis en œuvre et constitue un véritable atout
+                commercial.
               </p>
               <p>
                 Notre accompagnement personnalisé vous permet d'obtenir votre
@@ -298,10 +299,15 @@ export default function CertificationQualiopi() {
                       <h3 className="text-xl font-bold text-gray-900 mb-2">
                         {criterion.title}
                       </h3>
-                      <p className="text-gray-600 mb-3">{criterion.description}</p>
+                      <p className="text-gray-600 mb-3">
+                        {criterion.description}
+                      </p>
                       <ul className="space-y-1">
                         {criterion.points.map((point, idx) => (
-                          <li key={idx} className="flex items-start text-sm text-gray-600">
+                          <li
+                            key={idx}
+                            className="flex items-start text-sm text-gray-600"
+                          >
                             <FaCheckCircle className="text-green-500 mt-1 mr-2 flex-shrink-0" />
                             <span>{point}</span>
                           </li>

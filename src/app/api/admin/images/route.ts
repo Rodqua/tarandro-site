@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       const pathParts = blob.pathname.split("/");
       const filename = pathParts[pathParts.length - 1];
       const categoryFromPath = pathParts.length > 2 ? pathParts[1] : "general";
-      
+
       return {
         name: filename,
         path: blob.url,

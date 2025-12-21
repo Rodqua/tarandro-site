@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
-    const category = formData.get("category") as string || "general";
+    const category = (formData.get("category") as string) || "general";
 
     if (!files || files.length === 0) {
       return NextResponse.json(

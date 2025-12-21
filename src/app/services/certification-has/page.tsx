@@ -151,8 +151,9 @@ export default function CertificationHASPage() {
               Certification HAS & Plan de Maîtrise Sanitaire Dynamique
             </h1>
             <p className="text-xl text-blue-100 mb-8 animate-fadeInUp animate-delay-100">
-              Accompagnement expert pour votre certification HAS et la mise en œuvre de votre PSDM. 
-              Garantissez la qualité et la sécurité sanitaire de vos soins et prestations.
+              Accompagnement expert pour votre certification HAS et la mise en
+              œuvre de votre PSDM. Garantissez la qualité et la sécurité
+              sanitaire de vos soins et prestations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
               <Link
@@ -182,8 +183,8 @@ export default function CertificationHASPage() {
               Notre Accompagnement HAS & PSDM
             </h2>
             <p className="text-lg text-gray-600">
-              Une expertise reconnue au service de la qualité, de la sécurité des soins
-              et de la maîtrise sanitaire
+              Une expertise reconnue au service de la qualité, de la sécurité
+              des soins et de la maîtrise sanitaire
             </p>
           </div>
 

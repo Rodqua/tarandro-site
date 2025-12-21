@@ -4,67 +4,115 @@ import { FaArrowRight } from "react-icons/fa";
 
 export const metadata: Metadata = {
   title: "Nos Services - Accompagnement Qualité & Formation Professionnelle",
-  description: "Découvrez nos services d'accompagnement qualité (ISO, HAS, PSAD) et de formation professionnelle (bureautique, SST). Solutions sur-mesure pour votre entreprise.",
+  description:
+    "Découvrez nos services d'accompagnement qualité (ISO, HAS, PSAD) et de formation professionnelle (bureautique, SST). Solutions sur-mesure pour votre entreprise.",
   alternates: {
-    canonical: 'https://tarandro.org/services',
+    canonical: "https://tarandro.org/services",
   },
 };
 
 const servicesData = [
   {
     category: "Accompagnement Qualité",
-    description: "Des solutions complètes pour votre démarche qualité et vos certifications",
+    description:
+      "Des solutions complètes pour votre démarche qualité et vos certifications",
     services: [
       {
         title: "Certification ISO",
         slug: "certification-iso",
-        description: "ISO 9001 (qualité), ISO 14001 (environnement), ISO 45001 (santé/sécurité), ISO 27001 (sécurité de l'information)",
-        features: ["Audit de préparation", "Mise en conformité", "Documentation", "Accompagnement à la certification", "Suivi post-certification"],
-        image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334590968-freepik__the-style-is-candid-image-photography-with-natural__48008.png"
+        description:
+          "ISO 9001 (qualité), ISO 14001 (environnement), ISO 45001 (santé/sécurité), ISO 27001 (sécurité de l'information)",
+        features: [
+          "Audit de préparation",
+          "Mise en conformité",
+          "Documentation",
+          "Accompagnement à la certification",
+          "Suivi post-certification",
+        ],
+        image:
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766334590968-freepik__the-style-is-candid-image-photography-with-natural__48008.png",
       },
       {
         title: "Certification HAS-PSDM",
         slug: "certification-has",
-        description: "Accompagnement HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Qualité et sécurité sanitaire.",
-        features: ["Élaboration du PSDM", "Gestion des risques", "Préparation visite HAS", "Sécurité sanitaire", "Formation des équipes"],
-        image: null
+        description:
+          "Accompagnement HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Qualité et sécurité sanitaire.",
+        features: [
+          "Élaboration du PSDM",
+          "Gestion des risques",
+          "Préparation visite HAS",
+          "Sécurité sanitaire",
+          "Formation des équipes",
+        ],
+        image: null,
       },
       {
         title: "PSAD",
         slug: "psad",
-        description: "Élaboration et suivi du Programme d'Actions pour l'amélioration continue",
-        features: ["Diagnostic qualité", "Élaboration du programme", "Gestion des risques", "Indicateurs de suivi", "Amélioration continue"],
-        image: null
+        description:
+          "Élaboration et suivi du Programme d'Actions pour l'amélioration continue",
+        features: [
+          "Diagnostic qualité",
+          "Élaboration du programme",
+          "Gestion des risques",
+          "Indicateurs de suivi",
+          "Amélioration continue",
+        ],
+        image: null,
       },
       {
         title: "Certification Qualiopi",
         slug: "certification-qualiopi",
-        description: "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi",
-        features: ["Diagnostic Qualiopi", "Mise en conformité RNQ", "Constitution des preuves", "Audit à blanc", "Suivi post-certification"],
-        image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png"
-      }
-    ]
+        description:
+          "Accompagnement complet pour obtenir et maintenir votre certification Qualiopi",
+        features: [
+          "Diagnostic Qualiopi",
+          "Mise en conformité RNQ",
+          "Constitution des preuves",
+          "Audit à blanc",
+          "Suivi post-certification",
+        ],
+        image:
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png",
+      },
+    ],
   },
   {
     category: "Formation Professionnelle",
-    description: "Des formations adaptées pour développer les compétences de vos équipes",
+    description:
+      "Des formations adaptées pour développer les compétences de vos équipes",
     services: [
       {
         title: "Formation Bureautique",
         slug: "formation-bureautique",
-        description: "Maîtrise des outils Microsoft Office, Google Workspace et logiciels collaboratifs",
-        features: ["Word, Excel, PowerPoint", "Outlook et gestion emails", "Google Workspace", "Tous niveaux (débutant à expert)", "Inter et intra-entreprise"],
-        image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png"
+        description:
+          "Maîtrise des outils Microsoft Office, Google Workspace et logiciels collaboratifs",
+        features: [
+          "Word, Excel, PowerPoint",
+          "Outlook et gestion emails",
+          "Google Workspace",
+          "Tous niveaux (débutant à expert)",
+          "Inter et intra-entreprise",
+        ],
+        image:
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png",
       },
       {
         title: "Formation SST",
         slug: "formation-sst",
         description: "Formation Sauveteur Secouriste du Travail certifiée INRS",
-        features: ["Formation initiale (2 jours)", "Recyclage MAC SST", "Certification officielle INRS", "Pratique et mise en situation", "Formateurs certifiés"],
-        image: "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg"
-      }
-    ]
-  }
+        features: [
+          "Formation initiale (2 jours)",
+          "Recyclage MAC SST",
+          "Certification officielle INRS",
+          "Pratique et mise en situation",
+          "Formateurs certifiés",
+        ],
+        image:
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766332258884-pexels-shox-28271058.jpg",
+      },
+    ],
+  },
 ];
 
 export default function ServicesPage() {
@@ -78,8 +126,9 @@ export default function ServicesPage() {
               Nos Services d'Excellence
             </h1>
             <p className="text-xl text-primary-100">
-              Accompagnement qualité et formation professionnelle sur-mesure 
-              pour vous aider à atteindre vos objectifs de performance et de conformité
+              Accompagnement qualité et formation professionnelle sur-mesure
+              pour vous aider à atteindre vos objectifs de performance et de
+              conformité
             </p>
           </div>
         </div>
@@ -124,10 +173,13 @@ export default function ServicesPage() {
                       <p className="text-gray-600 mb-6">
                         {service.description}
                       </p>
-                      
+
                       <ul className="space-y-2 mb-6">
                         {service.features.map((feature, featureIdx) => (
-                          <li key={featureIdx} className="flex items-start text-sm text-gray-700">
+                          <li
+                            key={featureIdx}
+                            className="flex items-start text-sm text-gray-700"
+                          >
                             <span className="text-primary-600 mr-2">✓</span>
                             {feature}
                           </li>
@@ -136,7 +188,10 @@ export default function ServicesPage() {
 
                       <div className="inline-flex items-center text-primary-600 font-semibold group-hover:text-primary-700 group-hover:translate-x-2 transition-all">
                         En savoir plus
-                        <FaArrowRight className="ml-2 group-hover:ml-3 transition-all" size={14} />
+                        <FaArrowRight
+                          className="ml-2 group-hover:ml-3 transition-all"
+                          size={14}
+                        />
                       </div>
                     </div>
                   </Link>
@@ -154,7 +209,8 @@ export default function ServicesPage() {
             Besoin d'un accompagnement personnalisé ?
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Contactez-nous pour discuter de votre projet et obtenir un devis gratuit
+            Contactez-nous pour discuter de votre projet et obtenir un devis
+            gratuit
           </p>
           <Link
             href="/contact"

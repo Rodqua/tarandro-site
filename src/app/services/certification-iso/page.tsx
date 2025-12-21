@@ -140,47 +140,47 @@ export default function CertificationISOPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-800"></div>
         </div>
-        
-        <div className="relative -mt-32 py-20">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div
-            className="absolute bottom-0 left-0 w-96 h-96 bg-secondary-300 rounded-full filter blur-3xl animate-float"
-            style={{ animationDelay: "1s" }}
-          ></div>
-        </div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl">
-            <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
-              ⭐ Taux de réussite 95%
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
-              Certification ISO : Votre Passeport pour l'Excellence
-            </h1>
-            <p className="text-xl text-primary-100 mb-8 animate-fadeInUp animate-delay-100">
-              Accompagnement expert pour vos certifications ISO 9001, 14001,
-              45001, 27001. De l'audit à la certification, nous garantissons
-              votre réussite.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
-              <Link
-                href="/contact"
-                className="bg-white text-primary-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
-              >
-                Demander un diagnostic gratuit
-                <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
-              </Link>
-              <a
-                href="tel:+33000000000"
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-primary-600 transition-all font-semibold inline-flex items-center justify-center"
-              >
-                <FaPhone className="mr-2" />
-                06 33 28 91 61
-              </a>
+        <div className="relative -mt-32 py-20">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
+            <div
+              className="absolute bottom-0 left-0 w-96 h-96 bg-secondary-300 rounded-full filter blur-3xl animate-float"
+              style={{ animationDelay: "1s" }}
+            ></div>
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl">
+              <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
+                ⭐ Taux de réussite 95%
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
+                Certification ISO : Votre Passeport pour l'Excellence
+              </h1>
+              <p className="text-xl text-primary-100 mb-8 animate-fadeInUp animate-delay-100">
+                Accompagnement expert pour vos certifications ISO 9001, 14001,
+                45001, 27001. De l'audit à la certification, nous garantissons
+                votre réussite.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
+                <Link
+                  href="/contact"
+                  className="bg-white text-primary-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
+                >
+                  Demander un diagnostic gratuit
+                  <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
+                </Link>
+                <a
+                  href="tel:+33000000000"
+                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-primary-600 transition-all font-semibold inline-flex items-center justify-center"
+                >
+                  <FaPhone className="mr-2" />
+                  06 33 28 91 61
+                </a>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </section>
 

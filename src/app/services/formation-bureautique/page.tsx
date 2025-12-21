@@ -183,49 +183,49 @@ export default function FormationBureautiquePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-purple-700"></div>
         </div>
-        
         <div className="relative -mt-32 py-20">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
-          <div
-            className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
-            style={{ animationDelay: "1s" }}
-          ></div>
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
-              <FaLaptop className="mr-2" />
-              <FaCertificate className="mr-2" />
-              Formateurs Certifiés
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
-              Formation Bureautique Professionnelle
-            </h1>
-            <p className="text-xl text-green-100 mb-8 animate-fadeInUp animate-delay-100">
-              Maîtrisez Excel, Word, PowerPoint, Outlook et Google Workspace.
-              Formations tous niveaux, inter ou intra-entreprise, avec
-              formateurs certifiés.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
-              <Link
-                href="/contact"
-                className="bg-white text-green-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
-              >
-                Demander un devis formation
-                <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
-              </Link>
-              <a
-                href="tel:+33000000000"
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-green-600 transition-all font-semibold inline-flex items-center justify-center"
-              >
-                <FaPhone className="mr-2" />
-                06 33 28 91 61
-              </a>
-            </div>
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-float"></div>
+            <div
+              className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-float"
+              style={{ animationDelay: "1s" }}
+            ></div>
           </div>
-        </div>        </div>      </section>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-scaleIn">
+                <FaLaptop className="mr-2" />
+                <FaCertificate className="mr-2" />
+                Formateurs Certifiés
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fadeInUp">
+                Formation Bureautique Professionnelle
+              </h1>
+              <p className="text-xl text-green-100 mb-8 animate-fadeInUp animate-delay-100">
+                Maîtrisez Excel, Word, PowerPoint, Outlook et Google Workspace.
+                Formations tous niveaux, inter ou intra-entreprise, avec
+                formateurs certifiés.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp animate-delay-200">
+                <Link
+                  href="/contact"
+                  className="bg-white text-green-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all shadow-lg hover:shadow-2xl font-semibold inline-flex items-center justify-center group transform hover:scale-105"
+                >
+                  Demander un devis formation
+                  <FaArrowRight className="ml-2 group-hover:translate-x-2 transition-transform" />
+                </Link>
+                <a
+                  href="tel:+33000000000"
+                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-green-600 transition-all font-semibold inline-flex items-center justify-center"
+                >
+                  <FaPhone className="mr-2" />
+                  06 33 28 91 61
+                </a>
+              </div>
+            </div>
+          </div>{" "}
+        </div>{" "}
+      </section>
 
       {/* Formations Grid */}
       <section className="py-20 bg-white">

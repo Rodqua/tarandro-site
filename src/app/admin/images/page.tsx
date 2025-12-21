@@ -37,8 +37,11 @@ export default function ImagesManager() {
   const loadImages = async () => {
     try {
       // Ajouter un timestamp pour éviter le cache
-      const categoryParam = selectedCategory !== "all" ? `&category=${selectedCategory}` : "";
-      const response = await fetch(`/api/admin/images?t=${Date.now()}${categoryParam}`);
+      const categoryParam =
+        selectedCategory !== "all" ? `&category=${selectedCategory}` : "";
+      const response = await fetch(
+        `/api/admin/images?t=${Date.now()}${categoryParam}`
+      );
       const data = await response.json();
       console.log("Images chargées:", data);
       if (data.success) {
@@ -79,7 +82,9 @@ export default function ImagesManager() {
 
       // Gérer les autres erreurs HTTP
       if (!response.ok) {
-        setUploadStatus(`Erreur HTTP ${response.status}: ${response.statusText}`);
+        setUploadStatus(
+          `Erreur HTTP ${response.status}: ${response.statusText}`
+        );
         e.target.value = "";
         setTimeout(() => setUploadStatus(""), 5000);
         return;
@@ -96,23 +101,25 @@ export default function ImagesManager() {
         setUploadStatus(message);
         // Reset input pour permettre de réuploader le même fichier
         e.target.value = "";
-        
+
         // Ajouter les nouvelles images à la liste sans tout recharger
         if (data.files && data.files.length > 0) {
           const newImages = data.files.map((file: any) => ({
             name: file.filename,
             path: file.url,
             size: 0, // Taille non disponible immédiatement
-            type: file.filename.split('.').pop() || '',
+            type: file.filename.split(".").pop() || "",
             category: file.category || uploadCategory,
             lastModified: new Date().toISOString(),
           }));
-          setImages(prevImages => [...newImages, ...prevImages]);
+          setImages((prevImages) => [...newImages, ...prevImages]);
         }
-        
+
         setTimeout(() => setUploadStatus(""), 3000);
       } else {
-        setUploadStatus("Erreur lors de l'upload: " + (data.error || "Inconnue"));
+        setUploadStatus(
+          "Erreur lors de l'upload: " + (data.error || "Inconnue")
+        );
         e.target.value = "";
       }
     } catch (error) {
@@ -127,7 +134,7 @@ export default function ImagesManager() {
 
     try {
       console.log("Suppression de:", imagePath);
-      
+
       const response = await fetch("/api/admin/images/delete", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -139,7 +146,9 @@ export default function ImagesManager() {
 
       if (data.success) {
         // Retirer l'image immédiatement de l'UI sans recharger
-        setImages(prevImages => prevImages.filter(img => img.path !== imagePath));
+        setImages((prevImages) =>
+          prevImages.filter((img) => img.path !== imagePath)
+        );
       } else {
         alert("Erreur lors de la suppression: " + (data.error || "Inconnue"));
       }
@@ -149,7 +158,10 @@ export default function ImagesManager() {
     }
   };
 
-  const handleCategoryChange = async (imagePath: string, newCategory: string) => {
+  const handleCategoryChange = async (
+    imagePath: string,
+    newCategory: string
+  ) => {
     try {
       const response = await fetch("/api/admin/images/update-category", {
         method: "PUT",
@@ -161,15 +173,18 @@ export default function ImagesManager() {
 
       if (data.success) {
         // Mettre à jour l'image dans la liste
-        setImages(prevImages =>
-          prevImages.map(img =>
+        setImages((prevImages) =>
+          prevImages.map((img) =>
             img.path === imagePath
               ? { ...img, path: data.newUrl, category: data.category }
               : img
           )
         );
       } else {
-        alert("Erreur lors du changement de catégorie: " + (data.error || "Inconnue"));
+        alert(
+          "Erreur lors du changement de catégorie: " +
+            (data.error || "Inconnue")
+        );
       }
     } catch (error) {
       console.error("Erreur changement catégorie:", error);
@@ -236,11 +251,13 @@ export default function ImagesManager() {
                 onChange={(e) => setUploadCategory(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
               >
-                {categories.filter(c => c.value !== "all").map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
+                {categories
+                  .filter((c) => c.value !== "all")
+                  .map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
               </select>
               <label className="cursor-pointer bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors inline-flex items-center">
                 <FaUpload className="mr-2" />
@@ -265,7 +282,9 @@ export default function ImagesManager() {
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">Filtrer par catégorie :</span>
+            <span className="text-sm font-medium text-gray-700">
+              Filtrer par catégorie :
+            </span>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <button
@@ -319,15 +338,19 @@ export default function ImagesManager() {
                   </p>
                   <select
                     value={image.category || "general"}
-                    onChange={(e) => handleCategoryChange(image.path, e.target.value)}
+                    onChange={(e) =>
+                      handleCategoryChange(image.path, e.target.value)
+                    }
                     className="text-xs px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-primary-600 focus:border-transparent"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {categories.filter(c => c.value !== "all").map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
-                    ))}
+                    {categories
+                      .filter((c) => c.value !== "all")
+                      .map((cat) => (
+                        <option key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div className="flex gap-2">
