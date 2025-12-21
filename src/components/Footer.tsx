@@ -13,12 +13,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* À propos */}
           <div>
-            <h3 className="text-white text-xl font-bold mb-4">Tarandro</h3>
+            <div className="flex items-center mb-4">
+              <img
+                src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/logo/1766341574545-Logo_miniatureweb.png"
+                alt="Tarandro Logo"
+                className="h-8 w-8 mr-3"
+              />
+              <h3 className="text-white text-xl font-bold">Tarandro</h3>
+            </div>
             <p className="text-sm mb-4">
               Expert en accompagnement qualité et formation professionnelle.
               Nous vous accompagnons vers l'excellence.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-4">
               <a
                 href="https://linkedin.com"
                 target="_blank"
@@ -29,12 +36,9 @@ export default function Footer() {
                 <FaLinkedin size={24} />
               </a>
             </div>
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p>
-                &copy; {new Date().getFullYear()} Tarandro. Tous droits
-                réservés.
-              </p>
-            </div>
+            <p className="text-xs text-gray-400">
+              &copy; {new Date().getFullYear()} Tarandro. Tous droits réservés.
+            </p>
           </div>
 
           {/* Services */}
