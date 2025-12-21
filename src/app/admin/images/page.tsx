@@ -129,6 +129,34 @@ export default function ImagesManager() {
     }
   };
 
+  const handleCategoryChange = async (imagePath: string, newCategory: string) => {
+    try {
+      const response = await fetch("/api/admin/images/update-category", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: imagePath, newCategory }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Mettre à jour l'image dans la liste
+        setImages(prevImages =>
+          prevImages.map(img =>
+            img.path === imagePath
+              ? { ...img, path: data.newUrl, category: data.category }
+              : img
+          )
+        );
+      } else {
+        alert("Erreur lors du changement de catégorie: " + (data.error || "Inconnue"));
+      }
+    } catch (error) {
+      console.error("Erreur changement catégorie:", error);
+      alert("Erreur lors du changement de catégorie");
+    }
+  };
+
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -265,9 +293,23 @@ export default function ImagesManager() {
                 <p className="font-medium text-gray-900 truncate mb-1">
                   {image.name}
                 </p>
-                <p className="text-sm text-gray-500 mb-3">
-                  {formatFileSize(image.size)}
-                </p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm text-gray-500">
+                    {formatFileSize(image.size)}
+                  </p>
+                  <select
+                    value={image.category || "general"}
+                    onChange={(e) => handleCategoryChange(image.path, e.target.value)}
+                    className="text-xs px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-primary-600 focus:border-transparent"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {categories.filter(c => c.value !== "all").map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSelectedImage(image.path)}
