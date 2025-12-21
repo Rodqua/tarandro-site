@@ -26,6 +26,7 @@ export default function ImagesManager() {
     try {
       const response = await fetch("/api/admin/images");
       const data = await response.json();
+      console.log("Images chargées:", data);
       if (data.success) {
         setImages(data.images);
       }
@@ -54,13 +55,14 @@ export default function ImagesManager() {
       });
 
       const data = await response.json();
+      console.log("Réponse upload:", data);
 
       if (data.success) {
         setUploadStatus(`${data.uploaded} image(s) uploadée(s) avec succès !`);
-        loadImages();
+        await loadImages();
         setTimeout(() => setUploadStatus(""), 3000);
       } else {
-        setUploadStatus("Erreur lors de l'upload");
+        setUploadStatus("Erreur lors de l'upload: " + (data.error || "Inconnue"));
       }
     } catch (error) {
       setUploadStatus("Erreur lors de l'upload");
