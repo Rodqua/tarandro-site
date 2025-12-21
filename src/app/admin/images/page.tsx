@@ -28,6 +28,7 @@ export default function ImagesManager() {
     { value: "partenaire", label: "Partenaires" },
     { value: "service", label: "Services" },
     { value: "team", label: "Équipe" },
+    { value: "logo", label: "Logos" },
   ];
 
   useEffect(() => {

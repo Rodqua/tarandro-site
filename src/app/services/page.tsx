@@ -5,7 +5,7 @@ import { FaArrowRight } from "react-icons/fa";
 export const metadata: Metadata = {
   title: "Nos Services - Accompagnement Qualité & Formation Professionnelle",
   description:
-    "Découvrez nos services d'accompagnement qualité (ISO, HAS, PSAD) et de formation professionnelle (bureautique, SST). Solutions sur-mesure pour votre entreprise.",
+    "Découvrez nos services d'accompagnement qualité (ISO, HAS) et de formation professionnelle (bureautique, SST). Solutions sur-mesure pour votre entreprise.",
   alternates: {
     canonical: "https://tarandro.org/services",
   },
@@ -43,20 +43,6 @@ const servicesData = [
           "Préparation visite HAS",
           "Sécurité sanitaire",
           "Formation des équipes",
-        ],
-        image: null,
-      },
-      {
-        title: "PSAD",
-        slug: "psad",
-        description:
-          "Élaboration et suivi du Programme d'Actions pour l'amélioration continue",
-        features: [
-          "Diagnostic qualité",
-          "Élaboration du programme",
-          "Gestion des risques",
-          "Indicateurs de suivi",
-          "Amélioration continue",
         ],
         image: null,
       },

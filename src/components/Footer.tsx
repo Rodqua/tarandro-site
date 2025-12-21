@@ -55,14 +55,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/services/psad"
-                  className="hover:text-primary-400 transition-colors"
-                >
-                  PSAD
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/services/formation-bureautique"
                   className="hover:text-primary-400 transition-colors"
                 >

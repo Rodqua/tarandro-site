@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   FaCertificate,
   FaHospital,
-  FaFileAlt,
   FaLaptop,
   FaFirstAid,
   FaAward,
@@ -27,15 +26,6 @@ const services = [
       "Expert en certification HAS et Plan de Maîtrise Sanitaire Dynamique pour établissements de santé et médico-sociaux. Sécurité sanitaire et qualité des soins.",
     href: "/services/certification-has",
     color: "secondary",
-    image: null, // À remplacer par l'URL uploadée
-  },
-  {
-    icon: FaFileAlt,
-    title: "PSAD (Programme d'Actions)",
-    description:
-      "Élaboration et suivi de votre Programme d'Actions pour l'amélioration continue de la qualité et la gestion des risques.",
-    href: "/services/psad",
-    color: "primary",
     image: null, // À remplacer par l'URL uploadée
   },
   {

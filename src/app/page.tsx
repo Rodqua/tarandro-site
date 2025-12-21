@@ -7,9 +7,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "Tarandro - Accompagnement Qualité ISO, HAS, PSAD & Formation Professionnelle",
+    "Tarandro - Accompagnement Qualité ISO, HAS & Formation Professionnelle",
   description:
-    "Expert en accompagnement qualité (ISO, HAS, PSAD) et formation professionnelle (bureautique, SST). Optimisez votre démarche qualité et développez les compétences de vos équipes avec un expert certifié.",
+    "Expert en accompagnement qualité (ISO, HAS) et formation professionnelle (bureautique, SST). Optimisez votre démarche qualité et développez les compétences de vos équipes avec un expert certifié.",
   alternates: {
     canonical: "https://tarandro.org",
   },

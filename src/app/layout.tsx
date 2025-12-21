@@ -14,16 +14,15 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://tarandro.org"),
   title: {
     default:
-      "Tarandro - Accompagnement Qualité ISO, HAS, PSAD & Formation Professionnelle",
+      "Tarandro - Accompagnement Qualité ISO, HAS & Formation Professionnelle",
     template: "%s | Tarandro",
   },
   description:
-    "Expert en accompagnement qualité (certifications ISO, HAS, PSAD) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
+    "Expert en accompagnement qualité (certifications ISO, HAS) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
   keywords: [
     "accompagnement qualité",
     "certification ISO",
     "certification HAS",
-    "PSAD",
     "formation bureautique",
     "formation SST",
     "consultant qualité",
@@ -61,7 +60,7 @@ export const metadata: Metadata = {
     siteName: "Tarandro",
     title: "Tarandro - Expert Qualité & Formation",
     description:
-      "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
+      "Qualité et formation",
     images: [
       {
         url: "/og-image.svg",
@@ -75,7 +74,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tarandro - Expert Qualité & Formation",
     description:
-      "Accompagnement qualité ISO, HAS, PSAD et formation professionnelle",
+      "Qualité et formation",
     images: ["/og-image.svg"],
   },
   robots: {

@@ -4,7 +4,7 @@ export default function StructuredData() {
     "@type": "ProfessionalService",
     name: "Tarandro",
     description:
-      "Expert en accompagnement qualité (certifications ISO, HAS, PSAD) et formation professionnelle (bureautique, SST)",
+      "Expert en accompagnement qualité (certifications ISO, HAS) et formation professionnelle (bureautique, SST)",
     url: "https://tarandro.org",
     logo: "https://tarandro.org/icon.svg",
     image: "https://tarandro.org/og-image.jpg",
