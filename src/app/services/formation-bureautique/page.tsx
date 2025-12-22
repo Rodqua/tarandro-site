@@ -177,7 +177,7 @@ export default function FormationBureautiquePage() {
         {/* Image d'illustration */}
         <div className="relative h-64 md:h-80 overflow-hidden">
           <img
-            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png"
+            src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766398945373-g27.png"
             alt="Formation Bureautique"
             className="w-full h-full object-cover opacity-60"
           />

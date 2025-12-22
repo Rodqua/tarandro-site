@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://tarandro.org"),
   title: {
     default:
-      "Tarandro - Accompagnement Qualité ISO, HAS & Formation Professionnelle",
+      "Tarandro - Accompagnement Qualité QUALIOPI, ISO, HAS & Formation Professionnelle",
     template: "%s | Tarandro",
   },
   description:
-    "Expert en accompagnement qualité (certifications QAULIOPI, ISO, HAS) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
+    "Expert en accompagnement qualité (certifications QUALIOPI, ISO, HAS) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
   keywords: [
     "accompagnement qualité",
     "certification ISO",

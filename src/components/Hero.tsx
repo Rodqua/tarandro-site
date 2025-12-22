@@ -17,7 +17,7 @@ export default function Hero() {
           {/* Logo bannière */}
           <div className="mb-8 animate-scaleIn">
             <img
-              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/logos/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
+              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/logo/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
               alt="Tarandro - Qualité et Formation"
               className="mx-auto h-20 md:h-24 w-auto"
             />

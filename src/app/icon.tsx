@@ -15,7 +15,7 @@ export const contentType = "image/png";
 export default async function Icon() {
   // Fetch the logo image
   const imageData = await fetch(
-    "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/partenaire/1766341574545-Logo_miniatureweb.png"
+    "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/logo/1766341574545-Logo_miniatureweb.png"
   ).then((res) => res.arrayBuffer());
 
   return new Response(imageData, {

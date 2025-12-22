@@ -45,7 +45,7 @@ const servicesData = [
           "Formation des équipes",
         ],
         image:
-          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766347561396-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png",
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766398939861-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__14000.png",
       },
       {
         title: "Certification Qualiopi",
@@ -82,7 +82,7 @@ const servicesData = [
           "Inter et intra-entreprise",
         ],
         image:
-          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766337419345-freepik__photo-ultraraliste-scne-de-formation-bureautique.png",
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766398945373-g27.png",
       },
       {
         title: "Formation SST",
