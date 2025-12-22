@@ -26,7 +26,7 @@ export default function Header() {
             className="flex items-center hover:opacity-80 transition-opacity"
           >
             <img
-              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/partenaire/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
+              src="https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/logos/1766338321745-LogoSite_Hor_Qualit__et_Formation.png"
               alt="Tarandro - Qualité & Formation"
               className="h-12 w-auto"
             />

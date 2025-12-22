@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Tarandro",
   },
   description:
-    "Expert en accompagnement qualité (certifications ISO, HAS) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
+    "Expert en accompagnement qualité (certifications QAULIOPI, ISO, HAS) et formation professionnelle (bureautique, SST). Solutions sur-mesure pour optimiser votre démarche qualité et former vos équipes.",
   keywords: [
     "accompagnement qualité",
     "certification ISO",
