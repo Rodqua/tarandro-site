@@ -60,7 +60,7 @@ const servicesData = [
           "Suivi post-certification",
         ],
         image:
-          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766339707740-image1.png",
+          "https://8vsrlofryyepkmou.public.blob.vercel-storage.com/images/service/1766343145236-freepik__photo-ultraraliste-corporate-premium-scne-de-conse__25071b.png",
       },
     ],
   },
