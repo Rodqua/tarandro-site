@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -12,4 +6,40 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model EmailAccount {
+  id           String        @id @default(cuid())
+  provider     String        // "google" | "microsoft" | "zoho"
+  email        String
+  displayName  String?
+  accessToken  String        @db.Text
+  refreshToken String?       @db.Text
+  expiresAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  threads      EmailThread[]
+
+  @@unique([provider, email])
+}
+
+model EmailThread {
+  id          String       @id @default(cuid())
+  threadId    String
+  accountId   String
+  account     EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  subject     String       @db.Text
+  snippet     String       @db.Text
+  sender      String
+  date        DateTime
+  isUnread    Boolean      @default(true)
+  category    String       @default("important")
+  labels      String[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([accountId, threadId])
+  @@index([accountId, isUnread])
+  @@index([date])
+  @@index([category])
 }
