@@ -208,3 +208,15 @@ export async function markZohoMessageRead(
     body: JSON.stringify({ mode: 'markAsRead', messageId }),
   })
 }
+
+// Alias pour compatibilité avec les routes existantes
+export async function replyToZohoMessage(
+  accessToken: string,
+  accountId: string,
+  messageId: string,
+  to: string,
+  subject: string,
+  body: string
+) {
+  return sendZohoReply(accessToken, accountId, messageId, to, subject, body)
+}

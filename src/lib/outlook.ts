@@ -199,3 +199,6 @@ export async function markOutlookMessageRead(
     body: JSON.stringify({ isRead: true }),
   })
 }
+
+// Alias pour compatibilité avec les routes existantes
+export const replyToOutlookMessage = sendOutlookReply
