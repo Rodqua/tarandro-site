@@ -479,7 +479,19 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Link
+          href="/mail"
+          className="block bg-gradient-to-br from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <FaEnvelope size={32} />
+          </div>
+          <h3 className="text-lg font-bold mb-1">Boîte mail</h3>
+          <p className="text-sm text-cyan-100">
+            Gérer toutes vos adresses mail
+          </p>
+        </Link>
         <Link
           href="/admin/blog"
           className="block bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"

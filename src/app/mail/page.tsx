@@ -169,6 +169,13 @@ export default function MailPage() {
               {syncing ? "Synchro..." : "Synchroniser"}
             </button>
             <a
+              href="/mail/settings"
+              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              title="Paramètres"
+            >
+              ⚙️
+            </a>
+            <a
               href="/admin"
               className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
