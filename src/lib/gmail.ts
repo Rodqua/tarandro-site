@@ -14,6 +14,8 @@ export function getGmailAuthUrl(): string {
   return client.generateAuthUrl({
     access_type: "offline",
     scope: [
+      "https://www.googleapis.com/auth/gmail.modify",
+      "https://www.googleapis.com/auth/gmail.send",
       "https://www.googleapis.com/auth/gmail.readonly",
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile",
@@ -139,4 +141,89 @@ export function categorizeEmail(sender: string, subject: string): string {
     return "newsletter";
 
   return "important";
+}
+
+// ---- Nouvelles fonctions reply / delete ----
+
+export async function getGmailMessage(
+  accessToken: string,
+  refreshToken: string | undefined,
+  messageId: string
+) {
+  const client = getOAuth2Client()
+  client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+  const gmail = google.gmail({ version: 'v1', auth: client })
+  const { data } = await gmail.users.messages.get({
+    userId: 'me',
+    id: messageId,
+    format: 'full',
+  })
+  return data
+}
+
+function encodeMessage(headers: Record<string, string>, body: string): string {
+  const headerStr = Object.entries(headers)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join('\r\n')
+  const raw = `${headerStr}\r\n\r\n${body}`
+  return Buffer.from(raw).toString('base64url')
+}
+
+export async function sendGmailReply(
+  accessToken: string,
+  refreshToken: string | undefined,
+  threadId: string,
+  inReplyTo: string,
+  to: string,
+  subject: string,
+  body: string
+) {
+  const client = getOAuth2Client()
+  client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+  const gmail = google.gmail({ version: 'v1', auth: client })
+
+  const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`
+  const raw = encodeMessage(
+    {
+      'To': to,
+      'Subject': replySubject,
+      'In-Reply-To': inReplyTo,
+      'References': inReplyTo,
+      'Content-Type': 'text/plain; charset=utf-8',
+      'MIME-Version': '1.0',
+    },
+    body
+  )
+
+  const { data } = await gmail.users.messages.send({
+    userId: 'me',
+    requestBody: { raw, threadId },
+  })
+  return data
+}
+
+export async function trashGmailThread(
+  accessToken: string,
+  refreshToken: string | undefined,
+  threadId: string
+) {
+  const client = getOAuth2Client()
+  client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+  const gmail = google.gmail({ version: 'v1', auth: client })
+  await gmail.users.threads.trash({ userId: 'me', id: threadId })
+}
+
+export async function markGmailThreadRead(
+  accessToken: string,
+  refreshToken: string | undefined,
+  threadId: string
+) {
+  const client = getOAuth2Client()
+  client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+  const gmail = google.gmail({ version: 'v1', auth: client })
+  await gmail.users.threads.modify({
+    userId: 'me',
+    id: threadId,
+    requestBody: { removeLabelIds: ['UNREAD'] },
+  })
 }

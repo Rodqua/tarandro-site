@@ -26,6 +26,7 @@ model EmailAccount {
 model EmailThread {
   id          String       @id @default(cuid())
   threadId    String
+  messageId   String?
   accountId   String
   account     EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   subject     String       @db.Text
@@ -33,6 +34,7 @@ model EmailThread {
   sender      String
   date        DateTime
   isUnread    Boolean      @default(true)
+  isArchived  Boolean      @default(false)
   category    String       @default("important")
   labels      String[]
   createdAt   DateTime     @default(now())
@@ -42,4 +44,28 @@ model EmailThread {
   @@index([accountId, isUnread])
   @@index([date])
   @@index([category])
+}
+
+model FilterRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  field       String   @default("all")
+  pattern     String   @db.Text
+  category    String
+  priority    Int      @default(0)
+  isActive    Boolean  @default(true)
+  isBuiltIn   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NotificationPreference {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  enabled     Boolean  @default(true)
+  hour        Int      @default(8)
+  timezone    String   @default("Europe/Paris")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
