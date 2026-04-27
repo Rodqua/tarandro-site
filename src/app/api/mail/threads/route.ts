@@ -1,83 +1,163 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/prisma";
-import { listGmailThreads, getGmailThread, categorizeEmail } from "@/lib/gmail";
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { prisma } from '@/lib/prisma'
+import { listGmailThreads, getGmailThread, categorizeEmail } from '@/lib/gmail'
+import { listOutlookMessages, categorizeOutlookEmail, refreshOutlookToken } from '@/lib/outlook'
+import { listZohoMessages, getZohoUserInfo, categorizeZohoEmail, refreshZohoToken } from '@/lib/zoho'
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic'
+
+async function getValidToken(account: {
+  id: string
+  provider: string
+  accessToken: string
+  refreshToken: string | null
+  expiresAt: Date | null
+}): Promise<string> {
+  // Si le token n'expire pas avant 5 min, on l'utilise tel quel
+  if (!account.expiresAt || account.expiresAt.getTime() > Date.now() + 5 * 60 * 1000) {
+    return account.accessToken
+  }
+  if (!account.refreshToken) return account.accessToken
+
+  try {
+    let newTokens: { access_token: string; expires_in?: number; refresh_token?: string }
+    if (account.provider === 'outlook') {
+      newTokens = await refreshOutlookToken(account.refreshToken)
+    } else if (account.provider === 'zoho') {
+      newTokens = await refreshZohoToken(account.refreshToken)
+    } else {
+      return account.accessToken
+    }
+
+    const expiresAt = newTokens.expires_in
+      ? new Date(Date.now() + newTokens.expires_in * 1000)
+      : null
+
+    await (prisma as any).emailAccount.update({
+      where: { id: account.id },
+      data: {
+        accessToken: newTokens.access_token,
+        refreshToken: newTokens.refresh_token || account.refreshToken,
+        expiresAt,
+      },
+    })
+    return newTokens.access_token
+  } catch {
+    return account.accessToken
+  }
+}
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession();
-  if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const session = await getServerSession()
+  if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-  const { searchParams } = new URL(request.url);
-  const filter = searchParams.get("filter") || "all";
-  const sync = searchParams.get("sync") === "true";
+  const { searchParams } = new URL(request.url)
+  const filter = searchParams.get('filter') || 'all'
+  const sync = searchParams.get('sync') === 'true'
 
-  // Synchronisation si demandée
   if (sync) {
-    const accounts = await (prisma as any).emailAccount.findMany();
+    const accounts = await (prisma as any).emailAccount.findMany()
 
     for (const account of accounts) {
-      if (account.provider === "google") {
-        try {
+      try {
+        const token = await getValidToken(account)
+
+        if (account.provider === 'google') {
+          // --- Gmail ---
           const threads = await listGmailThreads(
-            account.accessToken,
+            token,
             account.refreshToken ?? undefined,
-            "is:unread newer_than:14d",
+            'is:unread newer_than:14d',
             30
-          );
-
+          )
           for (const thread of threads) {
-            if (!thread.id) continue;
+            if (!thread.id) continue
             try {
-              const detail = await getGmailThread(
-                account.accessToken,
-                account.refreshToken ?? undefined,
-                thread.id
-              );
-
-              const messages = detail.messages || [];
-              const last = messages[messages.length - 1];
-              if (!last) continue;
-
-              const headers = last.payload?.headers || [];
+              const detail = await getGmailThread(token, account.refreshToken ?? undefined, thread.id)
+              const messages = detail.messages || []
+              const last = messages[messages.length - 1]
+              if (!last) continue
+              const headers = last.payload?.headers || []
               const h = (name: string) =>
-                headers.find((x) => x.name?.toLowerCase() === name.toLowerCase())?.value || "";
-
-              const subject = h("Subject") || "(Sans objet)";
-              const sender = h("From") || "";
-              const date = h("Date") ? new Date(h("Date")) : new Date();
-              const snippet = last.snippet || "";
-              const labels = last.labelIds || [];
-              const category = categorizeEmail(sender, subject);
-
+                headers.find((x: { name?: string }) => x.name?.toLowerCase() === name.toLowerCase())?.value || ''
+              const subject = h('Subject') || '(Sans objet)'
+              const sender = h('From') || ''
+              const date = h('Date') ? new Date(h('Date')) : new Date()
+              const snippet = last.snippet || ''
+              const labels = last.labelIds || []
+              const category = categorizeEmail(sender, subject)
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId: thread.id } },
-                update: { subject, sender, snippet, date, category, labels, isUnread: labels.includes("UNREAD"), updatedAt: new Date() },
-                create: { threadId: thread.id, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread: labels.includes("UNREAD") },
-              });
+                update: { subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
+                create: { threadId: thread.id, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD') },
+              })
             } catch {}
           }
-        } catch (e) {
-          console.error(`Sync error for ${account.email}:`, e);
+
+        } else if (account.provider === 'outlook') {
+          // --- Outlook / Hotmail ---
+          const messages = await listOutlookMessages(token, 50)
+          for (const msg of messages) {
+            try {
+              const subject = msg.subject || '(Sans objet)'
+              const sender = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || ''
+              const date = new Date(msg.receivedDateTime)
+              const snippet = msg.bodyPreview || ''
+              const labels: string[] = msg.categories || []
+              const category = categorizeOutlookEmail(subject, sender, snippet)
+              const isUnread = !msg.isRead
+              const threadId = msg.conversationId || msg.id
+              await (prisma as any).emailThread.upsert({
+                where: { accountId_threadId: { accountId: account.id, threadId } },
+                update: { subject, sender, snippet, date, category, labels, isUnread, updatedAt: new Date() },
+                create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+              })
+            } catch {}
+          }
+
+        } else if (account.provider === 'zoho') {
+          // --- Zoho Mail ---
+          const userInfo = await getZohoUserInfo(token)
+          if (!userInfo.accountId) continue
+          const messages = await listZohoMessages(token, userInfo.accountId, 50)
+          for (const msg of messages) {
+            try {
+              const subject = msg.subject || '(Sans objet)'
+              const sender = msg.fromAddress || msg.sender || ''
+              const date = msg.receivedTime ? new Date(Number(msg.receivedTime)) : new Date()
+              const snippet = msg.summary || msg.content || ''
+              const labels: string[] = msg.flagged ? ['flagged'] : []
+              const category = categorizeZohoEmail(subject, sender, snippet)
+              const isUnread = msg.status === 'unread' || msg.isUnread === true
+              const threadId = msg.threadId || msg.messageId || String(msg.mid)
+              await (prisma as any).emailThread.upsert({
+                where: { accountId_threadId: { accountId: account.id, threadId } },
+                update: { subject, sender, snippet, date, category, labels, isUnread, updatedAt: new Date() },
+                create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+              })
+            } catch {}
+          }
         }
+      } catch (e) {
+        console.error(`Sync error for ${account.email} (${account.provider}):`, e)
       }
     }
   }
 
-  // Construction de la requête filtrée
-  const where: Record<string, unknown> = {};
-  if (filter === "unread") where.isUnread = true;
-  if (["urgent", "important", "veille", "loge", "compta", "newsletter", "events"].includes(filter)) {
-    where.category = filter;
+  // Filtrage
+  const where: Record<string, unknown> = {}
+  if (filter === 'unread') where.isUnread = true
+  if (['urgent', 'important', 'veille', 'loge', 'compta', 'newsletter', 'events'].includes(filter)) {
+    where.category = filter
   }
 
   const threads = await (prisma as any).emailThread.findMany({
     where,
     include: { account: { select: { email: true, provider: true } } },
-    orderBy: { date: "desc" },
+    orderBy: { date: 'desc' },
     take: 150,
-  });
+  })
 
-  return NextResponse.json(threads);
+  return NextResponse.json(threads)
 }
