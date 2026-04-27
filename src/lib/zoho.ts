@@ -147,3 +147,64 @@ export async function markZohoMessageRead(accessToken: string, accountId: string
     body: JSON.stringify({ mode: 'markAsRead', messageId }),
   })
 }
+
+// ---- Reply / Delete ----
+
+export async function sendZohoReply(
+  accessToken: string,
+  accountId: string,
+  messageId: string,
+  to: string,
+  subject: string,
+  body: string
+) {
+  const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`
+  const response = await fetch(`${ZOHO_API_BASE}/accounts/${accountId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Zoho-oauthtoken ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      toAddress: to,
+      subject: replySubject,
+      content: body,
+      mailFormat: 'plaintext',
+      inReplyTo: messageId,
+    }),
+  })
+  if (!response.ok) {
+    const err = await response.text()
+    throw new Error(`Zoho reply failed: ${err}`)
+  }
+}
+
+export async function deleteZohoMessage(
+  accessToken: string,
+  accountId: string,
+  messageId: string
+) {
+  const response = await fetch(
+    `${ZOHO_API_BASE}/accounts/${accountId}/messages/${messageId}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+    }
+  )
+  if (!response.ok) throw new Error('Zoho delete failed')
+}
+
+export async function markZohoMessageRead(
+  accessToken: string,
+  accountId: string,
+  messageId: string
+) {
+  await fetch(`${ZOHO_API_BASE}/accounts/${accountId}/updatemessage`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Zoho-oauthtoken ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ mode: 'markAsRead', messageId }),
+  })
+}

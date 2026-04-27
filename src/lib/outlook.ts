@@ -139,3 +139,63 @@ export async function markOutlookMessageRead(accessToken: string, messageId: str
     body: JSON.stringify({ isRead: true }),
   })
 }
+
+// ---- Reply / Delete ----
+
+export async function sendOutlookReply(
+  accessToken: string,
+  messageId: string,
+  body: string
+) {
+  const response = await fetch(
+    `${GRAPH_API_BASE}/me/messages/${messageId}/reply`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: {},
+        comment: body,
+      }),
+    }
+  )
+  if (!response.ok) {
+    const err = await response.text()
+    throw new Error(`Outlook reply failed: ${err}`)
+  }
+}
+
+export async function deleteOutlookMessage(
+  accessToken: string,
+  messageId: string
+) {
+  // Move to Deleted Items (soft delete)
+  const response = await fetch(
+    `${GRAPH_API_BASE}/me/messages/${messageId}/move`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ destinationId: 'deleteditems' }),
+    }
+  )
+  if (!response.ok) throw new Error('Outlook delete failed')
+}
+
+export async function markOutlookMessageRead(
+  accessToken: string,
+  messageId: string
+) {
+  await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ isRead: true }),
+  })
+}
