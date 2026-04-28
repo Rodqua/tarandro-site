@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
               if (!last) continue
               const headers = last.payload?.headers || []
               const h = (name: string) =>
-                headers.find((x: { name?: string }) => x.name?.toLowerCase() === name.toLowerCase())?.value || ''
+                headers.find((x: { name?: string | null }) => x.name?.toLowerCase() === name.toLowerCase())?.value || ''
               const subject = h('Subject') || '(Sans objet)'
               const sender = h('From') || ''
               const date = h('Date') ? new Date(h('Date')) : new Date()
