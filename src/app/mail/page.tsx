@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { EmailThread, EmailAccount, EmailCategory, CATEGORY_CONFIG } from '@/types/mail'
+import { FaGoogle, FaMicrosoft, FaEnvelope } from 'react-icons/fa'
 
 const FILTERS = [
   { key: 'all', label: 'Tous', emoji: '📬' },
@@ -36,17 +37,26 @@ function extractEmail(sender: string) {
   return m ? m[1] : sender
 }
 
-function providerBadge(provider: string) {
-  if (provider === 'google') return { color: 'bg-red-100 text-red-700' }
-  if (provider === 'outlook' || provider === 'microsoft') return { color: 'bg-blue-100 text-blue-700' }
-  return { color: 'bg-orange-100 text-orange-700' }
+function providerConfig(provider: string) {
+  if (provider === 'google') return { color: 'bg-red-50 text-red-700 border border-red-200', Icon: FaGoogle, iconColor: 'text-red-500' }
+  if (provider === 'outlook' || provider === 'microsoft') return { color: 'bg-blue-50 text-blue-700 border border-blue-200', Icon: FaMicrosoft, iconColor: 'text-blue-500' }
+  return { color: 'bg-orange-50 text-orange-700 border border-orange-200', Icon: FaEnvelope, iconColor: 'text-orange-500' }
 }
 
 function accountBadge(email: string, provider: string) {
-  const { color } = providerBadge(provider)
-  // Afficher la partie locale de l'email (avant @) ou l'adresse complète si courte
-  const short = email.length <= 20 ? email : email.split('@')[0]
-  return { label: short, color }
+  const cfg = providerConfig(provider)
+  const username = email.split('@')[0]
+  return { label: username, color: cfg.color, Icon: cfg.Icon, iconColor: cfg.iconColor }
+}
+
+function ProviderBadge({ email, provider, className = '' }: { email: string; provider: string; className?: string }) {
+  const { label, color, Icon, iconColor } = accountBadge(email, provider)
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full font-medium ${color} ${className}`}>
+      <Icon className={`text-[10px] ${iconColor} flex-shrink-0`} />
+      {label}
+    </span>
+  )
 }
 
 function providerUrl(thread: EmailThread) {
@@ -368,7 +378,7 @@ export default function MailPage() {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">{acc.email}</p>
-                      <span className={`text-xs px-1 py-0.5 rounded ${badge.color}`}>{acc.provider}</span>
+                      <ProviderBadge email={acc.email} provider={acc.provider} />
                     </div>
                   </button>
                 )
@@ -426,7 +436,7 @@ export default function MailPage() {
                       <p className="text-xs text-gray-400 truncate">{thread.snippet}</p>
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs px-1.5 py-0.5 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji}</span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${badge.color}`}>{badge.label}</span>
+                        <ProviderBadge email={thread.account.email} provider={thread.account.provider} />
                       </div>
                     </div>
                     {!selectMode && (
@@ -496,11 +506,11 @@ export default function MailPage() {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 {(() => { const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important; return <span className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.label}</span> })()}
-                <span className={`text-xs px-2 py-1 rounded-full ${accountBadge(selected.account.email, selected.account.provider).color}`}>{accountBadge(selected.account.email, selected.account.provider).label}</span>
+                <ProviderBadge email={selected.account.email} provider={selected.account.provider} className="px-2 py-1" />
                 {selected.isUnread && <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Non lu</span>}
               </div>
               <p className="text-xs text-gray-400 text-center">
-                Pour voir le contenu complet, <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">ouvrir dans {accountBadge(selected.account.email, selected.account.provider).label}</a>.
+                Pour voir le contenu complet, <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">ouvrir dans {selected.account.email}</a>.
               </p>
             </div>
             <div className="border-t border-gray-200 flex-shrink-0">
