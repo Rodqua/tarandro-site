@@ -61,6 +61,40 @@ export async function listGmailThreads(
   return data.threads || [];
 }
 
+// Récupère TOUS les thread IDs via pagination (nextPageToken), sans fetch les détails
+export async function listAllGmailThreadIds(
+  accessToken: string,
+  refreshToken: string | undefined,
+  query: string = '-in:spam -in:trash',
+  maxTotal: number = 500
+): Promise<string[]> {
+  const client = getOAuth2Client()
+  client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+  const gmail = google.gmail({ version: 'v1', auth: client })
+
+  const allIds: string[] = []
+  let pageToken: string | undefined = undefined
+
+  while (allIds.length < maxTotal) {
+    const pageSize = Math.min(maxTotal - allIds.length, 500)
+    const { data } = await gmail.users.threads.list({
+      userId: 'me',
+      q: query,
+      maxResults: pageSize,
+      ...(pageToken ? { pageToken } : {}),
+    })
+
+    const threads = data.threads || []
+    for (const t of threads) {
+      if (t.id) allIds.push(t.id)
+    }
+    if (!data.nextPageToken || threads.length === 0) break
+    pageToken = data.nextPageToken as string
+  }
+
+  return allIds
+}
+
 export async function getGmailThread(
   accessToken: string,
   refreshToken: string | undefined,

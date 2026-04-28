@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
-import { listGmailThreads, getGmailThread, categorizeEmail } from '@/lib/gmail'
+import { listGmailThreads, listAllGmailThreadIds, getGmailThread, categorizeEmail } from '@/lib/gmail'
 import { listOutlookMessages, categorizeOutlookEmail, refreshOutlookToken } from '@/lib/outlook'
 import { listZohoMessages, getZohoUserInfo, categorizeZohoEmail, refreshZohoToken } from '@/lib/zoho'
 export const dynamic = 'force-dynamic'
@@ -112,36 +112,55 @@ export async function GET(request: NextRequest) {
         const token = await getValidToken(account)
 
         if (account.provider === 'google') {
-          // Sync Gmail unread
-          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'newer_than:90d', 200)
-          for (const thread of threads) {
-            if (!thread.id) continue
-            try {
-              const detail = await getGmailThread(token, account.refreshToken ?? undefined, thread.id)
-              const messages = detail.messages || []
-              const last = messages[messages.length - 1]
-              if (!last) continue
-              const headers = last.payload?.headers || []
-              const h = (name: string) =>
-                headers.find((x: { name?: string | null }) => x.name?.toLowerCase() === name.toLowerCase())?.value || ''
-              const subject = h('Subject') || '(Sans objet)'
-              const sender = h('From') || ''
-              const date = h('Date') ? new Date(h('Date')) : new Date()
-              const snippet = last.snippet || ''
-              const labels = last.labelIds || []
-              const category = categorizeEmail(sender, subject)
-              await (prisma as any).emailThread.upsert({
-                where: { accountId_threadId: { accountId: account.id, threadId: thread.id } },
-                update: { subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
-                create: { threadId: thread.id, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD') },
-              })
-            } catch {}
+          // 1. Récupère TOUS les IDs via pagination (sans date limite, sans spam/trash)
+          const allIds = await listAllGmailThreadIds(
+            token,
+            account.refreshToken ?? undefined,
+            '-in:spam -in:trash',
+            500
+          )
+
+          // 2. Quels IDs sont déjà en DB ? On ne re-fetch que les nouveaux
+          const existingRows = await (prisma as any).emailThread.findMany({
+            where: { accountId: account.id, threadId: { in: allIds } },
+            select: { threadId: true },
+          })
+          const existingSet = new Set(existingRows.map((r: any) => r.threadId))
+          const newIds = allIds.filter((id: string) => !existingSet.has(id))
+
+          // 3. Fetch les détails uniquement pour les nouveaux threads, par batches de 10
+          const BATCH = 10
+          for (let i = 0; i < newIds.length; i += BATCH) {
+            const batch = newIds.slice(i, i + BATCH)
+            await Promise.allSettled(batch.map(async (threadId: string) => {
+              try {
+                const detail = await getGmailThread(token, account.refreshToken ?? undefined, threadId)
+                const messages = detail.messages || []
+                const last = messages[messages.length - 1]
+                if (!last) return
+                const headers = last.payload?.headers || []
+                const h = (name: string) =>
+                  headers.find((x: { name?: string | null }) => x.name?.toLowerCase() === name.toLowerCase())?.value || ''
+                const subject = h('Subject') || '(Sans objet)'
+                const sender = h('From') || ''
+                const date = h('Date') ? new Date(h('Date')) : new Date()
+                const snippet = last.snippet || ''
+                const labels = last.labelIds || []
+                const category = categorizeEmail(sender, subject)
+                await (prisma as any).emailThread.upsert({
+                  where: { accountId_threadId: { accountId: account.id, threadId } },
+                  update: { subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
+                  create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD') },
+                })
+              } catch {}
+            }))
           }
-          // Nettoyer les emails supprimés côté Gmail
+
+          // 4. Nettoyer les emails mis à la corbeille côté Gmail
           await cleanupGmailTrashed(account.id, token, account.refreshToken ?? undefined)
 
         } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
-          const messages = await listOutlookMessages(token, 100)
+          const messages = await listOutlookMessages(token, 500)
           const currentIds: string[] = []
           for (const msg of messages) {
             try {
@@ -170,7 +189,7 @@ export async function GET(request: NextRequest) {
         } else if (account.provider === 'zoho') {
           const userInfo = await getZohoUserInfo(token)
           if (!userInfo.accountId) continue
-          const messages = await listZohoMessages(token, userInfo.accountId, 100)
+          const messages = await listZohoMessages(token, userInfo.accountId, 200)
           for (const msg of messages) {
             try {
               const subject = msg.subject || '(Sans objet)'
