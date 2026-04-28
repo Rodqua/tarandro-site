@@ -275,11 +275,17 @@ export default function MailPage() {
       body: JSON.stringify({ action: 'remove', ids }),
     })
     if (res.ok) {
-      setThreads(prev => prev.filter(t => !checkedIds.has(t.id)))
-      if (selected && checkedIds.has(selected.id)) setSelected(null)
+      const data = await res.json()
+      const successIds = new Set<string>(data.deletedIds ?? ids)
+      setThreads(prev => prev.filter(t => !successIds.has(t.id)))
+      if (selected && successIds.has(selected.id)) setSelected(null)
       setCheckedIds(new Set())
       setSelectMode(false)
-      showToast(`🗑️ ${ids.length} email(s) supprimé(s)`)
+      if (data.failed > 0) {
+        showToast(`⚠️ ${data.deleted} supprimé(s), ${data.failed} échec(s) — réessayez`, 'error')
+      } else {
+        showToast(`🗑️ ${data.deleted} email(s) supprimé(s)`)
+      }
     } else {
       showToast('❌ Erreur lors de la suppression', 'error')
     }

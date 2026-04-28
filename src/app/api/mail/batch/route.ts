@@ -141,8 +141,14 @@ export async function POST(request: NextRequest) {
     await (prisma as any).emailThread.deleteMany({ where: { id: { in: deletedIds } } })
   }
 
+  const failedIds = providerResults
+    .map((r, i) => r.status === 'rejected' ? threads[i]?.id : null)
+    .filter(Boolean) as string[]
+
   return NextResponse.json({
     success: true,
+    deletedIds,
+    failedIds,
     deleted: deletedIds.length,
     failed: failedCount,
     message: failedCount > 0
