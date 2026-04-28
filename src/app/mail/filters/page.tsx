@@ -15,6 +15,24 @@ interface FilterRule {
   isBuiltIn: boolean
 }
 
+interface EmailCluster {
+  name: string
+  pattern: string
+  emails: number[]
+  senderDomains: string[]
+  keywords: string[]
+  suggestedAction: { label?: string; archive?: boolean; markRead?: boolean }
+  reason: string
+  emailSamples: { provider: string; account: string; from: string; subject: string }[]
+}
+
+interface AnalyzeResult {
+  clusters: EmailCluster[]
+  providerCounts: Record<string, number>
+  totalEmails: number
+  errors: string[]
+}
+
 const CATEGORY_COLORS: Record<string, string> = {
   important: 'bg-yellow-100 text-yellow-800',
   compta: 'bg-blue-100 text-blue-800',
@@ -30,6 +48,12 @@ const FIELD_LABELS: Record<string, string> = {
   subject: 'Objet',
 }
 
+const PROVIDER_ICONS: Record<string, string> = {
+  gmail: '📧',
+  outlook: '📨',
+  zoho: '📩',
+}
+
 export default function FiltersPage() {
   const router = useRouter()
   const [rules, setRules] = useState<FilterRule[]>([])
@@ -40,7 +64,14 @@ export default function FiltersPage() {
   const [saving, setSaving] = useState(false)
   const [flash, setFlash] = useState<string | null>(null)
 
-  const showFlash = (msg: string) => { setFlash(msg); setTimeout(() => setFlash(null), 3000) }
+  // Global AI analysis state
+  const [analyzeLimit, setAnalyzeLimit] = useState(50)
+  const [analyzeLoading, setAnalyzeLoading] = useState(false)
+  const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResult | null>(null)
+  const [applyingIdx, setApplyingIdx] = useState<number | null>(null)
+  const [appliedIdx, setAppliedIdx] = useState<Set<number>>(new Set())
+
+  const showFlash = (msg: string) => { setFlash(msg); setTimeout(() => setFlash(null), 3500) }
 
   async function loadRules() {
     setLoading(true)
@@ -99,6 +130,49 @@ export default function FiltersPage() {
     setSaving(false)
   }
 
+  async function runAnalysis() {
+    setAnalyzeLoading(true)
+    setAnalyzeResult(null)
+    setAppliedIdx(new Set())
+    try {
+      const res = await fetch('/api/mail/filters/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: analyzeLimit }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setAnalyzeResult(data)
+        if (data.errors?.length) showFlash(`⚠️ ${data.errors.length} compte(s) avec erreur`)
+      } else showFlash(`❌ ${data.error || 'Erreur analyse'}`)
+    } catch {
+      showFlash('❌ Erreur de connexion')
+    }
+    setAnalyzeLoading(false)
+  }
+
+  async function applyCluster(idx: number) {
+    setApplyingIdx(idx)
+    try {
+      const res = await fetch('/api/mail/filters/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: analyzeLimit, apply: true, clusterIndex: idx }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        const created = (data.applyResults || []).filter((r: any) => r.status === 'created').length
+        showFlash(`✅ ${created} filtre(s) Gmail créé(s) pour "${analyzeResult?.clusters[idx]?.name}"`)
+        setAppliedIdx(prev => new Set([...prev, idx]))
+      } else {
+        showFlash(`❌ ${data.error || 'Erreur application'}`)
+      }
+    } catch {
+      showFlash('❌ Erreur de connexion')
+    }
+    setApplyingIdx(null)
+  }
+
   const builtIn = rules.filter(r => r.isBuiltIn)
   const custom = rules.filter(r => !r.isBuiltIn)
 
@@ -121,7 +195,135 @@ export default function FiltersPage() {
           <div className="mb-4 p-3 rounded-xl bg-white border text-sm font-medium text-gray-800 shadow-sm">{flash}</div>
         )}
 
-        {/* Section IA */}
+        {/* ── Section Analyse IA globale ─────────────────────────────────── */}
+        <div className="bg-gradient-to-br from-violet-50 to-blue-50 border border-violet-200 rounded-2xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xl">🔍</span>
+            <h2 className="font-semibold text-gray-900">Analyse IA globale</h2>
+            <span className="ml-auto text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full font-medium">Gmail · Outlook · Zoho</span>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Claude analyse tes emails de tous tes comptes confondus, détecte les patterns et propose des filtres Gmail à créer en un clic.
+          </p>
+
+          <div className="flex items-center gap-3 mb-4">
+            <label className="text-sm text-gray-600 whitespace-nowrap">Emails par compte :</label>
+            <input
+              type="number"
+              min={10} max={200} step={10}
+              value={analyzeLimit}
+              onChange={e => setAnalyzeLimit(Number(e.target.value))}
+              className="w-24 px-3 py-1.5 rounded-lg border border-violet-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
+            />
+            <button
+              onClick={runAnalysis}
+              disabled={analyzeLoading}
+              className="px-5 py-2 bg-violet-600 text-white rounded-xl text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+            >
+              {analyzeLoading ? (
+                <>
+                  <span className="inline-block animate-spin">⟳</span>
+                  Analyse en cours… (30–60s)
+                </>
+              ) : '🚀 Analyser mes emails'}
+            </button>
+          </div>
+
+          {/* Résultats */}
+          {analyzeResult && (
+            <div className="mt-2">
+              {/* Résumé providers */}
+              <div className="flex gap-3 mb-4 flex-wrap">
+                <span className="text-xs text-gray-500">{analyzeResult.totalEmails} emails analysés ·</span>
+                {Object.entries(analyzeResult.providerCounts).map(([p, n]) => (
+                  <span key={p} className="text-xs bg-white border border-gray-200 rounded-full px-2 py-0.5 text-gray-600">
+                    {PROVIDER_ICONS[p] || '📧'} {p} : {n}
+                  </span>
+                ))}
+                {analyzeResult.clusters.length > 0 && (
+                  <span className="text-xs bg-violet-100 text-violet-700 rounded-full px-2 py-0.5 font-medium">
+                    {analyzeResult.clusters.length} cluster{analyzeResult.clusters.length > 1 ? 's' : ''} détecté{analyzeResult.clusters.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+
+              {analyzeResult.clusters.length === 0 ? (
+                <div className="text-center text-gray-400 text-sm py-4">Aucun cluster détecté. Essaie d&apos;augmenter le nombre d&apos;emails.</div>
+              ) : (
+                <div className="space-y-3">
+                  {analyzeResult.clusters.map((cluster, idx) => (
+                    <div key={idx} className={`bg-white rounded-xl border p-4 transition-all ${appliedIdx.has(idx) ? 'border-green-300 bg-green-50' : 'border-violet-100'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="font-semibold text-gray-900 text-sm">{cluster.name}</span>
+                            {cluster.suggestedAction?.label && (
+                              <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">{cluster.suggestedAction.label}</span>
+                            )}
+                            {cluster.suggestedAction?.archive && (
+                              <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">Skip inbox</span>
+                            )}
+                            {cluster.suggestedAction?.markRead && (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">Marquer lu</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mb-2">{cluster.reason}</p>
+                          <div className="flex gap-2 flex-wrap mb-2">
+                            {(cluster.senderDomains || []).slice(0, 4).map(d => (
+                              <code key={d} className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">@{d}</code>
+                            ))}
+                            {(cluster.keywords || []).slice(0, 3).map(k => (
+                              <code key={k} className="text-xs bg-blue-50 px-1.5 py-0.5 rounded text-blue-600">{k}</code>
+                            ))}
+                          </div>
+                          {/* Sample emails */}
+                          <div className="text-xs text-gray-400 space-y-0.5">
+                            {cluster.emailSamples?.slice(0, 2).map((e, i) => (
+                              <div key={i} className="truncate">
+                                <span className="mr-1">{PROVIDER_ICONS[e.provider]}</span>
+                                <span className="font-medium text-gray-500">{e.from.split('<')[0].trim().slice(0, 25)}</span>
+                                {' · '}
+                                <span>{e.subject.slice(0, 40)}</span>
+                              </div>
+                            ))}
+                            {(cluster.emailSamples?.length || 0) > 2 && (
+                              <div className="text-gray-400">+{(cluster.emailSamples?.length || 0) - 2} autres…</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex-shrink-0">
+                          {appliedIdx.has(idx) ? (
+                            <span className="text-xs text-green-600 font-medium flex items-center gap-1">✅ Appliqué</span>
+                          ) : (
+                            <button
+                              onClick={() => applyCluster(idx)}
+                              disabled={applyingIdx !== null}
+                              className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors whitespace-nowrap"
+                            >
+                              {applyingIdx === idx ? '⟳ Application…' : '⚡ Appliquer'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {analyzeResult.errors?.length > 0 && (
+                <details className="mt-3 text-xs text-gray-400 cursor-pointer">
+                  <summary>{analyzeResult.errors.length} erreur(s) de collecte</summary>
+                  <ul className="mt-1 space-y-0.5 pl-2">
+                    {analyzeResult.errors.map((e, i) => <li key={i}>• {e}</li>)}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── Section IA description libre ──────────────────────────────── */}
         <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-6 mb-6">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xl">🤖</span>
@@ -181,7 +383,7 @@ export default function FiltersPage() {
           ) : custom.length === 0 ? (
             <div className="p-8 text-center text-gray-400">
               <p className="text-2xl mb-2">✨</p>
-              <p>Aucun filtre personnalisé. Utilise l&apos;IA ci-dessus pour en créer un !</p>
+              <p>Aucun filtre personnalisé. Utilise l&apos;analyse globale ou l&apos;IA ci-dessus !</p>
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">
