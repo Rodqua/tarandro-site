@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
+import { google } from 'googleapis'
 import { trashGmailThread, markGmailThreadRead } from '@/lib/gmail'
 import { deleteOutlookMessage, markOutlookMessageRead, refreshOutlookToken } from '@/lib/outlook'
 import { deleteZohoMessage, getZohoUserInfo, markZohoMessageRead, refreshZohoToken } from '@/lib/zoho'
@@ -14,24 +15,77 @@ async function getFreshToken(account: any): Promise<string> {
   if (!account.refreshToken) return account.accessToken
 
   try {
-    let tokens: any
-    if (account.provider === 'outlook' || account.provider === 'microsoft') {
-      tokens = await refreshOutlookToken(account.refreshToken)
+    if (account.provider === 'google') {
+      const client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET
+      )
+      client.setCredentials({
+        access_token: account.accessToken,
+        refresh_token: account.refreshToken,
+      })
+      const { credentials } = await client.refreshAccessToken()
+      if (credentials.access_token) {
+        await (prisma as any).emailAccount.update({
+          where: { id: account.id },
+          data: {
+            accessToken: credentials.access_token,
+            ...(credentials.expiry_date
+              ? { expiresAt: new Date(credentials.expiry_date) }
+              : {}),
+          },
+        })
+        return credentials.access_token
+      }
+    } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
+      const tokens = await refreshOutlookToken(account.refreshToken)
+      const expiresAt = tokens.expires_in
+        ? new Date(Date.now() + tokens.expires_in * 1000)
+        : null
+      await (prisma as any).emailAccount.update({
+        where: { id: account.id },
+        data: {
+          accessToken: tokens.access_token,
+          ...(tokens.refresh_token ? { refreshToken: tokens.refresh_token } : {}),
+          ...(expiresAt ? { expiresAt } : {}),
+        },
+      })
+      return tokens.access_token
     } else if (account.provider === 'zoho') {
-      tokens = await refreshZohoToken(account.refreshToken)
-    } else {
-      return account.accessToken
+      const tokens = await refreshZohoToken(account.refreshToken)
+      const expiresAt = tokens.expires_in
+        ? new Date(Date.now() + tokens.expires_in * 1000)
+        : null
+      await (prisma as any).emailAccount.update({
+        where: { id: account.id },
+        data: {
+          accessToken: tokens.access_token,
+          ...(expiresAt ? { expiresAt } : {}),
+        },
+      })
+      return tokens.access_token
     }
-    const newToken = tokens.access_token
-    const expiresAt = tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null
-    await (prisma as any).emailAccount.update({
-      where: { id: account.id },
-      data: { accessToken: newToken, ...(expiresAt ? { expiresAt } : {}) },
-    })
-    return newToken
-  } catch {
-    return account.accessToken
+  } catch (e) {
+    console.warn('Token refresh failed:', e)
   }
+  return account.accessToken
+}
+
+// Fallback : supprime tous les messages d'une conversation Outlook par conversationId
+async function deleteOutlookConversation(conversationId: string, token: string): Promise<void> {
+  const encodedId = encodeURIComponent(conversationId)
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq '${encodedId}'&$select=id&$top=50`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+  if (!res.ok) {
+    const txt = await res.text()
+    throw new Error(`Impossible de récupérer la conversation Outlook (${res.status}): ${txt}`)
+  }
+  const data = await res.json()
+  const messages: { id: string }[] = data.value || []
+  if (messages.length === 0) throw new Error('Aucun message trouvé dans cette conversation')
+  await Promise.all(messages.map((msg) => deleteOutlookMessage(token, msg.id)))
 }
 
 // DELETE → supprime côté provider puis en DB
@@ -55,7 +109,13 @@ export async function DELETE(
     if (account.provider === 'google') {
       await trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId)
     } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
-      await deleteOutlookMessage(token, thread.messageId || thread.threadId)
+      if (thread.messageId) {
+        // On a l'ID direct du message → suppression directe
+        await deleteOutlookMessage(token, thread.messageId)
+      } else {
+        // Anciens threads sans messageId → chercher par conversationId
+        await deleteOutlookConversation(thread.threadId, token)
+      }
     } else if (account.provider === 'zoho') {
       const userInfo = await getZohoUserInfo(token)
       if (!userInfo.accountId) throw new Error('Zoho accountId introuvable')
@@ -108,7 +168,6 @@ export async function PATCH(
         }
       }
     } catch (e) {
-      // "Lu" localement même si le provider n'a pas répondu
       console.warn('Provider markRead failed (non-blocking):', e)
     }
   }

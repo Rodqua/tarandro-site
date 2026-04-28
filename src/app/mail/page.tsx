@@ -73,6 +73,7 @@ export default function MailPage() {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const [selectMode, setSelectMode] = useState(false)
   const [accountFilter, setAccountFilter] = useState<string | null>(null)
+  const [dbCounts, setDbCounts] = useState<Record<string, number>>({})
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type })
@@ -82,6 +83,12 @@ export default function MailPage() {
   const loadAccounts = useCallback(async () => {
     const res = await fetch('/api/mail/accounts')
     if (res.ok) setAccounts(await res.json())
+  }, [])
+
+  const fetchCounts = useCallback(async (accFilter: string | null = null) => {
+    const url = `/api/mail/counts${accFilter ? `?account=${encodeURIComponent(accFilter)}` : ''}`
+    const res = await fetch(url)
+    if (res.ok) setDbCounts(await res.json())
   }, [])
 
   const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null) => {
@@ -95,12 +102,14 @@ export default function MailPage() {
   useEffect(() => {
     loadAccounts()
     loadThreads('all')
-  }, [loadAccounts, loadThreads])
+    fetchCounts()
+  }, [loadAccounts, loadThreads, fetchCounts])
 
   const handleSync = async () => {
     setSyncing(true)
     await loadThreads(activeFilter, true, accountFilter)
     await loadAccounts()
+    await fetchCounts(accountFilter)
     setSyncing(false)
     showToast('✅ Boîte synchronisée !')
   }
@@ -110,6 +119,12 @@ export default function MailPage() {
     setSelected(null)
     setCheckedIds(new Set())
     loadThreads(f, false, accountFilter)
+  }
+
+  const handleAccountFilterChange = (email: string | null) => {
+    setAccountFilter(email)
+    loadThreads(activeFilter, false, email)
+    fetchCounts(email)
   }
 
   const handleSelect = async (thread: EmailThread) => {
@@ -217,9 +232,8 @@ export default function MailPage() {
     return t.subject.toLowerCase().includes(q) || t.sender.toLowerCase().includes(q) || t.snippet.toLowerCase().includes(q)
   })
 
-  const counts: Record<string, number> = { all: threads.length }
-  threads.forEach(t => { counts[t.category] = (counts[t.category] || 0) + 1 })
-  counts.unread = threads.filter(t => t.isUnread).length
+  // Les badges viennent de la DB (vrais totaux), pas seulement des threads chargés
+  const counts = dbCounts
   const allChecked = filtered.length > 0 && checkedIds.size === filtered.length
 
   return (
@@ -316,7 +330,7 @@ export default function MailPage() {
               <p className="text-xs text-gray-400 px-2">Aucun compte</p>
             ) : (<>
               <button
-                onClick={() => { setAccountFilter(null); loadThreads(activeFilter, false, null) }}
+                onClick={() => handleAccountFilterChange(null)}
                 className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs mb-0.5 transition-colors ${accountFilter === null ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <span>📬</span> Toutes les adresses
@@ -327,7 +341,7 @@ export default function MailPage() {
                 return (
                   <button
                     key={acc.id}
-                    onClick={() => { setAccountFilter(acc.email); loadThreads(activeFilter, false, acc.email) }}
+                    onClick={() => handleAccountFilterChange(acc.email)}
                     className={`w-full flex items-start gap-1.5 px-2 py-1.5 rounded-lg text-left mb-0.5 transition-colors ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   >
                     <div className="flex-1 min-w-0">

@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
 
         if (account.provider === 'google') {
           // Sync Gmail unread
-          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'is:unread newer_than:14d', 30)
+          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'newer_than:30d', 100)
           for (const thread of threads) {
             if (!thread.id) continue
             try {
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
           await cleanupGmailTrashed(account.id, token, account.refreshToken ?? undefined)
 
         } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
-          const messages = await listOutlookMessages(token, 50)
+          const messages = await listOutlookMessages(token, 100)
           const currentIds: string[] = []
           for (const msg of messages) {
             try {
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
         } else if (account.provider === 'zoho') {
           const userInfo = await getZohoUserInfo(token)
           if (!userInfo.accountId) continue
-          const messages = await listZohoMessages(token, userInfo.accountId, 50)
+          const messages = await listZohoMessages(token, userInfo.accountId, 100)
           for (const msg of messages) {
             try {
               const subject = msg.subject || '(Sans objet)'
