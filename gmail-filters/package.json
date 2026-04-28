@@ -1,0 +1,26 @@
+{
+  "name": "gmail-filters",
+  "version": "1.1.0",
+  "description": "AI-powered email filter generator using Claude API — Gmail, Outlook, Zoho",
+  "type": "module",
+  "main": "gmail-filters.js",
+  "bin": {
+    "gmail-filters": "./gmail-filters.js"
+  },
+  "scripts": {
+    "start": "node gmail-filters.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "commander": "^12.1.0",
+    "googleapis": "^144.0.0",
+    "pg": "^8.13.3",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "ora": "^8.1.1",
+    "dotenv": "^16.4.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
