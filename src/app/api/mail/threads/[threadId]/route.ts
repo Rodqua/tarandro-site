@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 // DELETE → supprime / envoie à la corbeille
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { threadId: string } }
 ) {
   const session = await getServerSession()
@@ -23,24 +23,26 @@ export async function DELETE(
 
   const { account } = thread
 
+  // Tentative de suppression côté provider (non bloquante)
   try {
     if (account.provider === 'google') {
       await trashGmailThread(account.accessToken, account.refreshToken ?? undefined, thread.threadId)
     } else if (account.provider === 'outlook') {
-      const msgId = thread.messageId || thread.threadId
-      await deleteOutlookMessage(account.accessToken, msgId)
+      await deleteOutlookMessage(account.accessToken, thread.messageId || thread.threadId)
     } else if (account.provider === 'zoho') {
       const userInfo = await getZohoUserInfo(account.accessToken)
-      if (userInfo.accountId && thread.messageId) {
-        await deleteZohoMessage(account.accessToken, userInfo.accountId, thread.messageId)
+      if (userInfo.accountId && (thread.messageId || thread.threadId)) {
+        await deleteZohoMessage(account.accessToken, userInfo.accountId, thread.messageId || thread.threadId)
       }
     }
-    await (prisma as any).emailThread.delete({ where: { id: params.threadId } })
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    console.error('Delete error:', err)
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+  } catch (providerErr) {
+    // On log mais on continue — la suppression locale reste valide
+    console.warn('Provider delete failed (non-blocking):', providerErr)
   }
+
+  // Toujours supprimer de la DB locale
+  await (prisma as any).emailThread.delete({ where: { id: params.threadId } })
+  return NextResponse.json({ success: true })
 }
 
 // PATCH → mark as read / archive
@@ -62,30 +64,31 @@ export async function PATCH(
 
   const { account } = thread
 
-  try {
-    if (markRead) {
+  // Tentative de marquage côté provider (non bloquante)
+  if (markRead) {
+    try {
       if (account.provider === 'google') {
         await markGmailThreadRead(account.accessToken, account.refreshToken ?? undefined, thread.threadId)
       } else if (account.provider === 'outlook') {
-        const msgId = thread.messageId || thread.threadId
-        await markOutlookMessageRead(account.accessToken, msgId)
+        await markOutlookMessageRead(account.accessToken, thread.messageId || thread.threadId)
       } else if (account.provider === 'zoho') {
         const userInfo = await getZohoUserInfo(account.accessToken)
-        if (userInfo.accountId && thread.messageId) {
-          await markZohoMessageRead(account.accessToken, userInfo.accountId, thread.messageId)
+        if (userInfo.accountId && (thread.messageId || thread.threadId)) {
+          await markZohoMessageRead(account.accessToken, userInfo.accountId, thread.messageId || thread.threadId)
         }
       }
+    } catch (providerErr) {
+      console.warn('Provider markRead failed (non-blocking):', providerErr)
     }
-    const updated = await (prisma as any).emailThread.update({
-      where: { id: params.threadId },
-      data: {
-        ...(markRead !== undefined ? { isUnread: !markRead } : {}),
-        ...(archive !== undefined ? { isArchived: archive } : {}),
-      },
-    })
-    return NextResponse.json(updated)
-  } catch (err) {
-    console.error('Patch error:', err)
-    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
+
+  // Toujours mettre à jour la DB locale
+  const updated = await (prisma as any).emailThread.update({
+    where: { id: params.threadId },
+    data: {
+      ...(markRead !== undefined ? { isUnread: !markRead } : {}),
+      ...(archive !== undefined ? { isArchived: archive } : {}),
+    },
+  })
+  return NextResponse.json(updated)
 }
