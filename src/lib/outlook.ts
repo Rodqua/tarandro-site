@@ -3,7 +3,7 @@ const MICROSOFT_TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.
 const GRAPH_API_BASE = 'https://graph.microsoft.com/v1.0'
 
 export function getOutlookAuthUrl(): string {
-  const redirectUri = process.env.MICROSOFT_REDIRECT_URI || 
+  const redirectUri = process.env.MICROSOFT_REDIRECT_URI ||
     `${process.env.NEXTAUTH_URL}/api/mail/connect/outlook/callback`
   const params = new URLSearchParams({
     client_id: process.env.MICROSOFT_CLIENT_ID!,
@@ -17,7 +17,7 @@ export function getOutlookAuthUrl(): string {
 }
 
 export async function exchangeOutlookCodeForTokens(code: string) {
-  const redirectUri = process.env.MICROSOFT_REDIRECT_URI || 
+  const redirectUri = process.env.MICROSOFT_REDIRECT_URI ||
     `${process.env.NEXTAUTH_URL}/api/mail/connect/outlook/callback`
   const params = new URLSearchParams({
     client_id: process.env.MICROSOFT_CLIENT_ID!,
@@ -86,30 +86,14 @@ export function categorizeOutlookEmail(subject: string, from: string, preview: s
   return 'important'
 }
 
-// ---- Nouvelles fonctions reply / delete ----
-
-export async function getOutlookMessage(accessToken: string, messageId: string) {
-  const response = await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}?$select=id,subject,body,from,toRecipients,receivedDateTime,isRead`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
-  if (!response.ok) throw new Error('Failed to get Outlook message')
-  return response.json()
-}
-
-export async function replyToOutlookMessage(
-  accessToken: string,
-  messageId: string,
-  body: string
-) {
+export async function replyToOutlookMessage(accessToken: string, messageId: string, body: string) {
   const response = await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}/reply`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      comment: body,
-    }),
+    body: JSON.stringify({ comment: body }),
   })
   if (!response.ok) {
     const err = await response.text()
@@ -139,66 +123,3 @@ export async function markOutlookMessageRead(accessToken: string, messageId: str
     body: JSON.stringify({ isRead: true }),
   })
 }
-
-// ---- Reply / Delete ----
-
-export async function sendOutlookReply(
-  accessToken: string,
-  messageId: string,
-  body: string
-) {
-  const response = await fetch(
-    `${GRAPH_API_BASE}/me/messages/${messageId}/reply`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: {},
-        comment: body,
-      }),
-    }
-  )
-  if (!response.ok) {
-    const err = await response.text()
-    throw new Error(`Outlook reply failed: ${err}`)
-  }
-}
-
-export async function deleteOutlookMessage(
-  accessToken: string,
-  messageId: string
-) {
-  // Move to Deleted Items (soft delete)
-  const response = await fetch(
-    `${GRAPH_API_BASE}/me/messages/${messageId}/move`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ destinationId: 'deleteditems' }),
-    }
-  )
-  if (!response.ok) throw new Error('Outlook delete failed')
-}
-
-export async function markOutlookMessageRead(
-  accessToken: string,
-  messageId: string
-) {
-  await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ isRead: true }),
-  })
-}
-
-// Alias pour compatibilité avec les routes existantes
-export const replyToOutlookMessage = sendOutlookReply

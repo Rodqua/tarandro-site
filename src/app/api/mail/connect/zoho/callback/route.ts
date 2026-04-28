@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+
 import { exchangeZohoCodeForTokens, getZohoUserInfo } from '@/lib/zoho'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession()
   if (!session) {
     return NextResponse.redirect(new URL('/admin/login', process.env.NEXTAUTH_URL))
   }
