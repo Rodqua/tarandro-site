@@ -9,10 +9,10 @@ import { deleteZohoMessage, getZohoUserInfo, markZohoMessageRead, refreshZohoTok
 export const dynamic = 'force-dynamic'
 
 async function getFreshToken(account: any): Promise<string> {
-  if (!account.expiresAt) return account.accessToken
-  const isExpired = new Date(account.expiresAt).getTime() < Date.now() + 60_000
-  if (!isExpired) return account.accessToken
   if (!account.refreshToken) return account.accessToken
+  // Si pas d'expiresAt stocké ou token expiré dans moins d'1 minute → refresh
+  const isExpired = !account.expiresAt || new Date(account.expiresAt).getTime() < Date.now() + 60_000
+  if (!isExpired) return account.accessToken
 
   try {
     if (account.provider === 'google') {
@@ -73,9 +73,14 @@ async function getFreshToken(account: any): Promise<string> {
 
 // Fallback : supprime tous les messages d'une conversation Outlook par conversationId
 async function deleteOutlookConversation(conversationId: string, token: string): Promise<void> {
-  const encodedId = encodeURIComponent(conversationId)
+  // URLSearchParams encode le paramètre $filter correctement (le conversationId garde ses '=' littéraux)
+  const qs = new URLSearchParams({
+    '$filter': `conversationId eq '${conversationId}'`,
+    '$select': 'id',
+    '$top': '50',
+  })
   const res = await fetch(
-    `https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq '${encodedId}'&$select=id&$top=50`,
+    `https://graph.microsoft.com/v1.0/me/messages?${qs.toString()}`,
     { headers: { Authorization: `Bearer ${token}` } }
   )
   if (!res.ok) {
