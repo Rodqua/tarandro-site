@@ -509,8 +509,8 @@ export default function MailPage() {
                   <button
                     onClick={() => {
                       setShowReply(true)
-                      // Pré-remplir avec la signature du compte
-                      const acc = accounts.find((a: any) => a.id === selected?.account?.id)
+                      // Pré-remplir avec la signature du compte (match par email)
+                      const acc = accounts.find((a: any) => a.email === selected?.account?.email)
                       const sig = (acc as any)?.signature
                       setReplyBody(sig ? `\n\n-- \n${sig}` : '')
                     }}

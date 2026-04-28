@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
   const tokenCache: Record<string, string> = {}
 
   // Séquentiel par compte pour éviter les refreshs concurrents
-  const accountIds = [...new Set(threads.map((t: any) => t.account.id))]
+  const accountIds = Array.from(new Set<string>(threads.map((t: any) => t.account.id)))
   for (const accId of accountIds) {
     const acc = threads.find((t: any) => t.account.id === accId)?.account
     if (acc) tokenCache[accId] = await getFreshToken(acc)
