@@ -1,4 +1,4 @@
-export type EmailProvider = "google" | "microsoft" | "zoho";
+export type EmailProvider = "google" | "microsoft" | "outlook" | "zoho";
 
 export type EmailCategory =
   | "urgent"
