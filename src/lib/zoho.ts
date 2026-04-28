@@ -69,9 +69,18 @@ export async function getZohoUserInfo(accessToken: string) {
   if (!response.ok) throw new Error('Failed to get Zoho user info')
   const data = await response.json()
   const account = data.data?.[0]
+  // emailAddress est un tableau d'objets {mailId, isPrimary, isAlias}
+  const emailList = account?.emailAddress
+  let email: string
+  if (Array.isArray(emailList)) {
+    const primary = emailList.find((e: any) => e.isPrimary === true) || emailList[0]
+    email = primary?.mailId || ''
+  } else {
+    email = emailList || account?.mailId || ''
+  }
   return {
-    email: account?.emailAddress || account?.mailId,
-    displayName: account?.displayName || account?.firstName,
+    email,
+    displayName: account?.displayName || account?.firstName || email,
     accountId: account?.accountId,
   }
 }
