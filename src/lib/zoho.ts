@@ -1,6 +1,14 @@
-const ZOHO_AUTH_URL = 'https://accounts.zoho.eu/oauth/v2/auth'
-const ZOHO_TOKEN_URL = 'https://accounts.zoho.eu/oauth/v2/token'
-const ZOHO_API_BASE = 'https://mail.zoho.eu/api'
+// Région Zoho : 'eu' (défaut), 'com' (US), 'in' (Inde), 'com.au' (Australie)
+function getZohoRegion() {
+  return process.env.ZOHO_REGION || 'eu'
+}
+function getZohoDomain() {
+  const r = getZohoRegion()
+  return r === 'com' ? 'zoho.com' : r === 'in' ? 'zoho.in' : r === 'com.au' ? 'zoho.com.au' : 'zoho.eu'
+}
+function getZohoAuthUrl_base() { return `https://accounts.${getZohoDomain()}/oauth/v2/auth` }
+function getZohoTokenUrl() { return `https://accounts.${getZohoDomain()}/oauth/v2/token` }
+function getZohoApiBase() { return `https://mail.${getZohoDomain()}/api` }
 
 export function getZohoAuthUrl(): string {
   const redirectUri = process.env.ZOHO_REDIRECT_URI ||
@@ -13,7 +21,7 @@ export function getZohoAuthUrl(): string {
     access_type: 'offline',
     prompt: 'consent',
   })
-  return `${ZOHO_AUTH_URL}?${params.toString()}`
+  return `${getZohoAuthUrl_base()}?${params.toString()}`
 }
 
 export async function exchangeZohoCodeForTokens(code: string) {
@@ -26,7 +34,7 @@ export async function exchangeZohoCodeForTokens(code: string) {
     redirect_uri: redirectUri,
     grant_type: 'authorization_code',
   })
-  const response = await fetch(ZOHO_TOKEN_URL, {
+  const response = await fetch(getZohoTokenUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString(),
@@ -45,7 +53,7 @@ export async function refreshZohoToken(refreshToken: string) {
     refresh_token: refreshToken,
     grant_type: 'refresh_token',
   })
-  const response = await fetch(ZOHO_TOKEN_URL, {
+  const response = await fetch(getZohoTokenUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString(),
@@ -55,7 +63,7 @@ export async function refreshZohoToken(refreshToken: string) {
 }
 
 export async function getZohoUserInfo(accessToken: string) {
-  const response = await fetch(`${ZOHO_API_BASE}/accounts`, {
+  const response = await fetch(`${getZohoApiBase()}/accounts`, {
     headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
   })
   if (!response.ok) throw new Error('Failed to get Zoho user info')
@@ -69,7 +77,7 @@ export async function getZohoUserInfo(accessToken: string) {
 }
 
 export async function listZohoMessages(accessToken: string, accountId: string, maxResults = 50) {
-  const url = `${ZOHO_API_BASE}/accounts/${accountId}/messages/view?limit=${maxResults}&sortBy=date&sortOrder=desc&folder=INBOX`
+  const url = `${getZohoApiBase()}/accounts/${accountId}/messages/view?limit=${maxResults}&sortBy=date&sortOrder=desc&folder=INBOX`
   const response = await fetch(url, {
     headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
   })
@@ -96,7 +104,7 @@ export async function replyToZohoMessage(
   body: string
 ) {
   const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`
-  const response = await fetch(`${ZOHO_API_BASE}/accounts/${accountId}/messages`, {
+  const response = await fetch(`${getZohoApiBase()}/accounts/${accountId}/messages`, {
     method: 'POST',
     headers: {
       Authorization: `Zoho-oauthtoken ${accessToken}`,
@@ -118,7 +126,7 @@ export async function replyToZohoMessage(
 
 export async function deleteZohoMessage(accessToken: string, accountId: string, messageId: string) {
   const response = await fetch(
-    `${ZOHO_API_BASE}/accounts/${accountId}/messages/${messageId}`,
+    `${getZohoApiBase()}/accounts/${accountId}/messages/${messageId}`,
     {
       method: 'DELETE',
       headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
@@ -128,7 +136,7 @@ export async function deleteZohoMessage(accessToken: string, accountId: string, 
 }
 
 export async function markZohoMessageRead(accessToken: string, accountId: string, messageId: string) {
-  await fetch(`${ZOHO_API_BASE}/accounts/${accountId}/updatemessage`, {
+  await fetch(`${getZohoApiBase()}/accounts/${accountId}/updatemessage`, {
     method: 'PUT',
     headers: {
       Authorization: `Zoho-oauthtoken ${accessToken}`,

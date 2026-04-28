@@ -37,9 +37,16 @@ function extractEmail(sender: string) {
 }
 
 function providerBadge(provider: string) {
-  if (provider === 'google') return { label: 'Gmail', color: 'bg-red-100 text-red-700' }
-  if (provider === 'outlook' || provider === 'microsoft') return { label: 'Outlook', color: 'bg-blue-100 text-blue-700' }
-  return { label: 'Zoho', color: 'bg-orange-100 text-orange-700' }
+  if (provider === 'google') return { color: 'bg-red-100 text-red-700' }
+  if (provider === 'outlook' || provider === 'microsoft') return { color: 'bg-blue-100 text-blue-700' }
+  return { color: 'bg-orange-100 text-orange-700' }
+}
+
+function accountBadge(email: string, provider: string) {
+  const { color } = providerBadge(provider)
+  // Afficher la partie locale de l'email (avant @) ou l'adresse complète si courte
+  const short = email.length <= 20 ? email : email.split('@')[0]
+  return { label: short, color }
 }
 
 function providerUrl(thread: EmailThread) {
@@ -65,6 +72,7 @@ export default function MailPage() {
   // Sélection multiple
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const [selectMode, setSelectMode] = useState(false)
+  const [accountFilter, setAccountFilter] = useState<string | null>(null)
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type })
@@ -76,9 +84,9 @@ export default function MailPage() {
     if (res.ok) setAccounts(await res.json())
   }, [])
 
-  const loadThreads = useCallback(async (filter: string, withSync = false) => {
+  const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null) => {
     setLoading(true)
-    const url = `/api/mail/threads?filter=${filter}${withSync ? '&sync=true' : ''}`
+    const url = `/api/mail/threads?filter=${filter}${withSync ? '&sync=true' : ''}${accFilter ? `&account=${encodeURIComponent(accFilter)}` : ''}`
     const res = await fetch(url)
     if (res.ok) setThreads(await res.json())
     setLoading(false)
@@ -91,7 +99,7 @@ export default function MailPage() {
 
   const handleSync = async () => {
     setSyncing(true)
-    await loadThreads(activeFilter, true)
+    await loadThreads(activeFilter, true, accountFilter)
     await loadAccounts()
     setSyncing(false)
     showToast('✅ Boîte synchronisée !')
@@ -101,7 +109,7 @@ export default function MailPage() {
     setActiveFilter(f)
     setSelected(null)
     setCheckedIds(new Set())
-    loadThreads(f)
+    loadThreads(f, false, accountFilter)
   }
 
   const handleSelect = async (thread: EmailThread) => {
@@ -302,18 +310,33 @@ export default function MailPage() {
             ))}
           </nav>
           <div className="p-2 border-t border-gray-100">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">Comptes</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">Adresses</p>
             {accounts.length === 0 ? (
               <p className="text-xs text-gray-400 px-2">Aucun compte</p>
-            ) : accounts.map((acc: EmailAccount) => {
-              const badge = providerBadge(acc.provider)
-              return (
-                <div key={acc.id} className="px-2 py-1 rounded-lg">
-                  <p className="text-xs font-medium text-gray-700 truncate">{acc.email}</p>
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${badge.color}`}>{badge.label}</span>
-                </div>
-              )
-            })}
+            ) : (<>
+              <button
+                onClick={() => { setAccountFilter(null); loadThreads(activeFilter, false, null) }}
+                className={`w-full flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs mb-0.5 transition-colors ${accountFilter === null ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                <span>📬</span> Toutes les adresses
+              </button>
+              {accounts.map((acc: EmailAccount) => {
+                const badge = accountBadge(acc.email, acc.provider)
+                const isActive = accountFilter === acc.email
+                return (
+                  <button
+                    key={acc.id}
+                    onClick={() => { setAccountFilter(acc.email); loadThreads(activeFilter, false, acc.email) }}
+                    className={`w-full flex items-start gap-1.5 px-2 py-1.5 rounded-lg text-left mb-0.5 transition-colors ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{acc.email}</p>
+                      <span className={`text-xs px-1 py-0.5 rounded ${badge.color}`}>{acc.provider}</span>
+                    </div>
+                  </button>
+                )
+              })}
+            </>)}
             <a href="/mail/settings" className="mt-1 flex items-center gap-1 w-full px-2 py-1.5 border border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors">
               <span>＋</span> Ajouter un compte
             </a>
@@ -334,7 +357,7 @@ export default function MailPage() {
             <div className="divide-y divide-gray-100">
               {filtered.map(thread => {
                 const cat = CATEGORY_CONFIG[thread.category as EmailCategory] || CATEGORY_CONFIG.important
-                const badge = providerBadge(thread.account.provider)
+                const badge = accountBadge(thread.account.email, thread.account.provider)
                 const isSelected = selected?.id === thread.id
                 const isChecked = checkedIds.has(thread.id)
                 return (
@@ -420,11 +443,11 @@ export default function MailPage() {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 {(() => { const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important; return <span className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.label}</span> })()}
-                <span className={`text-xs px-2 py-1 rounded-full ${providerBadge(selected.account.provider).color}`}>{providerBadge(selected.account.provider).label}</span>
+                <span className={`text-xs px-2 py-1 rounded-full ${accountBadge(selected.account.email, selected.account.provider).color}`}>{accountBadge(selected.account.email, selected.account.provider).label}</span>
                 {selected.isUnread && <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Non lu</span>}
               </div>
               <p className="text-xs text-gray-400 text-center">
-                Pour voir le contenu complet, <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">ouvrir dans {providerBadge(selected.account.provider).label}</a>.
+                Pour voir le contenu complet, <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">ouvrir dans {accountBadge(selected.account.email, selected.account.provider).label}</a>.
               </p>
             </div>
             <div className="border-t border-gray-200 flex-shrink-0">

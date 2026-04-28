@@ -4,48 +4,78 @@ import { prisma } from '@/lib/prisma'
 import { listGmailThreads, getGmailThread, categorizeEmail } from '@/lib/gmail'
 import { listOutlookMessages, categorizeOutlookEmail, refreshOutlookToken } from '@/lib/outlook'
 import { listZohoMessages, getZohoUserInfo, categorizeZohoEmail, refreshZohoToken } from '@/lib/zoho'
+import { google } from 'googleapis'
 
 export const dynamic = 'force-dynamic'
 
 async function getValidToken(account: {
-  id: string
-  provider: string
-  accessToken: string
-  refreshToken: string | null
-  expiresAt: Date | null
+  id: string; provider: string; accessToken: string
+  refreshToken: string | null; expiresAt: Date | null
 }): Promise<string> {
-  // Si le token n'expire pas avant 5 min, on l'utilise tel quel
   if (!account.expiresAt || account.expiresAt.getTime() > Date.now() + 5 * 60 * 1000) {
     return account.accessToken
   }
   if (!account.refreshToken) return account.accessToken
-
   try {
     let newTokens: { access_token: string; expires_in?: number; refresh_token?: string }
-    if (account.provider === 'outlook') {
+    if (account.provider === 'outlook' || account.provider === 'microsoft') {
       newTokens = await refreshOutlookToken(account.refreshToken)
     } else if (account.provider === 'zoho') {
       newTokens = await refreshZohoToken(account.refreshToken)
     } else {
       return account.accessToken
     }
-
-    const expiresAt = newTokens.expires_in
-      ? new Date(Date.now() + newTokens.expires_in * 1000)
-      : null
-
+    const expiresAt = newTokens.expires_in ? new Date(Date.now() + newTokens.expires_in * 1000) : null
     await (prisma as any).emailAccount.update({
       where: { id: account.id },
-      data: {
-        accessToken: newTokens.access_token,
-        refreshToken: newTokens.refresh_token || account.refreshToken,
-        expiresAt,
-      },
+      data: { accessToken: newTokens.access_token, refreshToken: newTokens.refresh_token || account.refreshToken, expiresAt },
     })
     return newTokens.access_token
   } catch {
     return account.accessToken
   }
+}
+
+// Supprime de la DB les threads qui ont été mis à la corbeille côté Gmail
+async function cleanupGmailTrashed(accountId: string, accessToken: string, refreshToken?: string) {
+  try {
+    const client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    )
+    client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
+    const gmail = google.gmail({ version: 'v1', auth: client })
+
+    // Récupérer les threads récemment mis à la corbeille
+    const { data } = await gmail.users.threads.list({
+      userId: 'me',
+      q: 'in:trash newer_than:30d',
+      maxResults: 100,
+    })
+    const trashedIds = (data.threads || []).map(t => t.id).filter(Boolean) as string[]
+    if (trashedIds.length > 0) {
+      await (prisma as any).emailThread.deleteMany({
+        where: { accountId, threadId: { in: trashedIds } },
+      })
+    }
+  } catch (e) {
+    console.warn('Gmail trash cleanup failed:', e)
+  }
+}
+
+// Supprime de la DB les threads Outlook qui ne sont plus dans l'inbox
+async function cleanupOutlookDeleted(accountId: string, currentIds: string[]) {
+  if (currentIds.length === 0) return
+  // Supprimer les threads en DB qui ne sont PAS dans les 50 derniers messages récupérés
+  // (uniquement pour les threads plus anciens que 3 jours pour éviter les faux positifs)
+  const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+  await (prisma as any).emailThread.deleteMany({
+    where: {
+      accountId,
+      threadId: { notIn: currentIds },
+      date: { lt: cutoff },
+    },
+  })
 }
 
 export async function GET(request: NextRequest) {
@@ -54,6 +84,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const filter = searchParams.get('filter') || 'all'
+  const accountFilter = searchParams.get('account') || null
   const sync = searchParams.get('sync') === 'true'
 
   if (sync) {
@@ -64,13 +95,8 @@ export async function GET(request: NextRequest) {
         const token = await getValidToken(account)
 
         if (account.provider === 'google') {
-          // --- Gmail ---
-          const threads = await listGmailThreads(
-            token,
-            account.refreshToken ?? undefined,
-            'is:unread newer_than:14d',
-            30
-          )
+          // Sync Gmail unread
+          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'is:unread newer_than:14d', 30)
           for (const thread of threads) {
             if (!thread.id) continue
             try {
@@ -94,20 +120,25 @@ export async function GET(request: NextRequest) {
               })
             } catch {}
           }
+          // Nettoyer les emails supprimés côté Gmail
+          await cleanupGmailTrashed(account.id, token, account.refreshToken ?? undefined)
 
-        } else if (account.provider === 'outlook') {
-          // --- Outlook / Hotmail ---
+        } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
           const messages = await listOutlookMessages(token, 50)
+          const currentIds: string[] = []
           for (const msg of messages) {
             try {
               const subject = msg.subject || '(Sans objet)'
-              const sender = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || ''
+              const sender = msg.from?.emailAddress?.address
+                ? `${msg.from.emailAddress.name || ''} <${msg.from.emailAddress.address}>`.trim()
+                : msg.from?.emailAddress?.name || ''
               const date = new Date(msg.receivedDateTime)
               const snippet = msg.bodyPreview || ''
               const labels: string[] = msg.categories || []
               const category = categorizeOutlookEmail(subject, sender, snippet)
               const isUnread = !msg.isRead
               const threadId = msg.conversationId || msg.id
+              currentIds.push(threadId)
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
                 update: { subject, sender, snippet, date, category, labels, isUnread, updatedAt: new Date() },
@@ -115,9 +146,10 @@ export async function GET(request: NextRequest) {
               })
             } catch {}
           }
+          // Nettoyer les emails supprimés côté Outlook
+          await cleanupOutlookDeleted(account.id, currentIds)
 
         } else if (account.provider === 'zoho') {
-          // --- Zoho Mail ---
           const userInfo = await getZohoUserInfo(token)
           if (!userInfo.accountId) continue
           const messages = await listZohoMessages(token, userInfo.accountId, 50)
@@ -151,10 +183,15 @@ export async function GET(request: NextRequest) {
   if (['urgent', 'important', 'veille', 'loge', 'compta', 'newsletter', 'events'].includes(filter)) {
     where.category = filter
   }
+  // Filtre par compte (adresse email)
+  if (accountFilter) {
+    const acc = await (prisma as any).emailAccount.findFirst({ where: { email: accountFilter } })
+    if (acc) where.accountId = acc.id
+  }
 
   const threads = await (prisma as any).emailThread.findMany({
     where,
-    include: { account: { select: { email: true, provider: true } } },
+    include: { account: { select: { id: true, email: true, provider: true, displayName: true } } },
     orderBy: { date: 'desc' },
     take: 150,
   })
