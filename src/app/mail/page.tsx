@@ -74,6 +74,9 @@ export default function MailPage() {
   const [selectMode, setSelectMode] = useState(false)
   const [accountFilter, setAccountFilter] = useState<string | null>(null)
   const [dbCounts, setDbCounts] = useState<Record<string, number>>({})
+  const [mailTotal, setMailTotal] = useState(0)
+  const [mailSkip, setMailSkip] = useState(0)
+  const TAKE = 50
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type })
@@ -91,11 +94,23 @@ export default function MailPage() {
     if (res.ok) setDbCounts(await res.json())
   }, [])
 
-  const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null) => {
+  const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null, skip = 0) => {
     setLoading(true)
-    const url = `/api/mail/threads?filter=${filter}${withSync ? '&sync=true' : ''}${accFilter ? `&account=${encodeURIComponent(accFilter)}` : ''}`
+    const url = `/api/mail/threads?filter=${filter}&skip=${skip}&take=50${withSync ? '&sync=true' : ''}${accFilter ? `&account=${encodeURIComponent(accFilter)}` : ''}`
     const res = await fetch(url)
-    if (res.ok) setThreads(await res.json())
+    if (res.ok) {
+      const data = await res.json()
+      // Support old array format and new { threads, total } format
+      const list = Array.isArray(data) ? data : (data.threads || [])
+      const tot = Array.isArray(data) ? data.length : (data.total || 0)
+      if (skip === 0) {
+        setThreads(list)
+      } else {
+        setThreads(prev => [...prev, ...list])
+      }
+      setMailTotal(tot)
+      setMailSkip(skip + list.length)
+    }
     setLoading(false)
   }, [])
 
@@ -107,7 +122,8 @@ export default function MailPage() {
 
   const handleSync = async () => {
     setSyncing(true)
-    await loadThreads(activeFilter, true, accountFilter)
+    setMailSkip(0)
+    await loadThreads(activeFilter, true, accountFilter, 0)
     await loadAccounts()
     await fetchCounts(accountFilter)
     setSyncing(false)
@@ -118,13 +134,19 @@ export default function MailPage() {
     setActiveFilter(f)
     setSelected(null)
     setCheckedIds(new Set())
-    loadThreads(f, false, accountFilter)
+    setMailSkip(0)
+    loadThreads(f, false, accountFilter, 0)
   }
 
   const handleAccountFilterChange = (email: string | null) => {
     setAccountFilter(email)
-    loadThreads(activeFilter, false, email)
+    setMailSkip(0)
+    loadThreads(activeFilter, false, email, 0)
     fetchCounts(email)
+  }
+
+  const loadMore = () => {
+    loadThreads(activeFilter, false, accountFilter, mailSkip)
   }
 
   const handleSelect = async (thread: EmailThread) => {
@@ -204,10 +226,10 @@ export default function MailPage() {
     if (!confirm(`Supprimer ${checkedIds.size} email(s) ?`)) return
     setBulkDeleting(true)
     const ids = Array.from(checkedIds)
-    const res = await fetch('/api/mail/threads/bulk-delete', {
+    const res = await fetch('/api/mail/batch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify({ action: 'remove', ids }),
     })
     if (res.ok) {
       setThreads(prev => prev.filter(t => !checkedIds.has(t.id)))
@@ -421,6 +443,22 @@ export default function MailPage() {
                 )
               })}
             </div>
+          )}
+          {/* Charger plus */}
+          {!loading && threads.length > 0 && threads.length < mailTotal && (
+            <div className="px-4 py-4 border-t border-gray-100 text-center">
+              <button
+                onClick={loadMore}
+                className="px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+              >
+                Charger plus ({threads.length} / {mailTotal})
+              </button>
+            </div>
+          )}
+          {!loading && threads.length > 0 && threads.length >= mailTotal && mailTotal > 0 && (
+            <p className="px-4 py-3 text-xs text-gray-300 text-center border-t border-gray-100">
+              {mailTotal} email(s) au total
+            </p>
           )}
         </main>
 

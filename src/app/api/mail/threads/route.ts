@@ -101,6 +101,8 @@ export async function GET(request: NextRequest) {
   const filter = searchParams.get('filter') || 'all'
   const accountFilter = searchParams.get('account') || null
   const sync = searchParams.get('sync') === 'true'
+  const skip = parseInt(searchParams.get('skip') || '0', 10)
+  const take = parseInt(searchParams.get('take') || '50', 10)
 
   if (sync) {
     const accounts = await (prisma as any).emailAccount.findMany()
@@ -111,7 +113,7 @@ export async function GET(request: NextRequest) {
 
         if (account.provider === 'google') {
           // Sync Gmail unread
-          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'newer_than:30d', 100)
+          const threads = await listGmailThreads(token, account.refreshToken ?? undefined, 'newer_than:90d', 200)
           for (const thread of threads) {
             if (!thread.id) continue
             try {
@@ -206,12 +208,16 @@ export async function GET(request: NextRequest) {
     if (acc) where.accountId = acc.id
   }
 
-  const threads = await (prisma as any).emailThread.findMany({
-    where,
-    include: { account: { select: { id: true, email: true, provider: true, displayName: true } } },
-    orderBy: { date: 'desc' },
-    take: 150,
-  })
+  const [threads, total] = await Promise.all([
+    (prisma as any).emailThread.findMany({
+      where,
+      include: { account: { select: { id: true, email: true, provider: true, displayName: true } } },
+      orderBy: { date: 'desc' },
+      skip,
+      take,
+    }),
+    (prisma as any).emailThread.count({ where }),
+  ])
 
-  return NextResponse.json(threads)
+  return NextResponse.json({ threads, total, skip, take })
 }
