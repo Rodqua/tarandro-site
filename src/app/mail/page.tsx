@@ -83,6 +83,10 @@ export default function MailPage() {
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
   const [selectMode, setSelectMode] = useState(false)
   const [accountFilter, setAccountFilter] = useState<string | null>(null)
+  const [emailBody, setEmailBody] = useState<{ html?: string; text?: string; attachments?: any[]; error?: string } | null>(null)
+  const [bodyLoading, setBodyLoading] = useState(false)
+  const [replyFiles, setReplyFiles] = useState<File[]>([])
+  const [syncErrors, setSyncErrors] = useState<string[]>([])
   const [dbCounts, setDbCounts] = useState<Record<string, number>>({})
   const [mailTotal, setMailTotal] = useState(0)
   const [mailSkip, setMailSkip] = useState(0)
@@ -103,6 +107,19 @@ export default function MailPage() {
     const res = await fetch(url)
     if (res.ok) setDbCounts(await res.json())
   }, [])
+
+  const fetchEmailBody = async (thread: any) => {
+    setEmailBody(null)
+    setBodyLoading(true)
+    try {
+      const res = await fetch(`/api/mail/threads/${thread.id}/body`)
+      if (res.ok) setEmailBody(await res.json())
+      else setEmailBody({ error: 'Impossible de charger le contenu' })
+    } catch {
+      setEmailBody({ error: 'Erreur réseau' })
+    }
+    setBodyLoading(false)
+  }
 
   const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null, skip = 0) => {
     setLoading(true)
@@ -167,6 +184,9 @@ export default function MailPage() {
     setSelected(thread)
     setShowReply(false)
     setReplyBody('')
+    setEmailBody(null)
+    setReplyFiles([])
+    fetchEmailBody(thread)
     if (thread.isUnread) {
       await fetch(`/api/mail/threads/${thread.id}`, {
         method: 'PATCH',
@@ -197,14 +217,27 @@ export default function MailPage() {
   const handleReply = async () => {
     if (!selected || !replyBody.trim()) return
     setReplying(true)
+    // Encode attachments as base64
+    const attachmentsData = await Promise.all(replyFiles.map(async (file) => {
+      return await new Promise<{name:string;mimeType:string;data:string}>((resolve) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const dataUrl = reader.result as string
+          const base64 = dataUrl.split(',')[1] || ''
+          resolve({ name: file.name, mimeType: file.type || 'application/octet-stream', data: base64 })
+        }
+        reader.readAsDataURL(file)
+      })
+    }))
     const res = await fetch(`/api/mail/threads/${selected.id}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ body: replyBody }),
+      body: JSON.stringify({ body: replyBody, attachments: attachmentsData }),
     })
     if (res.ok) {
       showToast('✅ Réponse envoyée !')
       setReplyBody('')
+      setReplyFiles([])
       setShowReply(false)
     } else {
       const err = await res.json()
@@ -500,18 +533,74 @@ export default function MailPage() {
                 </div>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 leading-relaxed mb-4">
-                {selected.snippet || '(pas de contenu prévisualisé)'}
-              </div>
-              <div className="flex items-center gap-2 mb-4">
+            <div className="flex-1 overflow-y-auto flex flex-col">
+              {/* Tags */}
+              <div className="flex items-center gap-2 px-6 pt-3 pb-2 flex-wrap">
                 {(() => { const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important; return <span className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.label}</span> })()}
                 <ProviderBadge email={selected.account.email} provider={selected.account.provider} className="px-2 py-1" />
                 {selected.isUnread && <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Non lu</span>}
+                <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-gray-400 hover:text-indigo-600 transition-colors">↗ Ouvrir dans l'app</a>
               </div>
-              <p className="text-xs text-gray-400 text-center">
-                Pour voir le contenu complet, <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">ouvrir dans {selected.account.email}</a>.
-              </p>
+              {/* Corps du mail */}
+              <div className="flex-1 px-6 pb-4">
+                {bodyLoading ? (
+                  <div className="flex items-center justify-center py-16 text-gray-400 text-sm">
+                    <span className="animate-pulse">⏳ Chargement...</span>
+                  </div>
+                ) : emailBody?.error ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 mb-3">
+                    ⚠️ {emailBody.error}
+                    <p className="mt-2 text-gray-600 text-xs whitespace-pre-wrap">{selected.snippet}</p>
+                  </div>
+                ) : emailBody?.html ? (
+                  <iframe
+                    srcDoc={`<base target="_blank"><style>body{font-family:sans-serif;font-size:14px;line-height:1.6;margin:0;padding:0;word-break:break-word}a{color:#4f46e5}img{max-width:100%}</style>${emailBody.html}`}
+                    sandbox="allow-same-origin allow-popups"
+                    className="w-full rounded-xl border border-gray-100 bg-white"
+                    style={{ minHeight: '300px', height: '500px' }}
+                    onLoad={(e) => {
+                      try {
+                        const doc = (e.currentTarget as HTMLIFrameElement).contentDocument
+                        if (doc?.body) {
+                          const h = doc.body.scrollHeight + 48
+                          ;(e.currentTarget as HTMLIFrameElement).style.height = Math.min(h, 800) + 'px'
+                        }
+                      } catch {}
+                    }}
+                  />
+                ) : emailBody?.text ? (
+                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed bg-gray-50 rounded-xl p-4 border border-gray-100">{emailBody.text}</pre>
+                ) : !bodyLoading && (
+                  <p className="text-sm text-gray-400 italic p-4 text-center">Contenu non disponible</p>
+                )}
+                {/* Pièces jointes */}
+                {emailBody?.attachments && emailBody.attachments.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                      📎 {emailBody.attachments.length} pièce(s) jointe(s)
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {emailBody.attachments.map((att: any, i: number) => (
+                        <a
+                          key={att.id || i}
+                          href={`/api/mail/threads/${selected.id}/attachment?id=${encodeURIComponent(att.id)}&filename=${encodeURIComponent(att.name)}`}
+                          download={att.name}
+                          className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs hover:bg-indigo-50 hover:border-indigo-300 transition-colors group"
+                        >
+                          <span className="text-base">📄</span>
+                          <div>
+                            <p className="font-medium text-gray-800 group-hover:text-indigo-700 truncate max-w-[160px]">{att.name}</p>
+                            {att.size > 0 && (
+                              <p className="text-gray-400">{att.size > 1048576 ? `${(att.size/1048576).toFixed(1)} Mo` : `${Math.round(att.size/1024)} Ko`}</p>
+                            )}
+                          </div>
+                          <span className="text-indigo-400 group-hover:text-indigo-600">↓</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="border-t border-gray-200 flex-shrink-0">
               {!showReply ? (
@@ -546,7 +635,18 @@ export default function MailPage() {
                     autoFocus
                     className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono leading-relaxed"
                   />
-                  <div className="flex gap-2 mt-2">
+                  {/* Pièces jointes */}
+                  {replyFiles.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {replyFiles.map((f, i) => (
+                        <span key={i} className="flex items-center gap-1 px-2 py-1 bg-indigo-50 border border-indigo-200 rounded-lg text-xs text-indigo-700">
+                          📎 {f.name}
+                          <button onClick={() => setReplyFiles(prev => prev.filter((_, j) => j !== i))} className="ml-1 text-indigo-400 hover:text-red-500">✕</button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex gap-2 mt-2 items-center">
                     <button
                       onClick={handleReply}
                       disabled={replying || !replyBody.trim()}
@@ -554,8 +654,17 @@ export default function MailPage() {
                     >
                       {replying ? '⏳ Envoi...' : '📤 Envoyer'}
                     </button>
+                    <label className="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors cursor-pointer" title="Joindre un fichier">
+                      📎
+                      <input
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={e => setReplyFiles(prev => [...prev, ...Array.from(e.target.files || [])])}
+                      />
+                    </label>
                     <button
-                      onClick={() => { setShowReply(false); setReplyBody('') }}
+                      onClick={() => { setShowReply(false); setReplyBody(''); setReplyFiles([]) }}
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors"
                     >
                       Annuler

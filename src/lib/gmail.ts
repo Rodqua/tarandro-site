@@ -210,24 +210,63 @@ export async function sendGmailReply(
   inReplyTo: string,
   to: string,
   subject: string,
-  body: string
+  body: string,
+  attachments: { name: string; mimeType: string; data: string }[] = []
 ) {
   const client = getOAuth2Client()
   client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
   const gmail = google.gmail({ version: 'v1', auth: client })
 
   const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`
-  const raw = encodeMessage(
-    {
-      'To': to,
-      'Subject': replySubject,
-      'In-Reply-To': inReplyTo,
-      'References': inReplyTo,
-      'Content-Type': 'text/plain; charset=utf-8',
-      'MIME-Version': '1.0',
-    },
-    body
-  )
+  const boundary = `boundary_${Date.now()}`
+
+  let raw: string
+  if (attachments.length === 0) {
+    raw = encodeMessage(
+      {
+        'To': to,
+        'Subject': replySubject,
+        'In-Reply-To': inReplyTo,
+        'References': inReplyTo,
+        'Content-Type': 'text/plain; charset=utf-8',
+        'MIME-Version': '1.0',
+      },
+      body
+    )
+  } else {
+    // Build multipart/mixed MIME message
+    const parts = [
+      `--${boundary}`,
+      'Content-Type: text/plain; charset=utf-8',
+      'Content-Transfer-Encoding: quoted-printable',
+      '',
+      body,
+      ...attachments.flatMap(att => [
+        `--${boundary}`,
+        `Content-Type: ${att.mimeType}; name="${att.name}"`,
+        'Content-Transfer-Encoding: base64',
+        `Content-Disposition: attachment; filename="${att.name}"`,
+        '',
+        att.data,
+      ]),
+      `--${boundary}--`,
+    ].join('
+')
+
+    const headers = [
+      `To: ${to}`,
+      `Subject: ${replySubject}`,
+      `In-Reply-To: ${inReplyTo}`,
+      `References: ${inReplyTo}`,
+      `MIME-Version: 1.0`,
+      `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    ].join('
+')
+
+    raw = Buffer.from(`${headers}
+
+${parts}`).toString('base64url')
+  }
 
   const { data } = await gmail.users.messages.send({
     userId: 'me',

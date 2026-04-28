@@ -66,7 +66,7 @@ export async function POST(
   const session = await getServerSession()
   if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-  const { body } = await request.json()
+  const { body, attachments = [] } = await request.json()
   if (!body?.trim()) {
     return NextResponse.json({ error: 'Corps du message vide' }, { status: 400 })
   }
@@ -94,7 +94,8 @@ export async function POST(
         inReplyTo,
         to,
         thread.subject,
-        body
+        body,
+        attachments
       )
     } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
       const msgId = thread.messageId || thread.threadId
