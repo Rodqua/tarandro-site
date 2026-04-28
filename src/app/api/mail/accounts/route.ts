@@ -14,6 +14,7 @@ export async function GET() {
       provider: true,
       email: true,
       displayName: true,
+      signature: true,
       createdAt: true,
       _count: { select: { threads: true } },
     },
@@ -21,6 +22,26 @@ export async function GET() {
   });
 
   return NextResponse.json(accounts);
+}
+
+export async function PATCH(request: NextRequest) {
+  const session = await getServerSession();
+  if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID manquant" }, { status: 400 });
+
+  const body = await request.json();
+  const { signature } = body;
+
+  const updated = await (prisma as any).emailAccount.update({
+    where: { id },
+    data: { signature: signature ?? null },
+    select: { id: true, signature: true },
+  });
+
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(request: NextRequest) {

@@ -468,25 +468,57 @@ export default function MailPage() {
             <div className="border-t border-gray-200 flex-shrink-0">
               {!showReply ? (
                 <div className="px-6 py-3 flex gap-2">
-                  <button onClick={() => setShowReply(true)} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                  <button
+                    onClick={() => {
+                      setShowReply(true)
+                      // Pré-remplir avec la signature du compte
+                      const acc = accounts.find((a: any) => a.id === selected?.account?.id)
+                      const sig = (acc as any)?.signature
+                      setReplyBody(sig ? `\n\n-- \n${sig}` : '')
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+                  >
                     ↩️ Répondre
                   </button>
                 </div>
               ) : (
                 <div className="px-6 py-4">
-                  <div className="text-xs text-gray-500 mb-2 font-medium">Réponse à : {extractEmail(selected.sender)}</div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-500 font-medium">
+                      ↩️ Réponse à <span className="text-gray-700">{extractEmail(selected.sender)}</span>
+                      <span className="ml-2 text-gray-400">depuis {selected.account.email}</span>
+                    </div>
+                    <span className="text-xs text-gray-300">{replyBody.length} car.</span>
+                  </div>
                   <textarea
                     value={replyBody}
                     onChange={e => setReplyBody(e.target.value)}
                     placeholder="Votre réponse..."
-                    rows={5}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    rows={7}
+                    autoFocus
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono leading-relaxed"
                   />
                   <div className="flex gap-2 mt-2">
-                    <button onClick={handleReply} disabled={replying || !replyBody.trim()} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors">
-                      {replying ? 'Envoi...' : '📤 Envoyer'}
+                    <button
+                      onClick={handleReply}
+                      disabled={replying || !replyBody.trim()}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                    >
+                      {replying ? '⏳ Envoi...' : '📤 Envoyer'}
                     </button>
-                    <button onClick={() => { setShowReply(false); setReplyBody('') }} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors">Annuler</button>
+                    <button
+                      onClick={() => { setShowReply(false); setReplyBody('') }}
+                      className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors"
+                    >
+                      Annuler
+                    </button>
+                    <a
+                      href="/mail/settings"
+                      className="ml-auto text-xs text-gray-400 hover:text-indigo-600 self-center transition-colors"
+                      title="Modifier la signature"
+                    >
+                      ✏️ Signature
+                    </a>
                   </div>
                 </div>
               )}

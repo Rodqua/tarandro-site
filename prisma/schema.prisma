@@ -16,6 +16,7 @@ model EmailAccount {
   accessToken  String        @db.Text
   refreshToken String?       @db.Text
   expiresAt    DateTime?
+  signature    String?       @db.Text
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   threads      EmailThread[]
