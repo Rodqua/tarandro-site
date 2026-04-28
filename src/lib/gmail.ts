@@ -250,8 +250,7 @@ export async function sendGmailReply(
         att.data,
       ]),
       `--${boundary}--`,
-    ].join('
-')
+    ].join('\r\n')
 
     const headers = [
       `To: ${to}`,
@@ -260,12 +259,9 @@ export async function sendGmailReply(
       `References: ${inReplyTo}`,
       `MIME-Version: 1.0`,
       `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ].join('
-')
+    ].join('\r\n')
 
-    raw = Buffer.from(`${headers}
-
-${parts}`).toString('base64url')
+    raw = Buffer.from(`${headers}\r\n\r\n${parts}`).toString('base64url')
   }
 
   const { data } = await gmail.users.messages.send({
