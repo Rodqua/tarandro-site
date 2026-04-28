@@ -2,10 +2,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { trashGmailThread } from '@/lib/gmail'
-import { deleteOutlookMessage } from '@/lib/outlook'
-import { deleteZohoMessage, getZohoUserInfo } from '@/lib/zoho'
+import { deleteOutlookMessage, refreshOutlookToken } from '@/lib/outlook'
+import { deleteZohoMessage, getZohoUserInfo, refreshZohoToken } from '@/lib/zoho'
 
 export const dynamic = 'force-dynamic'
+
+async function getFreshToken(account: any): Promise<string> {
+  if (!account.expiresAt) return account.accessToken
+  const isExpired = new Date(account.expiresAt).getTime() < Date.now() + 60_000
+  if (!isExpired) return account.accessToken
+  if (!account.refreshToken) return account.accessToken
+  try {
+    let tokens: any
+    if (account.provider === 'outlook' || account.provider === 'microsoft') {
+      tokens = await refreshOutlookToken(account.refreshToken)
+    } else if (account.provider === 'zoho') {
+      tokens = await refreshZohoToken(account.refreshToken)
+    } else {
+      return account.accessToken
+    }
+    await (prisma as any).emailAccount.update({
+      where: { id: account.id },
+      data: { accessToken: tokens.access_token, expiresAt: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000) : null },
+    })
+    return tokens.access_token
+  } catch {
+    return account.accessToken
+  }
+}
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession()
@@ -21,36 +45,50 @@ export async function POST(request: NextRequest) {
     include: { account: true },
   })
 
-  // Cache Zoho accountId par compte pour éviter les appels répétés
   const zohoAccountIds: Record<string, string> = {}
+  const tokenCache: Record<string, string> = {}
 
-  const results = await Promise.allSettled(
+  const providerResults = await Promise.allSettled(
     threads.map(async (thread: any) => {
       const { account } = thread
-      try {
-        if (account.provider === 'google') {
-          await trashGmailThread(account.accessToken, account.refreshToken ?? undefined, thread.threadId)
-        } else if (account.provider === 'outlook') {
-          await deleteOutlookMessage(account.accessToken, thread.messageId || thread.threadId)
-        } else if (account.provider === 'zoho') {
-          if (!zohoAccountIds[account.id]) {
-            const info = await getZohoUserInfo(account.accessToken)
-            if (info.accountId) zohoAccountIds[account.id] = info.accountId
-          }
-          const zohoId = zohoAccountIds[account.id]
-          if (zohoId && (thread.messageId || thread.threadId)) {
-            await deleteZohoMessage(account.accessToken, zohoId, thread.messageId || thread.threadId)
-          }
-        }
-      } catch (e) {
-        console.warn(`Provider delete failed for ${thread.id}:`, e)
+      if (!tokenCache[account.id]) {
+        tokenCache[account.id] = await getFreshToken(account)
       }
+      const token = tokenCache[account.id]
+
+      if (account.provider === 'google') {
+        await trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId)
+      } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
+        await deleteOutlookMessage(token, thread.messageId || thread.threadId)
+      } else if (account.provider === 'zoho') {
+        if (!zohoAccountIds[account.id]) {
+          const info = await getZohoUserInfo(token)
+          if (info.accountId) zohoAccountIds[account.id] = info.accountId
+        }
+        const zohoId = zohoAccountIds[account.id]
+        if (zohoId) await deleteZohoMessage(token, zohoId, thread.messageId || thread.threadId)
+      }
+      return thread.id
     })
   )
 
-  // Supprimer tous de la DB (même si provider a échoué)
-  await (prisma as any).emailThread.deleteMany({ where: { id: { in: ids } } })
+  // Supprimer de la DB uniquement ceux que le provider a confirmé
+  const deletedIds = providerResults
+    .filter(r => r.status === 'fulfilled')
+    .map(r => (r as PromiseFulfilledResult<string>).value)
 
-  const failed = results.filter(r => r.status === 'rejected').length
-  return NextResponse.json({ success: true, deleted: ids.length, providerFailed: failed })
+  const failedCount = providerResults.filter(r => r.status === 'rejected').length
+
+  if (deletedIds.length > 0) {
+    await (prisma as any).emailThread.deleteMany({ where: { id: { in: deletedIds } } })
+  }
+
+  return NextResponse.json({
+    success: true,
+    deleted: deletedIds.length,
+    failed: failedCount,
+    message: failedCount > 0
+      ? `${deletedIds.length} supprimé(s), ${failedCount} échec(s) côté provider`
+      : `${deletedIds.length} email(s) supprimé(s)`,
+  })
 }
