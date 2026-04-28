@@ -138,11 +138,12 @@ export async function GET(request: NextRequest) {
               const category = categorizeOutlookEmail(subject, sender, snippet)
               const isUnread = !msg.isRead
               const threadId = msg.conversationId || msg.id
+              const messageId = msg.id  // ID réel du message pour delete/reply
               currentIds.push(threadId)
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, updatedAt: new Date() },
-                create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, updatedAt: new Date() },
+                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
               })
             } catch {}
           }
@@ -163,10 +164,11 @@ export async function GET(request: NextRequest) {
               const category = categorizeZohoEmail(subject, sender, snippet)
               const isUnread = msg.status === 'unread' || msg.isUnread === true
               const threadId = msg.threadId || msg.messageId || String(msg.mid)
+              const messageId = msg.messageId || String(msg.mid)
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, updatedAt: new Date() },
-                create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, updatedAt: new Date() },
+                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
               })
             } catch {}
           }

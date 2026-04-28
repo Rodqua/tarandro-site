@@ -141,7 +141,8 @@ export default function MailPage() {
       if (selected?.id === thread.id) setSelected(null)
       showToast('🗑️ Email supprimé')
     } else {
-      showToast('❌ Erreur lors de la suppression', 'error')
+      const err = await res.json().catch(() => ({ error: 'Erreur inconnue' }))
+      showToast(`❌ ${err.error || 'Erreur lors de la suppression'}`, 'error')
     }
     setDeleting(null)
   }
