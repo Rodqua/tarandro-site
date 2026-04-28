@@ -4,8 +4,6 @@ import { prisma } from '@/lib/prisma'
 import { listGmailThreads, getGmailThread, categorizeEmail } from '@/lib/gmail'
 import { listOutlookMessages, categorizeOutlookEmail, refreshOutlookToken } from '@/lib/outlook'
 import { listZohoMessages, getZohoUserInfo, categorizeZohoEmail, refreshZohoToken } from '@/lib/zoho'
-import { google } from 'googleapis'
-
 export const dynamic = 'force-dynamic'
 
 async function getValidToken(account: {
@@ -36,39 +34,39 @@ async function getValidToken(account: {
   }
 }
 
-// Supprime de la DB les threads qui ont été mis à la corbeille côté Gmail
+// Supprime de la DB les threads Gmail mis à la corbeille ou supprimés côté provider
 async function cleanupGmailTrashed(accountId: string, accessToken: string, refreshToken?: string) {
   try {
-    const client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET
-    )
-    client.setCredentials({ access_token: accessToken, refresh_token: refreshToken })
-    const gmail = google.gmail({ version: 'v1', auth: client })
+    // Récupérer les IDs en corbeille récents
+    const trashed = await listGmailThreads(accessToken, refreshToken, 'in:trash newer_than:30d', 100)
+    // Récupérer aussi les supprimés définitivement (dans Bin)
+    const deleted = await listGmailThreads(accessToken, refreshToken, 'in:spam newer_than:14d', 50)
+    
+    const idsToRemove = [
+      ...trashed.map(t => t.id),
+      ...deleted.map(t => t.id),
+    ].filter(Boolean) as string[]
 
-    // Récupérer les threads récemment mis à la corbeille
-    const { data } = await gmail.users.threads.list({
-      userId: 'me',
-      q: 'in:trash newer_than:30d',
-      maxResults: 100,
-    })
-    const trashedIds = (data.threads || []).map(t => t.id).filter(Boolean) as string[]
-    if (trashedIds.length > 0) {
+    if (idsToRemove.length > 0) {
       await (prisma as any).emailThread.deleteMany({
-        where: { accountId, threadId: { in: trashedIds } },
+        where: { accountId, threadId: { in: idsToRemove } },
       })
     }
+
+    // Supprimer aussi les threads lus depuis plus de 30 jours (nettoyage général)
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    await (prisma as any).emailThread.deleteMany({
+      where: { accountId, isUnread: false, date: { lt: cutoff } },
+    })
   } catch (e) {
-    console.warn('Gmail trash cleanup failed:', e)
+    console.warn('Gmail cleanup failed:', e)
   }
 }
 
 // Supprime de la DB les threads Outlook qui ne sont plus dans l'inbox
-async function cleanupOutlookDeleted(accountId: string, currentIds: string[]) {
-  if (currentIds.length === 0) return
-  // Supprimer les threads en DB qui ne sont PAS dans les 50 derniers messages récupérés
-  // (uniquement pour les threads plus anciens que 3 jours pour éviter les faux positifs)
-  const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+async function cleanupOutlookDeleted(accountId: string, currentIds: string[], accessToken: string) {
+  // Supprimer threads absents de la dernière sync et plus anciens que 7 jours
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   await (prisma as any).emailThread.deleteMany({
     where: {
       accountId,
@@ -76,6 +74,23 @@ async function cleanupOutlookDeleted(accountId: string, currentIds: string[]) {
       date: { lt: cutoff },
     },
   })
+
+  // Vérifier aussi le dossier Deleted Items
+  try {
+    const url = 'https://graph.microsoft.com/v1.0/me/mailFolders/deleteditems/messages?$top=50&$select=id,conversationId'
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+    if (res.ok) {
+      const data = await res.json()
+      const deletedIds = (data.value || []).map((m: any) => m.conversationId || m.id)
+      if (deletedIds.length > 0) {
+        await (prisma as any).emailThread.deleteMany({
+          where: { accountId, threadId: { in: deletedIds } },
+        })
+      }
+    }
+  } catch (e) {
+    console.warn('Outlook deleted items cleanup failed:', e)
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -148,7 +163,7 @@ export async function GET(request: NextRequest) {
             } catch {}
           }
           // Nettoyer les emails supprimés côté Outlook
-          await cleanupOutlookDeleted(account.id, currentIds)
+          await cleanupOutlookDeleted(account.id, currentIds, token)
 
         } else if (account.provider === 'zoho') {
           const userInfo = await getZohoUserInfo(token)

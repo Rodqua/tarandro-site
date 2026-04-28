@@ -17,7 +17,7 @@ export function getZohoAuthUrl(): string {
     client_id: process.env.ZOHO_CLIENT_ID!,
     response_type: 'code',
     redirect_uri: redirectUri,
-    scope: 'ZohoMail.messages.READ,ZohoMail.accounts.READ',
+    scope: 'ZohoMail.messages.ALL,ZohoMail.accounts.READ,ZohoMail.send.CREATE',
     access_type: 'offline',
     prompt: 'consent',
   })

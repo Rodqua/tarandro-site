@@ -9,7 +9,7 @@ export function getOutlookAuthUrl(): string {
     client_id: process.env.MICROSOFT_CLIENT_ID!,
     response_type: 'code',
     redirect_uri: redirectUri,
-    scope: 'https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/User.Read offline_access',
+    scope: 'https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/User.Read offline_access',
     response_mode: 'query',
     prompt: 'select_account',
   })
