@@ -13,6 +13,12 @@ interface EmailAccount {
   createdAt: string
 }
 
+const RECONNECT_URLS: Record<string, string> = {
+  google: '/api/mail/connect',
+  outlook: '/api/mail/connect/outlook',
+  zoho: '/api/mail/connect/zoho',
+}
+
 const PROVIDER_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
   google: {
     label: 'Gmail',
@@ -209,15 +215,34 @@ export default function MailSettingsPage() {
                           <p className={`text-xs ${config.color}`}>{config.label}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => disconnect(account.id)}
-                        disabled={deleting === account.id}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        <FaTrash className="text-xs" />
-                        {deleting === account.id ? 'Suppression...' : 'Déconnecter'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={RECONNECT_URLS[account.provider] || '#'}
+                          className="flex items-center gap-1.5 px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          title="Reconnecter pour mettre à jour les permissions"
+                        >
+                          🔄 Reconnecter
+                        </a>
+                        <button
+                          onClick={() => disconnect(account.id)}
+                          disabled={deleting === account.id}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          <FaTrash className="text-xs" />
+                          {deleting === account.id ? 'Suppression...' : 'Déconnecter'}
+                        </button>
+                      </div>
                     </div>
+                    {/* Avertissement permissions Gmail */}
+                    {account.provider === 'google' && (
+                      <div className="mx-6 mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
+                        <span className="flex-shrink-0 mt-0.5">⚠️</span>
+                        <span>
+                          Si la suppression ou l'envoi de réponses échoue avec une erreur de permissions,
+                          cliquez sur <strong>Reconnecter</strong> pour accorder les droits complets (lecture, envoi, suppression).
+                        </span>
+                      </div>
+                    )}
                     <SignatureEditor account={account} onSaved={(sig) => updateSignature(account.id, sig)} />
                   </li>
                 )
