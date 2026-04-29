@@ -290,16 +290,20 @@ export default function FiltersPage() {
   }
 
   async function reapplyRule(rule: FilterRule) {
+    if (!rule.id) { showFlash('❌ Règle sans ID, impossible de réappliquer'); return }
     setReapplying(true)
-    const res = await fetch('/api/mail/categorize', {
+    const res = await fetch('/api/mail/filters/reapply', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ threadId: '__reapply__', sender: rule.field === 'sender' ? rule.pattern : '', subject: rule.field === 'subject' ? rule.pattern : '', category: rule.category }),
+      body: JSON.stringify({ ruleId: rule.id }),
     })
     if (res.ok) {
       const data = await res.json()
-      showFlash(`✅ ${data.recategorized} email(s) recatégorisé(s) avec ce filtre`)
-    } else showFlash(`❌ Erreur lors de l'application`)
+      showFlash(`✅ ${data.added} ajouté(s), ${data.removed} retiré(s) de la catégorie`)
+    } else {
+      const err = await res.json().catch(() => ({}))
+      showFlash(`❌ ${err.error || 'Erreur lors de l\'application'}`)
+    }
     setReapplying(false)
   }
 
