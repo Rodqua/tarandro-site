@@ -560,7 +560,10 @@ export default function MailPage() {
                   </div>
                 ) : emailBody?.html ? (
                   <iframe
-                    srcDoc={`<base target="_blank"><style>body{font-family:sans-serif;font-size:14px;line-height:1.6;margin:0;padding:0;word-break:break-word}a{color:#4f46e5}img{max-width:100%}</style>${emailBody.html}`}
+                    srcDoc={(() => {
+                      const clean = emailBody.html.replace(/src="cid:[^"]*"/gi, 'src=""').replace(/src='cid:[^']*'/gi, "src=''")
+                      return `<base target="_blank"><style>body{font-family:sans-serif;font-size:14px;line-height:1.6;margin:0;padding:0;word-break:break-word}a{color:#4f46e5}img{max-width:100%}.cid-blocked{display:none}</style>${clean}`
+                    })()}
                     sandbox="allow-same-origin allow-popups"
                     className="w-full rounded-xl border border-gray-100 bg-white"
                     style={{ minHeight: '300px', height: '500px' }}

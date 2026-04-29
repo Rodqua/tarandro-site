@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { google } from 'googleapis'
+import { refreshOutlookToken } from '@/lib/outlook'
+import { refreshZohoToken } from '@/lib/zoho'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +13,40 @@ function getOAuth2Client() {
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.GOOGLE_REDIRECT_URI
   )
+}
+
+async function getFreshToken(account: any): Promise<string> {
+  const isExpired = !account.expiresAt || new Date(account.expiresAt).getTime() < Date.now() + 60_000
+  if (!isExpired) return account.accessToken
+  try {
+    if (account.provider === 'google') {
+      const client = getOAuth2Client()
+      client.setCredentials({ access_token: account.accessToken, refresh_token: account.refreshToken })
+      const { credentials } = await client.refreshAccessToken()
+      if (credentials.access_token) {
+        await (prisma as any).emailAccount.update({
+          where: { id: account.id },
+          data: { accessToken: credentials.access_token, ...(credentials.expiry_date ? { expiresAt: new Date(credentials.expiry_date) } : {}) },
+        })
+        return credentials.access_token
+      }
+    } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
+      const tokens = await refreshOutlookToken(account.refreshToken)
+      await (prisma as any).emailAccount.update({
+        where: { id: account.id },
+        data: { accessToken: tokens.access_token, ...(tokens.refresh_token ? { refreshToken: tokens.refresh_token } : {}), ...(tokens.expires_in ? { expiresAt: new Date(Date.now() + tokens.expires_in * 1000) } : {}) },
+      })
+      return tokens.access_token
+    } else if (account.provider === 'zoho') {
+      const tokens = await refreshZohoToken(account.refreshToken)
+      await (prisma as any).emailAccount.update({
+        where: { id: account.id },
+        data: { accessToken: tokens.access_token, ...(tokens.expires_in ? { expiresAt: new Date(Date.now() + tokens.expires_in * 1000) } : {}) },
+      })
+      return tokens.access_token
+    }
+  } catch (e) { console.warn('Token refresh failed in body route:', e) }
+  return account.accessToken
 }
 
 function decodeBase64Url(data: string): string {
@@ -49,8 +85,9 @@ function parseGmailParts(
 }
 
 async function getGmailBody(account: any, thread: any) {
+  const token = await getFreshToken(account)
   const client = getOAuth2Client()
-  client.setCredentials({ access_token: account.accessToken, refresh_token: account.refreshToken })
+  client.setCredentials({ access_token: token, refresh_token: account.refreshToken })
   const gmail = google.gmail({ version: 'v1', auth: client })
 
   // Get the latest message in the thread with full format
@@ -77,10 +114,11 @@ async function getGmailBody(account: any, thread: any) {
 }
 
 async function getOutlookBody(account: any, thread: any) {
+  const token = await getFreshToken(account)
   const msgId = thread.messageId || thread.threadId
   const res = await fetch(
     `https://graph.microsoft.com/v1.0/me/messages/${msgId}?$select=body,hasAttachments`,
-    { headers: { Authorization: `Bearer ${account.accessToken}` } }
+    { headers: { Authorization: `Bearer ${token}` } }
   )
   if (!res.ok) throw new Error(`Outlook fetch failed: ${res.status}`)
   const data = await res.json()
@@ -93,7 +131,7 @@ async function getOutlookBody(account: any, thread: any) {
   if (data.hasAttachments) {
     const attRes = await fetch(
       `https://graph.microsoft.com/v1.0/me/messages/${msgId}/attachments?$select=id,name,size,contentType`,
-      { headers: { Authorization: `Bearer ${account.accessToken}` } }
+      { headers: { Authorization: `Bearer ${token}` } }
     )
     if (attRes.ok) {
       const attData = await attRes.json()
@@ -114,13 +152,14 @@ async function getOutlookBody(account: any, thread: any) {
 }
 
 async function getZohoBody(account: any, thread: any) {
+  const token = await getFreshToken(account)
   const zohoBase = process.env.ZOHO_REGION === 'eu'
     ? 'https://mail.zoho.eu/api'
     : 'https://mail.zoho.com/api'
 
   // Get Zoho accountId
   const accRes = await fetch(`${zohoBase}/accounts`, {
-    headers: { Authorization: `Zoho-oauthtoken ${account.accessToken}` },
+    headers: { Authorization: `Zoho-oauthtoken ${token}` },
   })
   if (!accRes.ok) throw new Error('Zoho accounts fetch failed')
   const accData = await accRes.json()
@@ -130,7 +169,7 @@ async function getZohoBody(account: any, thread: any) {
   const msgId = thread.messageId || thread.threadId
   const res = await fetch(
     `${zohoBase}/accounts/${zohoAccountId}/messages/${msgId}/content`,
-    { headers: { Authorization: `Zoho-oauthtoken ${account.accessToken}` } }
+    { headers: { Authorization: `Zoho-oauthtoken ${token}` } }
   )
   if (!res.ok) throw new Error(`Zoho message fetch failed: ${res.status}`)
   const data = await res.json()
