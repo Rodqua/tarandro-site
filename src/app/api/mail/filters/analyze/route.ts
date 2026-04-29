@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
 
   // Load all accounts
   const accounts = await (prisma as any).emailAccount.findMany({
-    select: { id: true, email: true, provider: true, accessToken: true, refreshToken: true, expiresAt: true, metadata: true },
+    select: { id: true, email: true, provider: true, accessToken: true, refreshToken: true, expiresAt: true },
   })
 
   const googleAccounts = accounts.filter((a: any) => a.provider === 'google')
