@@ -154,7 +154,7 @@ export async function GET(request: NextRequest) {
           const newIds = allIds.filter((id: string) => !existingSet.has(id))
 
           // 3. Fetch les détails uniquement pour les nouveaux threads, par batches de 10
-          const BATCH = 10
+          const BATCH = 25
           for (let i = 0; i < newIds.length; i += BATCH) {
             const batch = newIds.slice(i, i + BATCH)
             await Promise.allSettled(batch.map(async (threadId: string) => {
@@ -186,28 +186,39 @@ export async function GET(request: NextRequest) {
 
         } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
           const messages = await listOutlookMessages(token, 500)
-          const currentIds: string[] = []
-          for (const msg of messages) {
-            try {
-              const subject = msg.subject || '(Sans objet)'
-              const sender = msg.from?.emailAddress?.address
-                ? `${msg.from.emailAddress.name || ''} <${msg.from.emailAddress.address}>`.trim()
-                : msg.from?.emailAddress?.name || ''
-              const date = new Date(msg.receivedDateTime)
-              const snippet = msg.bodyPreview || ''
-              const labels: string[] = msg.categories || []
-              const category = applyFilterRules(sender, subject, filterRules) ?? categorizeOutlookEmail(subject, sender, snippet)
-              const isUnread = !msg.isRead
-              const threadId = msg.conversationId || msg.id
-              const messageId = msg.id  // ID réel du message pour delete/reply
-              currentIds.push(threadId)
-              const outlookAttCount = msg.hasAttachments ? 1 : 0
-              await (prisma as any).emailThread.upsert({
-                where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, labels, isUnread, messageId, attachmentCount: outlookAttCount, updatedAt: new Date() },
-                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: outlookAttCount },
-              })
-            } catch {}
+          const currentIds = messages.map((m: any) => m.conversationId || m.id).filter(Boolean)
+
+          // Trouver les threads déjà en DB
+          const existingOutlook = await (prisma as any).emailThread.findMany({
+            where: { accountId: account.id, threadId: { in: currentIds } },
+            select: { threadId: true },
+          })
+          const existingOutlookSet = new Set(existingOutlook.map((r: any) => r.threadId))
+          const newOutlookMsgs = messages.filter((m: any) => !existingOutlookSet.has(m.conversationId || m.id))
+
+          // Insérer uniquement les nouveaux, en lots de 25
+          const OBATCH = 25
+          for (let i = 0; i < newOutlookMsgs.length; i += OBATCH) {
+            const chunk = newOutlookMsgs.slice(i, i + OBATCH)
+            await Promise.allSettled(chunk.map(async (msg: any) => {
+              try {
+                const subject = msg.subject || '(Sans objet)'
+                const sender = msg.from?.emailAddress?.address
+                  ? `${msg.from.emailAddress.name || ''} <${msg.from.emailAddress.address}>`.trim()
+                  : msg.from?.emailAddress?.name || ''
+                const date = new Date(msg.receivedDateTime)
+                const snippet = msg.bodyPreview || ''
+                const labels: string[] = msg.categories || []
+                const category = applyFilterRules(sender, subject, filterRules) ?? categorizeOutlookEmail(subject, sender, snippet)
+                const isUnread = !msg.isRead
+                const threadId = msg.conversationId || msg.id
+                const messageId = msg.id
+                const outlookAttCount = msg.hasAttachments ? 1 : 0
+                await (prisma as any).emailThread.create({
+                  data: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: outlookAttCount },
+                })
+              } catch {}
+            }))
           }
           // Nettoyer les emails supprimés côté Outlook
           await cleanupOutlookDeleted(account.id, currentIds, token)
@@ -216,24 +227,37 @@ export async function GET(request: NextRequest) {
           const userInfo = await getZohoUserInfo(token)
           if (!userInfo.accountId) continue
           const messages = await listZohoMessages(token, userInfo.accountId, 200)
-          for (const msg of messages) {
-            try {
-              const subject = msg.subject || '(Sans objet)'
-              const sender = msg.fromAddress || msg.sender || ''
-              const date = msg.receivedTime ? new Date(Number(msg.receivedTime)) : new Date()
-              const snippet = msg.summary || msg.content || ''
-              const labels: string[] = msg.flagged ? ['flagged'] : []
-              const category = applyFilterRules(sender, subject, filterRules) ?? categorizeZohoEmail(subject, sender, snippet)
-              const isUnread = msg.status === 'unread' || msg.isUnread === true
-              const threadId = msg.threadId || msg.messageId || String(msg.mid)
-              const messageId = msg.messageId || String(msg.mid)
-              const zohoAttCount = msg.hasAttachment ? (msg.attachmentCount || 1) : 0
-              await (prisma as any).emailThread.upsert({
-                where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, labels, isUnread, messageId, attachmentCount: zohoAttCount, updatedAt: new Date() },
-                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: zohoAttCount },
-              })
-            } catch {}
+          const zohoIds = messages.map((m: any) => m.threadId || m.messageId || String(m.mid)).filter(Boolean)
+
+          // Trouver les threads déjà en DB
+          const existingZoho = await (prisma as any).emailThread.findMany({
+            where: { accountId: account.id, threadId: { in: zohoIds } },
+            select: { threadId: true },
+          })
+          const existingZohoSet = new Set(existingZoho.map((r: any) => r.threadId))
+          const newZohoMsgs = messages.filter((m: any) => !existingZohoSet.has(m.threadId || m.messageId || String(m.mid)))
+
+          // Insérer uniquement les nouveaux, en lots de 25
+          const ZBATCH = 25
+          for (let i = 0; i < newZohoMsgs.length; i += ZBATCH) {
+            const chunk = newZohoMsgs.slice(i, i + ZBATCH)
+            await Promise.allSettled(chunk.map(async (msg: any) => {
+              try {
+                const subject = msg.subject || '(Sans objet)'
+                const sender = msg.fromAddress || msg.sender || ''
+                const date = msg.receivedTime ? new Date(Number(msg.receivedTime)) : new Date()
+                const snippet = msg.summary || msg.content || ''
+                const labels: string[] = msg.flagged ? ['flagged'] : []
+                const category = applyFilterRules(sender, subject, filterRules) ?? categorizeZohoEmail(subject, sender, snippet)
+                const isUnread = msg.status === 'unread' || msg.isUnread === true
+                const threadId = msg.threadId || msg.messageId || String(msg.mid)
+                const messageId = msg.messageId || String(msg.mid)
+                const zohoAttCount = msg.hasAttachment ? (msg.attachmentCount || 1) : 0
+                await (prisma as any).emailThread.create({
+                  data: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: zohoAttCount },
+                })
+              } catch {}
+            }))
           }
         }
       } catch (e) {
