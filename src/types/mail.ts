@@ -27,6 +27,7 @@ export interface EmailThread {
   sender: string;
   date: string;
   isUnread: boolean;
+  attachmentCount?: number;
   category: EmailCategory;
   labels: string[];
   account: {
