@@ -7,6 +7,7 @@ import { deleteOutlookMessage, refreshOutlookToken } from '@/lib/outlook'
 import { deleteZohoMessage, getZohoUserInfo, refreshZohoToken } from '@/lib/zoho'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 async function getFreshToken(account: any): Promise<string> {
   if (!account.refreshToken) return account.accessToken
@@ -79,6 +80,27 @@ async function deleteOutlookConversation(conversationId: string, token: string):
   await Promise.all(messages.map((msg) => deleteOutlookMessage(token, msg.id)))
 }
 
+async function deleteOne(thread: any, token: string, zohoAccountIds: Record<string, string>): Promise<void> {
+  const { account } = thread
+
+  if (account.provider === 'google') {
+    await trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId)
+  } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
+    if (thread.messageId) {
+      await deleteOutlookMessage(token, thread.messageId)
+    } else {
+      await deleteOutlookConversation(thread.threadId, token)
+    }
+  } else if (account.provider === 'zoho') {
+    if (!zohoAccountIds[account.id]) {
+      const info = await getZohoUserInfo(token)
+      if (info.accountId) zohoAccountIds[account.id] = info.accountId
+    }
+    const zohoId = zohoAccountIds[account.id]
+    if (zohoId) await deleteZohoMessage(token, zohoId, thread.messageId || thread.threadId)
+  }
+}
+
 // POST /api/mail/batch  { action: 'remove', ids: string[] }
 export async function POST(request: NextRequest) {
   const session = await getServerSession()
@@ -96,63 +118,52 @@ export async function POST(request: NextRequest) {
     include: { account: true },
   })
 
-  const zohoAccountIds: Record<string, string> = {}
+  // Refresh tokens once per account (séquentiel pour éviter les conflits)
   const tokenCache: Record<string, string> = {}
-
-  // Séquentiel par compte pour éviter les refreshs concurrents
   const accountIds = Array.from(new Set<string>(threads.map((t: any) => t.account.id)))
   for (const accId of accountIds) {
     const acc = threads.find((t: any) => t.account.id === accId)?.account
     if (acc) tokenCache[accId] = await getFreshToken(acc)
   }
 
-  const providerResults = await Promise.allSettled(
-    threads.map(async (thread: any) => {
-      const { account } = thread
-      const token = tokenCache[account.id] || account.accessToken
+  const zohoAccountIds: Record<string, string> = {}
+  const deletedIds: string[] = []
+  const failedIds: string[] = []
 
-      if (account.provider === 'google') {
-        await trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId)
-      } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
-        if (thread.messageId) {
-          await deleteOutlookMessage(token, thread.messageId)
-        } else {
-          await deleteOutlookConversation(thread.threadId, token)
-        }
-      } else if (account.provider === 'zoho') {
-        if (!zohoAccountIds[account.id]) {
-          const info = await getZohoUserInfo(token)
-          if (info.accountId) zohoAccountIds[account.id] = info.accountId
-        }
-        const zohoId = zohoAccountIds[account.id]
-        if (zohoId) await deleteZohoMessage(token, zohoId, thread.messageId || thread.threadId)
+  // Traitement par lots de 5 en parallèle pour éviter rate limits + timeout
+  const CHUNK = 5
+  for (let i = 0; i < threads.length; i += CHUNK) {
+    const chunk = threads.slice(i, i + CHUNK)
+    const results = await Promise.allSettled(
+      chunk.map(async (thread: any) => {
+        const token = tokenCache[thread.account.id] || thread.account.accessToken
+        await deleteOne(thread, token, zohoAccountIds)
+        return thread.id
+      })
+    )
+    for (let j = 0; j < results.length; j++) {
+      if (results[j].status === 'fulfilled') {
+        deletedIds.push((results[j] as PromiseFulfilledResult<string>).value)
+      } else {
+        failedIds.push(chunk[j].id)
+        console.warn(`Batch delete failed for thread ${chunk[j].id}:`, (results[j] as PromiseRejectedResult).reason)
       }
-      return thread.id
-    })
-  )
+    }
+  }
 
-  const deletedIds = providerResults
-    .filter(r => r.status === 'fulfilled')
-    .map(r => (r as PromiseFulfilledResult<string>).value)
-
-  const failedCount = providerResults.filter(r => r.status === 'rejected').length
-
+  // Supprimer en DB seulement les succès
   if (deletedIds.length > 0) {
     await (prisma as any).emailThread.deleteMany({ where: { id: { in: deletedIds } } })
   }
-
-  const failedIds = providerResults
-    .map((r, i) => r.status === 'rejected' ? threads[i]?.id : null)
-    .filter(Boolean) as string[]
 
   return NextResponse.json({
     success: true,
     deletedIds,
     failedIds,
     deleted: deletedIds.length,
-    failed: failedCount,
-    message: failedCount > 0
-      ? `${deletedIds.length} supprimé(s), ${failedCount} échec(s) côté provider`
+    failed: failedIds.length,
+    message: failedIds.length > 0
+      ? `${deletedIds.length} supprimé(s), ${failedIds.length} échec(s) côté provider`
       : `${deletedIds.length} email(s) supprimé(s)`,
   })
 }
