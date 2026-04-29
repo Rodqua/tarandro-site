@@ -71,6 +71,13 @@ export default function FiltersPage() {
   const [applyingIdx, setApplyingIdx] = useState<number | null>(null)
   const [appliedIdx, setAppliedIdx] = useState<Set<number>>(new Set())
 
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState<Partial<FilterRule>>({})
+  const [editSaving, setEditSaving] = useState(false)
+  const [mergeIds, setMergeIds] = useState<Set<string>>(new Set())
+  const [merging, setMerging] = useState(false)
+  const [reapplying, setReapplying] = useState(false)
+
   const showFlash = (msg: string) => { setFlash(msg); setTimeout(() => setFlash(null), 3500) }
 
   async function loadRules() {
@@ -172,6 +179,81 @@ export default function FiltersPage() {
     }
     setApplyingIdx(null)
   }
+
+  function startEdit(rule: FilterRule) {
+    setEditingId(rule.id)
+    setEditForm({ name: rule.name, description: rule.description, field: rule.field, pattern: rule.pattern, category: rule.category, priority: rule.priority })
+  }
+
+  async function saveEdit(id: string) {
+    setEditSaving(true)
+    const res = await fetch(`/api/mail/filters/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editForm),
+    })
+    if (res.ok) {
+      const updated = await res.json()
+      setRules(prev => prev.map(r => r.id === id ? { ...r, ...updated } : r))
+      setEditingId(null)
+      showFlash('✅ Filtre mis à jour')
+    } else showFlash('❌ Erreur lors de la mise à jour')
+    setEditSaving(false)
+  }
+
+  function toggleMerge(id: string) {
+    setMergeIds(prev => {
+      const next = new Set(Array.from(prev))
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  async function mergeSelected() {
+    if (mergeIds.size < 2) return
+    const selected = rules.filter(r => mergeIds.has(r.id))
+    const mergedPattern = selected.map(r => r.pattern).join('|')
+    const mergedName = selected.map(r => r.name).join(' + ')
+    const category = selected[0].category
+    setMerging(true)
+    // Create merged rule
+    const res = await fetch('/api/mail/filters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: mergedName,
+        description: `Fusion de : ${selected.map(r => r.name).join(', ')}`,
+        field: selected[0].field,
+        pattern: mergedPattern,
+        category,
+        priority: Math.max(...selected.map(r => r.priority)),
+      }),
+    })
+    if (res.ok) {
+      // Delete merged rules
+      await Promise.all(selected.map(r => fetch(`/api/mail/filters/${r.id}`, { method: 'DELETE' })))
+      showFlash(`✅ ${selected.length} filtres fusionnés`)
+      setMergeIds(new Set())
+      await loadRules()
+    } else showFlash('❌ Erreur lors de la fusion')
+    setMerging(false)
+  }
+
+  async function reapplyRule(rule: FilterRule) {
+    setReapplying(true)
+    const res = await fetch('/api/mail/categorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ threadId: '__reapply__', sender: rule.field === 'sender' ? rule.pattern : '', subject: rule.field === 'subject' ? rule.pattern : '', category: rule.category }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      showFlash(`✅ ${data.recategorized} email(s) recatégorisé(s) avec ce filtre`)
+    } else showFlash('❌ Erreur lors de l'application')
+    setReapplying(false)
+  }
+
+  const CATEGORIES = ['important', 'compta', 'veille', 'events', 'loge', 'newsletter']
 
   const builtIn = rules.filter(r => r.isBuiltIn)
   const custom = rules.filter(r => !r.isBuiltIn)
@@ -374,9 +456,23 @@ export default function FiltersPage() {
 
         {/* Filtres personnalisés */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-800">Filtres personnalisés</h2>
-            <span className="text-xs text-gray-400">{custom.length} filtre{custom.length !== 1 ? 's' : ''}</span>
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-gray-800">Filtres personnalisés</h2>
+              <span className="text-xs text-gray-400">{custom.length} filtre{custom.length !== 1 ? 's' : ''}</span>
+            </div>
+            {mergeIds.size >= 2 && (
+              <button
+                onClick={mergeSelected}
+                disabled={merging}
+                className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center gap-1"
+              >
+                {merging ? '⏳' : '🔗'} Fusionner {mergeIds.size} filtres
+              </button>
+            )}
+            {mergeIds.size > 0 && mergeIds.size < 2 && (
+              <span className="text-xs text-gray-400">Sélectionne 1 filtre de plus pour fusionner</span>
+            )}
           </div>
           {loading ? (
             <div className="p-8 text-center text-gray-400">Chargement...</div>
@@ -388,27 +484,93 @@ export default function FiltersPage() {
           ) : (
             <ul className="divide-y divide-gray-100">
               {custom.map(rule => (
-                <li key={rule.id} className="px-6 py-4 flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-900 text-sm">{rule.name}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[rule.category] || 'bg-gray-100'}`}>{rule.category}</span>
-                      {!rule.isActive && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Inactif</span>}
+                <li key={rule.id} className="px-6 py-4">
+                  {editingId === rule.id ? (
+                    /* ── Formulaire d'édition inline ── */
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Nom</label>
+                          <input value={editForm.name || ''} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Catégorie</label>
+                          <select value={editForm.category || ''} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Champ</label>
+                          <select value={editForm.field || 'all'} onChange={e => setEditForm(p => ({ ...p, field: e.target.value }))}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+                            {Object.entries(FIELD_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Priorité</label>
+                          <input type="number" value={editForm.priority ?? 0} onChange={e => setEditForm(p => ({ ...p, priority: Number(e.target.value) }))}
+                            className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">Pattern <span className="text-gray-400">(sépare plusieurs valeurs par |)</span></label>
+                        <input value={editForm.pattern || ''} onChange={e => setEditForm(p => ({ ...p, pattern: e.target.value }))}
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">Description</label>
+                        <input value={editForm.description || ''} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => saveEdit(rule.id)} disabled={editSaving}
+                          className="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50">
+                          {editSaving ? 'Sauvegarde…' : '✅ Sauvegarder'}
+                        </button>
+                        <button onClick={() => reapplyRule({ ...rule, ...editForm } as FilterRule)} disabled={reapplying}
+                          className="px-4 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-medium hover:bg-amber-600 disabled:opacity-50" title="Recatégorise les emails existants avec ce filtre">
+                          {reapplying ? '⏳' : '🔄'} Réappliquer aux emails
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg text-xs">Annuler</button>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 italic">&ldquo;{rule.description}&rdquo;</p>
-                    <p className="text-xs text-gray-400 mt-1">Champ : {FIELD_LABELS[rule.field]} · Pattern : <code className="bg-gray-100 px-1 rounded">{rule.pattern}</code></p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => toggleRule(rule.id, !rule.isActive)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${rule.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                    >
-                      {rule.isActive ? 'Actif' : 'Inactif'}
-                    </button>
-                    <button onClick={() => deleteRule(rule.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
-                      🗑️
-                    </button>
-                  </div>
+                  ) : (
+                    /* ── Vue normale ── */
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <input type="checkbox" checked={mergeIds.has(rule.id)} onChange={() => toggleMerge(rule.id)}
+                          className="mt-1 w-4 h-4 rounded accent-indigo-600 cursor-pointer flex-shrink-0" title="Sélectionner pour fusion" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="font-medium text-gray-900 text-sm">{rule.name}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[rule.category] || 'bg-gray-100'}`}>{rule.category}</span>
+                            {!rule.isActive && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Inactif</span>}
+                            <span className="text-xs text-gray-300">prio {rule.priority}</span>
+                          </div>
+                          <p className="text-sm text-gray-600 italic mb-1">&ldquo;{rule.description}&rdquo;</p>
+                          <p className="text-xs text-gray-400">
+                            {FIELD_LABELS[rule.field]} · <code className="bg-gray-100 px-1 rounded">{rule.pattern.length > 60 ? rule.pattern.slice(0, 60) + '…' : rule.pattern}</code>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button onClick={() => toggleRule(rule.id, !rule.isActive)}
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${rule.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                          {rule.isActive ? 'Actif' : 'Inactif'}
+                        </button>
+                        <button onClick={() => startEdit(rule)} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Modifier">
+                          ✏️
+                        </button>
+                        <button onClick={() => deleteRule(rule.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -423,7 +585,38 @@ export default function FiltersPage() {
           </div>
           <ul className="divide-y divide-gray-100">
             {builtIn.map(rule => (
-              <li key={rule.id} className="px-6 py-4 flex items-start justify-between gap-4">
+              <li key={rule.id} className="px-6 py-4">
+                {editingId === rule.id ? (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">Nom</label>
+                        <input value={editForm.name || ''} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">Catégorie</label>
+                        <select value={editForm.category || ''} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}
+                          className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+                          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">Description</label>
+                      <input value={editForm.description || ''} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                        className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => saveEdit(rule.id)} disabled={editSaving}
+                        className="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50">
+                        {editSaving ? 'Sauvegarde…' : '✅ Sauvegarder'}
+                      </button>
+                      <button onClick={() => setEditingId(null)} className="px-4 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg text-xs">Annuler</button>
+                    </div>
+                  </div>
+                ) : (
+                <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-gray-900 text-sm">{rule.name}</span>
@@ -433,12 +626,17 @@ export default function FiltersPage() {
                   <p className="text-sm text-gray-600 italic">&ldquo;{rule.description}&rdquo;</p>
                   <p className="text-xs text-gray-400 mt-1">Champ : {FIELD_LABELS[rule.field]}</p>
                 </div>
-                <button
-                  onClick={() => toggleRule(rule.id, !rule.isActive)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${rule.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-                >
-                  {rule.isActive ? 'Actif' : 'Inactif'}
-                </button>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button onClick={() => toggleRule(rule.id, !rule.isActive)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${rule.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                    {rule.isActive ? 'Actif' : 'Inactif'}
+                  </button>
+                  <button onClick={() => startEdit(rule)} className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Modifier">
+                    ✏️
+                  </button>
+                </div>
+              </div>
+                )}
               </li>
             ))}
           </ul>
