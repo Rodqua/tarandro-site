@@ -93,6 +93,25 @@ async function cleanupOutlookDeleted(accountId: string, currentIds: string[], ac
   }
 }
 
+
+// ── Catégorisation par FilterRule DB ─────────────────────────────────────────
+function applyFilterRules(
+  sender: string,
+  subject: string,
+  rules: Array<{ field: string; pattern: string; category: string }>
+): string | null {
+  for (const rule of rules) {
+    try {
+      const regex = new RegExp(rule.pattern, 'i')
+      const haystack = rule.field === 'sender' ? sender : subject
+      if (regex.test(haystack)) return rule.category
+    } catch {
+      // pattern invalide → ignore
+    }
+  }
+  return null
+}
+
 export async function GET(request: NextRequest) {
   const session = await getServerSession()
   if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
@@ -106,6 +125,12 @@ export async function GET(request: NextRequest) {
 
   if (sync) {
     const accounts = await (prisma as any).emailAccount.findMany()
+
+    // Charger les FilterRule triées par priorité décroissante (une seule fois)
+    const filterRules = await (prisma as any).filterRule.findMany({
+      orderBy: { priority: 'desc' },
+      select: { field: true, pattern: true, category: true },
+    })
 
     for (const account of accounts) {
       try {
@@ -146,10 +171,10 @@ export async function GET(request: NextRequest) {
                 const date = h('Date') ? new Date(h('Date')) : new Date()
                 const snippet = last.snippet || ''
                 const labels = last.labelIds || []
-                const category = categorizeEmail(sender, subject)
+                const category = applyFilterRules(sender, subject, filterRules) ?? categorizeEmail(sender, subject)
                 await (prisma as any).emailThread.upsert({
                   where: { accountId_threadId: { accountId: account.id, threadId } },
-                  update: { subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
+                  update: { subject, sender, snippet, date, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
                   create: { threadId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread: labels.includes('UNREAD') },
                 })
               } catch {}
@@ -171,7 +196,7 @@ export async function GET(request: NextRequest) {
               const date = new Date(msg.receivedDateTime)
               const snippet = msg.bodyPreview || ''
               const labels: string[] = msg.categories || []
-              const category = categorizeOutlookEmail(subject, sender, snippet)
+              const category = applyFilterRules(sender, subject, filterRules) ?? categorizeOutlookEmail(subject, sender, snippet)
               const isUnread = !msg.isRead
               const threadId = msg.conversationId || msg.id
               const messageId = msg.id  // ID réel du message pour delete/reply
@@ -179,7 +204,7 @@ export async function GET(request: NextRequest) {
               const outlookAttCount = msg.hasAttachments ? 1 : 0
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, attachmentCount: outlookAttCount, updatedAt: new Date() },
+                update: { subject, sender, snippet, date, labels, isUnread, messageId, attachmentCount: outlookAttCount, updatedAt: new Date() },
                 create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: outlookAttCount },
               })
             } catch {}
@@ -198,14 +223,14 @@ export async function GET(request: NextRequest) {
               const date = msg.receivedTime ? new Date(Number(msg.receivedTime)) : new Date()
               const snippet = msg.summary || msg.content || ''
               const labels: string[] = msg.flagged ? ['flagged'] : []
-              const category = categorizeZohoEmail(subject, sender, snippet)
+              const category = applyFilterRules(sender, subject, filterRules) ?? categorizeZohoEmail(subject, sender, snippet)
               const isUnread = msg.status === 'unread' || msg.isUnread === true
               const threadId = msg.threadId || msg.messageId || String(msg.mid)
               const messageId = msg.messageId || String(msg.mid)
               const zohoAttCount = msg.hasAttachment ? (msg.attachmentCount || 1) : 0
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, attachmentCount: zohoAttCount, updatedAt: new Date() },
+                update: { subject, sender, snippet, date, labels, isUnread, messageId, attachmentCount: zohoAttCount, updatedAt: new Date() },
                 create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: zohoAttCount },
               })
             } catch {}
