@@ -249,7 +249,7 @@ export default function FiltersPage() {
     if (res.ok) {
       const data = await res.json()
       showFlash(`✅ ${data.recategorized} email(s) recatégorisé(s) avec ce filtre`)
-    } else showFlash('❌ Erreur lors de l'application')
+    } else showFlash(`❌ Erreur lors de l'application`)
     setReapplying(false)
   }
 
