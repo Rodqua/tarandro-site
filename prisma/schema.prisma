@@ -36,6 +36,7 @@ model EmailThread {
   date        DateTime
   isUnread    Boolean      @default(true)
   isArchived  Boolean      @default(false)
+  attachmentCount Int       @default(0)
   category    String       @default("important")
   labels      String[]
   createdAt   DateTime     @default(now())

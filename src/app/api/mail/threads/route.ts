@@ -176,10 +176,11 @@ export async function GET(request: NextRequest) {
               const threadId = msg.conversationId || msg.id
               const messageId = msg.id  // ID réel du message pour delete/reply
               currentIds.push(threadId)
+              const outlookAttCount = msg.hasAttachments ? 1 : 0
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, updatedAt: new Date() },
-                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, attachmentCount: outlookAttCount, updatedAt: new Date() },
+                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: outlookAttCount },
               })
             } catch {}
           }
@@ -201,10 +202,11 @@ export async function GET(request: NextRequest) {
               const isUnread = msg.status === 'unread' || msg.isUnread === true
               const threadId = msg.threadId || msg.messageId || String(msg.mid)
               const messageId = msg.messageId || String(msg.mid)
+              const zohoAttCount = msg.hasAttachment ? (msg.attachmentCount || 1) : 0
               await (prisma as any).emailThread.upsert({
                 where: { accountId_threadId: { accountId: account.id, threadId } },
-                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, updatedAt: new Date() },
-                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread },
+                update: { subject, sender, snippet, date, category, labels, isUnread, messageId, attachmentCount: zohoAttCount, updatedAt: new Date() },
+                create: { threadId, messageId, accountId: account.id, subject, sender, snippet, date, category, labels, isUnread, attachmentCount: zohoAttCount },
               })
             } catch {}
           }

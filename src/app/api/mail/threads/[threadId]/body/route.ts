@@ -220,6 +220,14 @@ export async function GET(
       return NextResponse.json({ error: 'Provider non supporté' }, { status: 400 })
     }
 
+    // Persist attachment count in DB so list can show icon without opening
+    if (body.attachments && body.attachments.length > 0) {
+      await (prisma as any).emailThread.update({
+        where: { id: params.threadId },
+        data: { attachmentCount: body.attachments.length },
+      }).catch(() => {})
+    }
+
     return NextResponse.json(body)
   } catch (err: any) {
     console.error('Body fetch error:', err)

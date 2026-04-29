@@ -542,12 +542,12 @@ export default function MailPage() {
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs px-1.5 py-0.5 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji}</span>
                         <ProviderBadge email={thread.account.email} provider={thread.account.provider} />
-                        {attachmentCounts[thread.id] > 0 && (
-                          <span className="flex items-center gap-0.5 text-xs text-gray-400 ml-1" title={`${attachmentCounts[thread.id]} pièce(s) jointe(s)`}>
+                        {(() => { const cnt = attachmentCounts[thread.id] ?? thread.attachmentCount ?? 0; return cnt > 0 ? (
+                          <span className="flex items-center gap-0.5 text-xs text-gray-400 ml-1" title={`${cnt} pièce(s) jointe(s)`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                            {attachmentCounts[thread.id]}
+                            {cnt}
                           </span>
-                        )}
+                        ) : null })()}
                       </div>
                     </div>
                     {!selectMode && (
