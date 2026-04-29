@@ -102,7 +102,15 @@ export async function replyToOutlookMessage(accessToken: string, messageId: stri
 }
 
 export async function deleteOutlookMessage(accessToken: string, messageId: string) {
-  const response = await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}/move`, {
+  // Essai 1 : DELETE direct (permanent, ou Corbeille selon config mailbox)
+  const del = await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (del.ok || del.status === 204) return
+
+  // Essai 2 : move vers deleteditems (soft delete)
+  const move = await fetch(`${GRAPH_API_BASE}/me/messages/${messageId}/move`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -110,7 +118,10 @@ export async function deleteOutlookMessage(accessToken: string, messageId: strin
     },
     body: JSON.stringify({ destinationId: 'deleteditems' }),
   })
-  if (!response.ok) throw new Error('Outlook delete failed')
+  if (!move.ok) {
+    const errBody = await move.text().catch(() => '')
+    throw new Error(`Outlook delete failed: HTTP ${move.status} — ${errBody}`)
+  }
 }
 
 export async function markOutlookMessageRead(accessToken: string, messageId: string) {
