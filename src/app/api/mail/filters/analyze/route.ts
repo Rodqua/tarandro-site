@@ -316,10 +316,12 @@ export async function POST(request: NextRequest) {
   }
 
   // Cluster with Claude
+  console.log(`[analyze] Collected ${allEmails.length} emails from providers. Errors: ${errors.join(", ")}`)
   let clusters: any[]
   try {
     clusters = await clusterWithClaude(allEmails)
   } catch (e: any) {
+    console.error('[analyze] Claude clustering error:', e)
     return NextResponse.json({ error: `Claude: ${e.message}` }, { status: 500 })
   }
 

@@ -145,8 +145,8 @@ export default function FiltersPage() {
         setAnalyzeResult(data)
         if (data.errors?.length) showFlash(`⚠️ ${data.errors.length} compte(s) avec erreur`)
       } else showFlash(`❌ ${data.error || 'Erreur analyse'}`)
-    } catch {
-      showFlash('❌ Erreur de connexion')
+    } catch (e: any) {
+      showFlash(`❌ Erreur: ${e?.message || 'connexion impossible'}`)
     }
     setAnalyzeLoading(false)
   }
