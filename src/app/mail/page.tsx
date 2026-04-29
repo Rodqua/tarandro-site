@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { EmailThread, EmailAccount, CategoryConfig, CATEGORY_CONFIG, buildCategoryConfig } from '@/types/mail'
 import { FaGoogle, FaMicrosoft, FaEnvelope } from 'react-icons/fa'
 
@@ -87,6 +87,8 @@ export default function MailPage() {
   const [mailTotal, setMailTotal] = useState(0)
   const [mailSkip, setMailSkip] = useState(0)
   const TAKE = 50
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast({ msg, type })
@@ -154,6 +156,24 @@ export default function MailPage() {
       }
     }).catch(() => {})
   }, [loadAccounts, loadThreads, fetchCounts])
+
+  // Infinite scroll — charger plus quand sentinel visible
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && mailSkip < mailTotal) {
+          setIsLoadingMore(true)
+          await loadThreads(activeFilter, false, accountFilter, mailSkip)
+          setIsLoadingMore(false)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [isLoadingMore, mailSkip, mailTotal, activeFilter, accountFilter, loadThreads])
 
   const handleSync = async () => {
     setSyncing(true)
@@ -645,9 +665,16 @@ export default function MailPage() {
               })}
             </div>
           )}
-          {!loading && mailTotal > 0 && (
+          {/* Sentinel pour infinite scroll */}
+          <div ref={sentinelRef} className="h-4" />
+          {isLoadingMore && (
+            <div className="flex justify-center py-3">
+              <span className="text-xs text-gray-400 animate-pulse">Chargement...</span>
+            </div>
+          )}
+          {!loading && !isLoadingMore && mailTotal > 0 && (
             <p className="px-4 py-3 text-xs text-gray-300 text-center border-t border-gray-100">
-              {mailTotal} email(s)
+              {threads.length} / {mailTotal} email(s)
             </p>
           )}
         </main>
