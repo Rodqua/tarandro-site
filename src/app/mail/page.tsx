@@ -357,6 +357,46 @@ export default function MailPage() {
     setBulkDeleting(false)
   }
 
+  const clearCategory = async () => {
+    if (activeFilter === 'all' || activeFilter === 'unread') return
+    const cat = categoryConfig[activeFilter]
+    const label = cat?.label || activeFilter
+    const total = counts[activeFilter] || threads.length
+    if (!confirm(`Supprimer les ${total} emails de la catégorie "${label}" ?`)) return
+    setLoading(true)
+    const res = await fetch('/api/mail/category/clear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: activeFilter }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setThreads([])
+      setSelected(null)
+      await fetchCounts(accountFilter)
+      showToast(`🗑️ ${data.deleted} email(s) supprimé(s)${data.failed > 0 ? `, ${data.failed} échec(s)` : ''}`)
+    } else {
+      showToast('❌ Erreur lors de la suppression', 'error')
+    }
+    setLoading(false)
+  }
+
+  const markAllRead = async () => {
+    const res = await fetch('/api/mail/category/read-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category: activeFilter }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setThreads(prev => prev.map(t => ({ ...t, isUnread: false })))
+      await fetchCounts(accountFilter)
+      showToast(`✅ ${data.updated} email(s) marqué(s) comme lu(s)`)
+    } else {
+      showToast('❌ Erreur', 'error')
+    }
+  }
+
   const exitSelectMode = () => {
     setSelectMode(false)
     setCheckedIds(new Set())
@@ -513,6 +553,30 @@ export default function MailPage() {
 
         {/* Liste emails */}
         <main className={`flex-1 overflow-y-auto bg-white border-r border-gray-200 ${selected && !selectMode ? 'hidden sm:block sm:w-80 sm:flex-none' : 'w-full'}`}>
+          {/* Barre d'actions de catégorie */}
+          {!selectMode && activeFilter !== 'all' && activeFilter !== 'unread' && (
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 bg-gray-50/80">
+              <span className="text-xs text-gray-500 flex-1">
+                {counts[activeFilter] ? `${counts[activeFilter]} email(s)` : ''}
+              </span>
+              <button
+                onClick={markAllRead}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+                title="Tout marquer comme lu"
+              >
+                ✓ Tout lire
+              </button>
+              {activeFilter && (
+                <button
+                  onClick={clearCategory}
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-rose-600 hover:bg-rose-50 rounded-lg transition-colors border border-rose-200"
+                  title="Supprimer tous les emails de cette catégorie"
+                >
+                  🗑️ Tout supprimer
+                </button>
+              )}
+            </div>
+          )}
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center"><div className="text-4xl mb-3 animate-pulse">📬</div><p className="text-gray-400 text-sm">Chargement...</p></div>
