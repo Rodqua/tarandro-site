@@ -163,7 +163,7 @@ export default function FiltersPage() {
       if (res.ok) {
         const created = (data.applyResults || []).filter((r: any) => r.status === 'created').length
         showFlash(`✅ ${created} filtre(s) Gmail créé(s) pour "${analyzeResult?.clusters[idx]?.name}"`)
-        setAppliedIdx(prev => new Set([...prev, idx]))
+        setAppliedIdx(prev => { const s = new Set(Array.from(prev)); s.add(idx); return s })
       } else {
         showFlash(`❌ ${data.error || 'Erreur application'}`)
       }
