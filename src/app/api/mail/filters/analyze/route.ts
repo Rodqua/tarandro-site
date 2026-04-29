@@ -265,7 +265,9 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession()
   if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
 
-  const { limit = 50, apply = false, clusterIndex } = await request.json()
+  const body = await request.json()
+  const { apply = false, clusterIndex } = body
+  const limit = Math.min(body.limit ?? 50, 100) // hard cap per account
 
   // Load all accounts
   const accounts = await (prisma as any).emailAccount.findMany({

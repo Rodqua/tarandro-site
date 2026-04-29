@@ -292,7 +292,7 @@ export default function FiltersPage() {
             <label className="text-sm text-gray-600 whitespace-nowrap">Emails par compte :</label>
             <input
               type="number"
-              min={10} max={200} step={10}
+              min={10} max={100} step={10}
               value={analyzeLimit}
               onChange={e => setAnalyzeLimit(Number(e.target.value))}
               className="w-24 px-3 py-1.5 rounded-lg border border-violet-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
