@@ -245,7 +245,8 @@ export async function GET(request: NextRequest) {
   // Filtrage
   const where: Record<string, unknown> = {}
   if (filter === 'unread') where.isUnread = true
-  if (['urgent', 'important', 'veille', 'loge', 'compta', 'newsletter', 'events'].includes(filter)) {
+  // Appliquer le filtre de catégorie pour tout filtre qui n'est pas 'all' ou 'unread'
+  else if (filter !== 'all') {
     where.category = filter
   }
   // Filtre par compte (adresse email)
