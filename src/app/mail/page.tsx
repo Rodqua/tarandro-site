@@ -123,7 +123,7 @@ export default function MailPage() {
 
   const loadThreads = useCallback(async (filter: string, withSync = false, accFilter: string | null = null, skip = 0) => {
     setLoading(true)
-    const url = `/api/mail/threads?filter=${filter}&skip=${skip}&take=50${withSync ? '&sync=true' : ''}${accFilter ? `&account=${encodeURIComponent(accFilter)}` : ''}`
+    const url = `/api/mail/threads?filter=${filter}&skip=${skip}&take=10000${withSync ? '&sync=true' : ''}${accFilter ? `&account=${encodeURIComponent(accFilter)}` : ''}`
     const res = await fetch(url)
     if (res.ok) {
       const data = await res.json()
@@ -493,20 +493,9 @@ export default function MailPage() {
               })}
             </div>
           )}
-          {/* Charger plus */}
-          {!loading && threads.length > 0 && threads.length < mailTotal && (
-            <div className="px-4 py-4 border-t border-gray-100 text-center">
-              <button
-                onClick={loadMore}
-                className="px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
-              >
-                Charger plus ({threads.length} / {mailTotal})
-              </button>
-            </div>
-          )}
-          {!loading && threads.length > 0 && threads.length >= mailTotal && mailTotal > 0 && (
+          {!loading && mailTotal > 0 && (
             <p className="px-4 py-3 text-xs text-gray-300 text-center border-t border-gray-100">
-              {mailTotal} email(s) au total
+              {mailTotal} email(s)
             </p>
           )}
         </main>
