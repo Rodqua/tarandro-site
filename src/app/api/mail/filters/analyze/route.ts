@@ -139,10 +139,26 @@ async function collectZoho(account: any, limit: number): Promise<EmailSample[]> 
   const primary = zohoAccounts.find((a: any) => a.isPrimary) || zohoAccounts[0]
   if (!primary) throw new Error('No Zoho account found')
 
-  const msgsRes = await fetch(
-    `${apiBase}/accounts/${primary.accountId}/messages/view?limit=${Math.min(limit, 200)}&start=0`,
+  // Get INBOX folder id to avoid invalid param errors on messages/view
+  const foldersRes = await fetch(
+    `${apiBase}/accounts/${primary.accountId}/folders`,
     { headers: { Authorization: `Zoho-oauthtoken ${token}` } }
   )
+  let folderId: string | null = null
+  if (foldersRes.ok) {
+    const fData = await foldersRes.json()
+    const inbox = (fData.data || []).find((f: any) =>
+      f.folderName?.toLowerCase() === 'inbox' || f.path?.toLowerCase() === 'inbox' || f.folderId === '1'
+    )
+    folderId = inbox?.folderId ?? (fData.data?.[0]?.folderId ?? null)
+  }
+
+  const cap = Math.min(limit, 50)
+  const url = folderId
+    ? `${apiBase}/accounts/${primary.accountId}/folders/${folderId}/messages/view?limit=${cap}&start=0`
+    : `${apiBase}/accounts/${primary.accountId}/messages/view?limit=${cap}&start=0`
+
+  const msgsRes = await fetch(url, { headers: { Authorization: `Zoho-oauthtoken ${token}` } })
   if (!msgsRes.ok) throw new Error(`Zoho messages: ${await msgsRes.text()}`)
   const msgsData = await msgsRes.json()
   return (msgsData.data || []).map((m: any) => {
@@ -267,7 +283,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json()
   const { apply = false, clusterIndex } = body
-  const limit = Math.min(body.limit ?? 50, 100) // hard cap per account
+  const limit = Math.min(body.limit ?? 20, 20) // hard cap per account — 20 per account = ~60 total, fits in 60s
 
   // Load all accounts
   const accounts = await (prisma as any).emailAccount.findMany({
