@@ -286,9 +286,9 @@ export default function MailPage() {
       if (res.ok) {
         const data = await res.json()
         setThreads(prev => prev.map(t =>
-          t.id === selected.id ? { ...t, category: newCat } :
+          t.id === selected.id ? { ...t, category: newCat as any } :
           data.recategorized > 1 && t.id !== selected.id ? t : t
-        ))
+        ) as any)
         setSelected((prev: any) => prev ? { ...prev, category: newCat } : prev)
         showToast(`✅ Catégorie corrigée${data.recategorized > 1 ? ` + ${data.recategorized} email(s) recatégorisé(s)` : ''} — règle sauvegardée`)
         // Refresh list to show updated categories
