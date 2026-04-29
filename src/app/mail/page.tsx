@@ -177,12 +177,28 @@ export default function MailPage() {
 
   const handleSync = async () => {
     setSyncing(true)
+    setSyncErrors([])
     setMailSkip(0)
-    await loadThreads(activeFilter, true, accountFilter, 0)
+    const res = await fetch(`/api/mail/threads?filter=${activeFilter}&skip=0&take=10000&sync=true${accountFilter ? `&account=${encodeURIComponent(accountFilter)}` : ''}`)
+    if (res.ok) {
+      const data = await res.json()
+      const list = Array.isArray(data) ? data : (data.threads || [])
+      const tot = Array.isArray(data) ? data.length : (data.total || 0)
+      setThreads(list)
+      setMailTotal(tot)
+      setMailSkip(list.length)
+      if (data.syncErrors?.length > 0) {
+        setSyncErrors(data.syncErrors)
+        showToast(`⚠️ Synchro partielle — ${data.syncErrors.length} erreur(s)`, 'error')
+      } else {
+        showToast('✅ Boîte synchronisée !')
+      }
+    } else {
+      showToast('❌ Erreur de synchronisation', 'error')
+    }
     await loadAccounts()
     await fetchCounts(accountFilter)
     setSyncing(false)
-    showToast('✅ Boîte synchronisée !')
   }
 
   const handleFilterChange = (f: string) => {
@@ -455,6 +471,15 @@ export default function MailPage() {
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
           {toast.msg}
+        </div>
+      )}
+
+      {/* Erreurs de synchro */}
+      {syncErrors.length > 0 && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center gap-2 text-xs text-amber-800 flex-shrink-0">
+          <span>⚠️</span>
+          <span className="flex-1">{syncErrors.join(' · ')}</span>
+          <button onClick={() => setSyncErrors([])} className="text-amber-500 hover:text-amber-700">✕</button>
         </div>
       )}
 

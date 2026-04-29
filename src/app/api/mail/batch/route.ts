@@ -5,6 +5,7 @@ import { google } from 'googleapis'
 import { trashGmailThread } from '@/lib/gmail'
 import { deleteOutlookMessage, refreshOutlookToken } from '@/lib/outlook'
 import { deleteZohoMessage, getZohoUserInfo, refreshZohoToken } from '@/lib/zoho'
+import { withRetry } from '@/lib/retry'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -84,12 +85,12 @@ async function deleteOne(thread: any, token: string, zohoAccountIds: Record<stri
   const { account } = thread
 
   if (account.provider === 'google') {
-    await trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId)
+    await withRetry(() => trashGmailThread(token, account.refreshToken ?? undefined, thread.threadId))
   } else if (account.provider === 'outlook' || account.provider === 'microsoft') {
     if (thread.messageId) {
-      await deleteOutlookMessage(token, thread.messageId)
+      await withRetry(() => deleteOutlookMessage(token, thread.messageId))
     } else {
-      await deleteOutlookConversation(thread.threadId, token)
+      await withRetry(() => deleteOutlookConversation(thread.threadId, token))
     }
   } else if (account.provider === 'zoho') {
     if (!zohoAccountIds[account.id]) {
@@ -97,7 +98,7 @@ async function deleteOne(thread: any, token: string, zohoAccountIds: Record<stri
       if (info.accountId) zohoAccountIds[account.id] = info.accountId
     }
     const zohoId = zohoAccountIds[account.id]
-    if (zohoId) await deleteZohoMessage(token, zohoId, thread.messageId || thread.threadId)
+    if (zohoId) await withRetry(() => deleteZohoMessage(token, zohoId, thread.messageId || thread.threadId))
   }
 }
 
