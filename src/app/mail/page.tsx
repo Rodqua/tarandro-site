@@ -85,6 +85,7 @@ export default function MailPage() {
   const [accountFilter, setAccountFilter] = useState<string | null>(null)
   const [emailBody, setEmailBody] = useState<{ html?: string; text?: string; attachments?: any[]; error?: string } | null>(null)
   const [bodyLoading, setBodyLoading] = useState(false)
+  const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({})
   const [replyFiles, setReplyFiles] = useState<File[]>([])
   const [syncErrors, setSyncErrors] = useState<string[]>([])
   const [dbCounts, setDbCounts] = useState<Record<string, number>>({})
@@ -113,7 +114,13 @@ export default function MailPage() {
     setBodyLoading(true)
     try {
       const res = await fetch(`/api/mail/threads/${thread.id}/body`)
-      if (res.ok) setEmailBody(await res.json())
+      if (res.ok) {
+        const body = await res.json()
+        setEmailBody(body)
+        if (body.attachments?.length > 0) {
+          setAttachmentCounts(prev => ({ ...prev, [thread.id]: body.attachments.length }))
+        }
+      }
       else setEmailBody({ error: 'Impossible de charger le contenu' })
     } catch {
       setEmailBody({ error: 'Erreur réseau' })
@@ -261,6 +268,36 @@ export default function MailPage() {
       setCheckedIds(new Set())
     } else {
       setCheckedIds(new Set(filtered.map(t => t.id)))
+    }
+  }
+
+  const downloadAttachment = async (url: string, filename: string) => {
+    try {
+      if ('showSaveFilePicker' in window) {
+        const ext = filename.split('.').pop() || ''
+        const mimeMap: Record<string, string> = { pdf: 'application/pdf', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', zip: 'application/zip' }
+        const handle = await (window as any).showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'Fichier', accept: { [mimeMap[ext] || 'application/octet-stream']: ['.' + ext] } }],
+        })
+        const res = await fetch(url)
+        const blob = await res.blob()
+        const writable = await handle.createWritable()
+        await writable.write(blob)
+        await writable.close()
+      } else {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+      }
+    } catch (e: any) {
+      if (e?.name !== 'AbortError') {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+      }
     }
   }
 
@@ -476,6 +513,12 @@ export default function MailPage() {
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs px-1.5 py-0.5 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji}</span>
                         <ProviderBadge email={thread.account.email} provider={thread.account.provider} />
+                        {attachmentCounts[thread.id] > 0 && (
+                          <span className="flex items-center gap-0.5 text-xs text-gray-400 ml-1" title={`${attachmentCounts[thread.id]} pièce(s) jointe(s)`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                            {attachmentCounts[thread.id]}
+                          </span>
+                        )}
                       </div>
                     </div>
                     {!selectMode && (
@@ -579,10 +622,9 @@ export default function MailPage() {
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {emailBody.attachments.map((att: any, i: number) => (
-                        <a
+                        <button
                           key={att.id || i}
-                          href={`/api/mail/threads/${selected.id}/attachment?id=${encodeURIComponent(att.id)}&filename=${encodeURIComponent(att.name)}`}
-                          download={att.name}
+                          onClick={() => downloadAttachment(`/api/mail/threads/${selected.id}/attachment?id=${encodeURIComponent(att.id)}&filename=${encodeURIComponent(att.name)}`, att.name)}
                           className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs hover:bg-indigo-50 hover:border-indigo-300 transition-colors group"
                         >
                           <span className="text-base">📄</span>
@@ -593,7 +635,7 @@ export default function MailPage() {
                             )}
                           </div>
                           <span className="text-indigo-400 group-hover:text-indigo-600">↓</span>
-                        </a>
+                        </button>
                       ))}
                     </div>
                   </div>
