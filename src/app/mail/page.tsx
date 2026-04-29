@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { EmailThread, EmailAccount, EmailCategory, CATEGORY_CONFIG } from '@/types/mail'
+import { EmailThread, EmailAccount, CategoryConfig, CATEGORY_CONFIG, buildCategoryConfig } from '@/types/mail'
 import { FaGoogle, FaMicrosoft, FaEnvelope } from 'react-icons/fa'
 
 const FILTERS = [
@@ -86,6 +86,7 @@ export default function MailPage() {
   const [emailBody, setEmailBody] = useState<{ html?: string; text?: string; attachments?: any[]; error?: string } | null>(null)
   const [bodyLoading, setBodyLoading] = useState(false)
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({})
+  const [categoryConfig, setCategoryConfig] = useState(CATEGORY_CONFIG)
   const [showCatPicker, setShowCatPicker] = useState(false)
   const [recatLoading, setRecatLoading] = useState(false)
   const [replyFiles, setReplyFiles] = useState<File[]>([])
@@ -154,6 +155,9 @@ export default function MailPage() {
     loadAccounts()
     loadThreads('all')
     fetchCounts()
+    fetch('/api/mail/categories').then(r => r.ok ? r.json() : []).then((cats: CategoryConfig[]) => {
+      if (cats.length) setCategoryConfig(buildCategoryConfig(cats))
+    }).catch(() => {})
   }, [loadAccounts, loadThreads, fetchCounts])
 
   const handleSync = async () => {
@@ -508,7 +512,7 @@ export default function MailPage() {
           ) : (
             <div className="divide-y divide-gray-100">
               {filtered.map(thread => {
-                const cat = CATEGORY_CONFIG[thread.category as EmailCategory] || CATEGORY_CONFIG.important
+                const cat = categoryConfig[thread.category] || categoryConfig.important || { emoji: "📁", label: thread.category, color: "text-gray-600", bg: "bg-gray-50 border-gray-200" }
                 const badge = accountBadge(thread.account.email, thread.account.provider)
                 const isSelected = selected?.id === thread.id
                 const isChecked = checkedIds.has(thread.id)
@@ -605,7 +609,7 @@ export default function MailPage() {
               {/* Tags */}
               <div className="flex items-center gap-2 px-6 pt-3 pb-2 flex-wrap">
                 {(() => {
-                  const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important
+                  const cat = categoryConfig[selected.category] || categoryConfig.important || { emoji: "📁", label: selected.category, color: "text-gray-600", bg: "bg-gray-50 border-gray-200" }
                   return (
                     <div className="relative">
                       <button
@@ -619,7 +623,7 @@ export default function MailPage() {
                       {showCatPicker && (
                         <div className="absolute top-7 left-0 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[180px]">
                           <p className="text-xs text-gray-400 px-2 pb-1 border-b border-gray-100">Corriger la catégorie</p>
-                          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
+                          {Object.entries(categoryConfig).map(([key, cfg]) => (
                             <button
                               key={key}
                               onClick={() => recategorize(key)}

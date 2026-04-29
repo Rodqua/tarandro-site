@@ -3,6 +3,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface CategoryConfig {
+  id: string
+  name: string
+  label: string
+  emoji: string
+  color: string
+  bg: string
+  isBuiltIn: boolean
+}
+
 interface FilterRule {
   id: string
   name: string
@@ -63,6 +73,13 @@ export default function FiltersPage() {
   const [aiPreview, setAiPreview] = useState<Partial<FilterRule> | null>(null)
   const [saving, setSaving] = useState(false)
   const [flash, setFlash] = useState<string | null>(null)
+  const [categories, setCategories] = useState<CategoryConfig[]>([])
+  const [newCatName, setNewCatName] = useState('')
+  const [newCatLabel, setNewCatLabel] = useState('')
+  const [newCatEmoji, setNewCatEmoji] = useState('📁')
+  const [newCatColor, setNewCatColor] = useState('text-gray-700 bg-gray-50 border-gray-200')
+  const [catSaving, setCatSaving] = useState(false)
+  const [showCatForm, setShowCatForm] = useState(false)
 
   // Global AI analysis state
   const [analyzeLimit, setAnalyzeLimit] = useState(50)
@@ -87,7 +104,40 @@ export default function FiltersPage() {
     setLoading(false)
   }
 
-  useEffect(() => { loadRules() }, [])
+  async function loadCategories() {
+    const res = await fetch('/api/mail/categories')
+    if (res.ok) setCategories(await res.json())
+  }
+
+  async function createCategory() {
+    if (!newCatName.trim() || !newCatLabel.trim()) return
+    setCatSaving(true)
+    const [color, ...bgParts] = newCatColor.split(' ')
+    const bg = bgParts.join(' ')
+    const res = await fetch('/api/mail/categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCatName, label: newCatLabel, emoji: newCatEmoji, color, bg }),
+    })
+    if (res.ok) {
+      showFlash('✅ Catégorie créée !')
+      setNewCatName(''); setNewCatLabel(''); setNewCatEmoji('📁'); setShowCatForm(false)
+      await loadCategories()
+    } else {
+      const d = await res.json()
+      showFlash(`❌ ${d.error || 'Erreur'}`)
+    }
+    setCatSaving(false)
+  }
+
+  async function deleteCategory(name: string) {
+    if (!confirm(`Supprimer la catégorie "${name}" ?`)) return
+    const res = await fetch(`/api/mail/categories/${name}`, { method: 'DELETE' })
+    if (res.ok) { showFlash('✅ Catégorie supprimée'); await loadCategories() }
+    else showFlash('❌ Impossible de supprimer une catégorie intégrée')
+  }
+
+  useEffect(() => { loadRules(); loadCategories() }, [])
 
   async function toggleRule(id: string, isActive: boolean) {
     await fetch(`/api/mail/filters/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isActive }) })
@@ -253,7 +303,7 @@ export default function FiltersPage() {
     setReapplying(false)
   }
 
-  const CATEGORIES = ['important', 'compta', 'veille', 'events', 'loge', 'newsletter']
+  const CATEGORIES = categories.length ? categories.map(c => c.name) : ['important', 'compta', 'veille', 'events', 'loge', 'newsletter']
 
   const builtIn = rules.filter(r => r.isBuiltIn)
   const custom = rules.filter(r => !r.isBuiltIn)
@@ -452,6 +502,113 @@ export default function FiltersPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* ── Gestion des catégories ─────────────────────────────────── */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-gray-800">Catégories</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Gérez les catégories utilisées pour trier vos emails</p>
+            </div>
+            <button
+              onClick={() => setShowCatForm(p => !p)}
+              className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 transition-colors"
+            >
+              + Nouvelle catégorie
+            </button>
+          </div>
+
+          {showCatForm && (
+            <div className="px-6 py-4 border-b border-gray-100 bg-indigo-50">
+              <p className="text-xs font-semibold text-indigo-700 mb-3">Créer une nouvelle catégorie</p>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Nom interne <span className="text-gray-400">(sans espaces)</span></label>
+                  <input value={newCatName} onChange={e => setNewCatName(e.target.value)}
+                    placeholder="ex: clients"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Libellé affiché</label>
+                  <input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)}
+                    placeholder="ex: Clients"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Emoji</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {['📁','🏷️','⚡','🎯','🔖','💡','🌟','🔑','📌','🛡️','🏠','🚀'].map(e => (
+                      <button key={e} onClick={() => setNewCatEmoji(e)}
+                        className={`text-lg p-1 rounded-lg transition-colors ${newCatEmoji === e ? 'bg-indigo-200 ring-2 ring-indigo-400' : 'hover:bg-gray-100'}`}>
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Couleur</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {[
+                      { label: 'Gris',   value: 'text-gray-700 bg-gray-50 border-gray-200' },
+                      { label: 'Rouge',  value: 'text-red-700 bg-red-50 border-red-200' },
+                      { label: 'Bleu',   value: 'text-blue-700 bg-blue-50 border-blue-200' },
+                      { label: 'Vert',   value: 'text-green-700 bg-green-50 border-green-200' },
+                      { label: 'Orange', value: 'text-orange-700 bg-orange-50 border-orange-200' },
+                      { label: 'Violet', value: 'text-purple-700 bg-purple-50 border-purple-200' },
+                      { label: 'Rose',   value: 'text-pink-700 bg-pink-50 border-pink-200' },
+                      { label: 'Indigo', value: 'text-indigo-700 bg-indigo-50 border-indigo-200' },
+                    ].map(c => {
+                      const [color, ...bgParts] = c.value.split(' ')
+                      const bg = bgParts.join(' ')
+                      return (
+                        <button key={c.value} onClick={() => setNewCatColor(c.value)} title={c.label}
+                          className={`px-2 py-1 rounded-lg text-xs font-medium border ${color} ${bg} ${newCatColor === c.value ? 'ring-2 ring-indigo-500' : ''}`}>
+                          {c.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {newCatLabel && (
+                  <span className={`text-xs px-2 py-1 rounded-full border font-medium ${newCatColor.split(' ').slice(0).join(' ')}`}>
+                    {newCatEmoji} {newCatLabel}
+                  </span>
+                )}
+                <button onClick={createCategory} disabled={catSaving || !newCatName || !newCatLabel}
+                  className="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50">
+                  {catSaving ? 'Création…' : '✅ Créer'}
+                </button>
+                <button onClick={() => setShowCatForm(false)} className="text-xs text-gray-500 hover:underline">Annuler</button>
+              </div>
+            </div>
+          )}
+
+          <div className="divide-y divide-gray-100">
+            {categories.map(cat => {
+              return (
+                <div key={cat.name} className="px-6 py-3 flex items-center gap-3">
+                  <span className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.color} ${cat.bg}`}>
+                    {cat.emoji} {cat.label}
+                  </span>
+                  <code className="text-xs text-gray-400 bg-gray-100 px-1.5 rounded">{cat.name}</code>
+                  {cat.isBuiltIn && <span className="text-xs text-indigo-400 bg-indigo-50 px-2 py-0.5 rounded-full">Intégrée</span>}
+                  <div className="ml-auto">
+                    {!cat.isBuiltIn && (
+                      <button onClick={() => deleteCategory(cat.name)}
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors text-xs">
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         {/* Filtres personnalisés */}

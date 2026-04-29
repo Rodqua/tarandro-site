@@ -71,3 +71,14 @@ model NotificationPreference {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model CategoryConfig {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  label     String
+  emoji     String   @default("📁")
+  color     String   @default("text-gray-700")
+  bg        String   @default("bg-gray-50 border-gray-200")
+  isBuiltIn Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
