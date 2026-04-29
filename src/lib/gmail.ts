@@ -174,6 +174,45 @@ export function categorizeEmail(sender: string, subject: string): string {
   )
     return "newsletter";
 
+  // Emails automatiques / promotionnels — candidats à la suppression directe
+  if (
+    s.includes("marketing@") ||
+    s.includes("promo@") ||
+    s.includes("deals@") ||
+    s.includes("offers@") ||
+    s.includes("donotreply@") ||
+    s.includes("do-not-reply@") ||
+    s.includes("automated@") ||
+    s.includes("robot@") ||
+    s.includes("notification@") ||
+    s.includes("alerts@") ||
+    s.includes("mailchimp") ||
+    s.includes("sendgrid") ||
+    s.includes("sendinblue") ||
+    s.includes("brevo.com") ||
+    s.includes("mailjet") ||
+    s.includes("klaviyo") ||
+    s.includes("constantcontact") ||
+    s.includes("hubspot") ||
+    s.includes("marketo") ||
+    s.includes("linkedin.com") ||
+    s.includes("facebookmail") ||
+    s.includes("twitter.com") ||
+    s.includes("notifications@") ||
+    sub.includes("offre spéciale") ||
+    sub.includes("promotion") ||
+    sub.includes("code promo") ||
+    sub.includes("réduction") ||
+    sub.includes("dernière chance") ||
+    sub.includes("ne manquez pas") ||
+    sub.includes("vous avez été sélectionné") ||
+    sub.includes("gagnez") ||
+    sub.includes("avis sur votre") ||
+    sub.includes("notez votre") ||
+    sub.includes("satisfaction client")
+  )
+    return "corbeille";
+
   return "important";
 }
 

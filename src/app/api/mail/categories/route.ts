@@ -11,6 +11,7 @@ const BUILT_IN = [
   { name: 'loge',       label: 'Loge',           emoji: '🤝', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200', isBuiltIn: true },
   { name: 'compta',     label: 'Comptabilité',   emoji: '💼', color: 'text-blue-700',   bg: 'bg-blue-50 border-blue-200',    isBuiltIn: true },
   { name: 'newsletter', label: 'Newsletter',     emoji: '📧', color: 'text-gray-600',   bg: 'bg-gray-50 border-gray-200',    isBuiltIn: true },
+  { name: 'corbeille',  label: 'À supprimer',    emoji: '🗑️', color: 'text-rose-500',   bg: 'bg-rose-50 border-rose-200',    isBuiltIn: true },
   { name: 'events',     label: 'Événements',     emoji: '🗓️', color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200', isBuiltIn: true },
 ]
 

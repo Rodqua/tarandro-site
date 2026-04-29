@@ -83,6 +83,8 @@ export function categorizeOutlookEmail(subject: string, from: string, preview: s
   if (/newsletter|unsubscribe|désabonner|no-reply|noreply|donotreply/.test(text)) return 'newsletter'
   if (/conférence|webinar|webinaire|event|événement|invitation|meetup/.test(text)) return 'events'
   if (/veille|digest|weekly|monthly|résumé|summary/.test(text)) return 'veille'
+  if (/marketing@|promo@|deals@|donotreply@|do-not-reply@|automated@|notification@|alerts@|mailchimp|sendgrid|sendinblue|brevo\.com|mailjet|klaviyo|hubspot|marketo|linkedin\.com|facebookmail|notifications@/.test(text) ||
+      /offre spéciale|code promo|réduction|dernière chance|ne manquez pas|gagnez|avis sur votre|notez votre|satisfaction client/.test(text)) return 'corbeille'
   return 'important'
 }
 
