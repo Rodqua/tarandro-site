@@ -86,6 +86,8 @@ export default function MailPage() {
   const [emailBody, setEmailBody] = useState<{ html?: string; text?: string; attachments?: any[]; error?: string } | null>(null)
   const [bodyLoading, setBodyLoading] = useState(false)
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({})
+  const [showCatPicker, setShowCatPicker] = useState(false)
+  const [recatLoading, setRecatLoading] = useState(false)
   const [replyFiles, setReplyFiles] = useState<File[]>([])
   const [syncErrors, setSyncErrors] = useState<string[]>([])
   const [dbCounts, setDbCounts] = useState<Record<string, number>>({})
@@ -269,6 +271,33 @@ export default function MailPage() {
     } else {
       setCheckedIds(new Set(filtered.map(t => t.id)))
     }
+  }
+
+  const recategorize = async (newCat: string) => {
+    if (!selected || newCat === selected.category) { setShowCatPicker(false); return }
+    setRecatLoading(true)
+    setShowCatPicker(false)
+    try {
+      const res = await fetch('/api/mail/categorize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: selected.id, sender: selected.sender, subject: selected.subject, category: newCat }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setThreads(prev => prev.map(t =>
+          t.id === selected.id ? { ...t, category: newCat } :
+          data.recategorized > 1 && t.id !== selected.id ? t : t
+        ))
+        setSelected((prev: any) => prev ? { ...prev, category: newCat } : prev)
+        showToast(`✅ Catégorie corrigée${data.recategorized > 1 ? ` + ${data.recategorized} email(s) recatégorisé(s)` : ''} — règle sauvegardée`)
+        // Refresh list to show updated categories
+        await loadThreads(activeFilter, false, accountFilter, 0)
+      } else {
+        showToast('❌ Erreur lors de la recatégorisation', 'error')
+      }
+    } catch { showToast('❌ Erreur réseau', 'error') }
+    setRecatLoading(false)
   }
 
   const downloadAttachment = async (url: string, filename: string) => {
@@ -544,7 +573,8 @@ export default function MailPage() {
         </main>
 
         {/* Panneau de détail */}
-        {selected && !selectMode ? (
+        {showCatPicker && <div className="fixed inset-0 z-40" onClick={() => setShowCatPicker(false)} />}
+      {selected && !selectMode ? (
           <div className="flex-1 flex flex-col overflow-hidden bg-white">
             <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
               <div className="flex items-start justify-between gap-4">
@@ -574,7 +604,37 @@ export default function MailPage() {
             <div className="flex-1 overflow-y-auto flex flex-col">
               {/* Tags */}
               <div className="flex items-center gap-2 px-6 pt-3 pb-2 flex-wrap">
-                {(() => { const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important; return <span className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.label}</span> })()}
+                {(() => {
+                  const cat = CATEGORY_CONFIG[selected.category as EmailCategory] || CATEGORY_CONFIG.important
+                  return (
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowCatPicker(p => !p)}
+                        disabled={recatLoading}
+                        title="Corriger la catégorie"
+                        className={`text-xs px-2 py-1 rounded-full border font-medium ${cat.bg} ${cat.color} hover:opacity-80 transition-opacity flex items-center gap-1`}
+                      >
+                        {cat.emoji} {cat.label} {recatLoading ? '⏳' : '✏️'}
+                      </button>
+                      {showCatPicker && (
+                        <div className="absolute top-7 left-0 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-2 flex flex-col gap-1 min-w-[180px]">
+                          <p className="text-xs text-gray-400 px-2 pb-1 border-b border-gray-100">Corriger la catégorie</p>
+                          {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
+                            <button
+                              key={key}
+                              onClick={() => recategorize(key)}
+                              className={`text-xs px-3 py-1.5 rounded-lg text-left hover:bg-gray-50 flex items-center gap-2 ${key === selected.category ? 'font-semibold bg-gray-50' : ''}`}
+                            >
+                              <span>{(cfg as any).emoji}</span>
+                              <span>{(cfg as any).label}</span>
+                              {key === selected.category && <span className="ml-auto text-indigo-500">✓</span>}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
                 <ProviderBadge email={selected.account.email} provider={selected.account.provider} className="px-2 py-1" />
                 {selected.isUnread && <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">Non lu</span>}
                 <a href={providerUrl(selected)} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-gray-400 hover:text-indigo-600 transition-colors">↗ Ouvrir dans l'app</a>
