@@ -4,16 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { EmailThread, EmailAccount, CategoryConfig, CATEGORY_CONFIG, buildCategoryConfig } from '@/types/mail'
 import { FaGoogle, FaMicrosoft, FaEnvelope } from 'react-icons/fa'
 
-const FILTERS = [
-  { key: 'all', label: 'Tous', emoji: '📬' },
-  { key: 'unread', label: 'Non lus', emoji: '🔵' },
-  { key: 'important', label: 'Important', emoji: '🔴' },
-  { key: 'compta', label: 'Comptabilité', emoji: '💼' },
-  { key: 'veille', label: 'Veille santé', emoji: '🏥' },
-  { key: 'loge', label: 'Loge', emoji: '🤝' },
-  { key: 'events', label: 'Événements', emoji: '🗓️' },
-  { key: 'newsletter', label: 'Newsletters', emoji: '📧' },
-]
+// FILTERS is now dynamic — built from categoryConfig state
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr)
@@ -87,6 +78,7 @@ export default function MailPage() {
   const [bodyLoading, setBodyLoading] = useState(false)
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({})
   const [categoryConfig, setCategoryConfig] = useState(CATEGORY_CONFIG)
+  const [categories, setCategories] = useState<CategoryConfig[]>([])
   const [showCatPicker, setShowCatPicker] = useState(false)
   const [recatLoading, setRecatLoading] = useState(false)
   const [replyFiles, setReplyFiles] = useState<File[]>([])
@@ -156,7 +148,10 @@ export default function MailPage() {
     loadThreads('all')
     fetchCounts()
     fetch('/api/mail/categories').then(r => r.ok ? r.json() : []).then((cats: CategoryConfig[]) => {
-      if (cats.length) setCategoryConfig(buildCategoryConfig(cats))
+      if (cats.length) {
+        setCategories(cats)
+        setCategoryConfig(buildCategoryConfig(cats))
+      }
     }).catch(() => {})
   }, [loadAccounts, loadThreads, fetchCounts])
 
@@ -377,6 +372,23 @@ export default function MailPage() {
   const counts = dbCounts
   const allChecked = filtered.length > 0 && checkedIds.size === filtered.length
 
+  // Build sidebar filters dynamically from loaded categories (falls back to static list)
+  const sidebarFilters: { key: string; label: string; emoji: string }[] = [
+    { key: 'all', label: 'Tous', emoji: '📬' },
+    { key: 'unread', label: 'Non lus', emoji: '🔵' },
+    ...(categories.length > 0
+      ? categories.map(c => ({ key: c.name, label: c.label, emoji: c.emoji }))
+      : [
+          { key: 'important', label: 'Important', emoji: '🔴' },
+          { key: 'compta', label: 'Comptabilité', emoji: '💼' },
+          { key: 'veille', label: 'Veille santé', emoji: '🏥' },
+          { key: 'loge', label: 'Loge', emoji: '🤝' },
+          { key: 'events', label: 'Événements', emoji: '🗓️' },
+          { key: 'newsletter', label: 'Newsletters', emoji: '📧' },
+        ]
+    ),
+  ]
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       {/* Toast */}
@@ -454,7 +466,7 @@ export default function MailPage() {
         <aside className="w-48 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-y-auto">
           <nav className="p-2 flex-1">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 px-2">Filtres</p>
-            {FILTERS.map(f => (
+            {sidebarFilters.map(f => (
               <button
                 key={f.key}
                 onClick={() => handleFilterChange(f.key)}

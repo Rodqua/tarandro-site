@@ -22,26 +22,23 @@ export async function GET(request: NextRequest) {
 
   const baseWhere: any = accountId ? { accountId } : {}
 
-  const [total, unread, important, compta, veille, loge, events, newsletter] =
-    await Promise.all([
-      (prisma as any).emailThread.count({ where: baseWhere }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, isUnread: true } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'important' } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'compta' } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'veille' } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'loge' } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'events' } }),
-      (prisma as any).emailThread.count({ where: { ...baseWhere, category: 'newsletter' } }),
-    ])
+  // Count total + unread
+  const [total, unread] = await Promise.all([
+    (prisma as any).emailThread.count({ where: baseWhere }),
+    (prisma as any).emailThread.count({ where: { ...baseWhere, isUnread: true } }),
+  ])
 
-  return NextResponse.json({
-    all: total,
-    unread,
-    important,
-    compta,
-    veille,
-    loge,
-    events,
-    newsletter,
+  // Count by category dynamically (group by)
+  const byCat = await (prisma as any).emailThread.groupBy({
+    by: ['category'],
+    where: baseWhere,
+    _count: { category: true },
   })
+
+  const counts: Record<string, number> = { all: total, unread }
+  for (const row of byCat) {
+    if (row.category) counts[row.category] = row._count.category
+  }
+
+  return NextResponse.json(counts)
 }
