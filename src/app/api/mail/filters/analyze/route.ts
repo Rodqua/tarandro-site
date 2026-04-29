@@ -140,7 +140,7 @@ async function collectZoho(account: any, limit: number): Promise<EmailSample[]> 
   if (!primary) throw new Error('No Zoho account found')
 
   const msgsRes = await fetch(
-    `${apiBase}/accounts/${primary.accountId}/messages/view?limit=${Math.min(limit, 200)}&start=0&sortby=date&order=desc`,
+    `${apiBase}/accounts/${primary.accountId}/messages/view?limit=${Math.min(limit, 200)}&start=0`,
     { headers: { Authorization: `Zoho-oauthtoken ${token}` } }
   )
   if (!msgsRes.ok) throw new Error(`Zoho messages: ${await msgsRes.text()}`)
@@ -197,7 +197,7 @@ Retourne UNIQUEMENT le tableau JSON.`
     method: 'POST',
     headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-opus-4-6',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }],
@@ -319,7 +319,9 @@ export async function POST(request: NextRequest) {
   console.log(`[analyze] Collected ${allEmails.length} emails from providers. Errors: ${errors.join(", ")}`)
   let clusters: any[]
   try {
-    clusters = await clusterWithClaude(allEmails)
+    // Cap at 100 emails to stay within Vercel timeout
+    const emailsToCluster = allEmails.length > 100 ? allEmails.slice(0, 100) : allEmails
+    clusters = await clusterWithClaude(emailsToCluster)
   } catch (e: any) {
     console.error('[analyze] Claude clustering error:', e)
     return NextResponse.json({ error: `Claude: ${e.message}` }, { status: 500 })
