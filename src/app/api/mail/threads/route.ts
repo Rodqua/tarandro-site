@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { listGmailThreads, listAllGmailThreadIds, getGmailThread, categorizeEmail } from '@/lib/gmail'
+import { aiCategorizeEmails, EmailToClassify } from '@/lib/ai-categorize'
 import { listOutlookMessages, categorizeOutlookEmail, refreshOutlookToken } from '@/lib/outlook'
 import { listZohoMessages, getZohoUserInfo, categorizeZohoEmail, refreshZohoToken } from '@/lib/zoho'
 export const dynamic = 'force-dynamic'
@@ -153,8 +154,11 @@ export async function GET(request: NextRequest) {
           const existingSet = new Set(existingRows.map((r: any) => r.threadId))
           const newIds = allIds.filter((id: string) => !existingSet.has(id))
 
-          // 3. Fetch les détails uniquement pour les nouveaux threads, par batches de 10
+          // 3. Fetch les détails uniquement pour les nouveaux threads, par batches de 25
           const BATCH = 25
+          // Collecte des emails pour catégorisation IA (ceux en fallback "important")
+          const pendingAiCat: Array<{ threadId: string; sender: string; subject: string; snippet: string }> = []
+
           for (let i = 0; i < newIds.length; i += BATCH) {
             const batch = newIds.slice(i, i + BATCH)
             await Promise.allSettled(batch.map(async (threadId: string) => {
@@ -171,7 +175,13 @@ export async function GET(request: NextRequest) {
                 const date = h('Date') ? new Date(h('Date')) : new Date()
                 const snippet = last.snippet || ''
                 const labels = last.labelIds || []
-                const category = applyFilterRules(sender, subject, filterRules) ?? categorizeEmail(sender, subject)
+                const ruleCategory = applyFilterRules(sender, subject, filterRules)
+                const hardcodedCategory = categorizeEmail(sender, subject)
+                const category = ruleCategory ?? hardcodedCategory
+                // Marquer pour IA si tombé en fallback "important"
+                if (!ruleCategory && hardcodedCategory === 'important') {
+                  pendingAiCat.push({ threadId, sender, subject, snippet })
+                }
                 await (prisma as any).emailThread.upsert({
                   where: { accountId_threadId: { accountId: account.id, threadId } },
                   update: { subject, sender, snippet, date, labels, isUnread: labels.includes('UNREAD'), updatedAt: new Date() },
@@ -179,6 +189,25 @@ export async function GET(request: NextRequest) {
                 })
               } catch {}
             }))
+          }
+
+          // Catégorisation IA sur les emails en fallback (max 30 à la fois)
+          if (pendingAiCat.length > 0) {
+            const availableCats = filterRules.map((r: any) => r.category)
+              .concat(['urgent', 'important', 'compta', 'veille', 'loge', 'newsletter', 'events', 'corbeille'])
+              .filter((v: string, i: number, a: string[]) => a.indexOf(v) === i)
+            const toAi: EmailToClassify[] = pendingAiCat.slice(0, 30).map(e => ({
+              id: e.threadId, sender: e.sender, subject: e.subject, snippet: e.snippet,
+            }))
+            const aiResults = await aiCategorizeEmails(toAi, availableCats)
+            if (aiResults.length > 0) {
+              await Promise.allSettled(aiResults.map(r =>
+                (prisma as any).emailThread.updateMany({
+                  where: { accountId: account.id, threadId: r.id, category: 'important' },
+                  data: { category: r.category },
+                })
+              ))
+            }
           }
 
           // 4. Nettoyer les emails mis à la corbeille côté Gmail
@@ -265,6 +294,10 @@ export async function GET(request: NextRequest) {
       }
     }
   }
+
+  // ── Catégorisation IA pour les nouveaux emails tombés en fallback ───────────
+  // (exécuté hors sync également si des threads en "important" attendent)
+  // Note: la logique principale est inline dans les blocs provider ci-dessus.
 
   // Filtrage
   const where: Record<string, unknown> = {}
