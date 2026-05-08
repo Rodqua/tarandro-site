@@ -82,3 +82,115 @@ model CategoryConfig {
   isBuiltIn Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// ─── EVJF Lise ────────────────────────────────────────────────────────────────
+
+enum EvjfRole {
+  ORGANIZER
+  PARTICIPANT
+}
+
+enum EvjfCategory {
+  ACTIVITY
+  FOOD
+  TRANSPORT
+  ACCOMMODATION
+  DECO
+  OTHER
+}
+
+enum EvjfIdeaStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+  RETAINED
+}
+
+enum EvjfVoteType {
+  POSITIVE
+  VETO
+}
+
+model EvjfUser {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  role      EvjfRole      @default(PARTICIPANT)
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  ideas     EvjfIdea[]
+  votes     EvjfVote[]
+  comments  EvjfComment[]
+  messages  EvjfMessage[]
+  reactions EvjfReaction[]
+
+  @@map("evjf_users")
+}
+
+model EvjfIdea {
+  id              String         @id @default(cuid())
+  title           String
+  description     String?        @db.Text
+  category        EvjfCategory
+  estimatedBudget Float?
+  referenceUrl    String?
+  status          EvjfIdeaStatus @default(PENDING)
+  authorId        String
+  author          EvjfUser       @relation(fields: [authorId], references: [id])
+  votes           EvjfVote[]
+  comments        EvjfComment[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("evjf_ideas")
+}
+
+model EvjfVote {
+  id        String       @id @default(cuid())
+  ideaId    String
+  idea      EvjfIdea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      EvjfUser     @relation(fields: [userId], references: [id])
+  type      EvjfVoteType
+  createdAt DateTime     @default(now())
+
+  @@unique([ideaId, userId])
+  @@map("evjf_votes")
+}
+
+model EvjfComment {
+  id        String   @id @default(cuid())
+  ideaId    String
+  idea      EvjfIdea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      EvjfUser @relation(fields: [userId], references: [id])
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("evjf_comments")
+}
+
+model EvjfMessage {
+  id        String         @id @default(cuid())
+  content   String         @db.Text
+  authorId  String
+  author    EvjfUser       @relation(fields: [authorId], references: [id])
+  isPinned  Boolean        @default(false)
+  reactions EvjfReaction[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("evjf_messages")
+}
+
+model EvjfReaction {
+  id        String      @id @default(cuid())
+  messageId String
+  message   EvjfMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      EvjfUser    @relation(fields: [userId], references: [id])
+  emoji     String
+  createdAt DateTime    @default(now())
+
+  @@unique([messageId, userId, emoji])
+  @@map("evjf_reactions")
+}
