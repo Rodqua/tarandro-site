@@ -25,6 +25,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(body.category && { category: body.category }),
       ...(body.estimatedBudget !== undefined && { estimatedBudget: Number(body.estimatedBudget) }),
       ...(body.referenceUrl !== undefined && { referenceUrl: body.referenceUrl }),
+      ...(body.imageUrl !== undefined && { imageUrl: body.imageUrl }),
       ...(isOrganizer && body.status && { status: body.status }),
     },
     include: { author: { select: { id: true, name: true } }, votes: true, comments: { include: { user: { select: { id: true, name: true } } } } },
