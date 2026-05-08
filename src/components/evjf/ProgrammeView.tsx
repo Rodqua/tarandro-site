@@ -43,7 +43,7 @@ export default function ProgrammeView({
   const [printMode, setPrintMode] = useState(false);
 
   // Grouper par jour
-  const days = [...new Set(blocks.map((b) => b.day))].sort();
+  const days = Array.from(new Set(blocks.map((b) => b.day))).sort();
 
   // ── Drag & drop ────────────────────────────────────────────────────────────
   function handleDragStart(id: string) { setDragId(id); }
