@@ -23,6 +23,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(body.notes !== undefined && { notes: body.notes }),
       ...(body.budget !== undefined && { budget: body.budget ? Number(body.budget) : null }),
       ...(body.order !== undefined && { order: body.order }),
+      ...(body.day !== undefined && { day: Number(body.day) }),
     },
   });
   return NextResponse.json(block);

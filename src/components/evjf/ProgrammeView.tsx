@@ -249,6 +249,18 @@ export default function ProgrammeView({
                               </div>
                             </div>
                             <div>
+                              <label className="text-xs font-semibold text-gray-500 block mb-1">Jour</label>
+                              <select
+                                className="w-full px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:border-pink-400 bg-white"
+                                value={editForm.day ?? 1}
+                                onChange={(e) => setEditForm((f) => ({ ...f, day: Number(e.target.value) }))}
+                              >
+                                <option value={1}>Jour 1 — Vendredi 19 juin</option>
+                                <option value={2}>Jour 2 — Samedi 20 juin</option>
+                                <option value={3}>Jour 3 — Dimanche 21 juin</option>
+                              </select>
+                            </div>
+                            <div>
                               <label className="text-xs font-semibold text-gray-500 block mb-1">Description</label>
                               <textarea rows={2} className="w-full px-3 py-2 rounded-lg border border-pink-200 text-sm focus:outline-none focus:border-pink-400 resize-none" value={editForm.description ?? ""} onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} />
                             </div>
