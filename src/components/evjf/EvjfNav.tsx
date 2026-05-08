@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import EvjfAvatar from "@/components/evjf/EvjfAvatar";
 
 const navLinks = [
   { href: "/lise/dashboard", label: "Accueil", icon: "🏠" },
@@ -16,6 +17,14 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/evjf/me")
+      .then(r => r.ok ? r.json() : null)
+      .then(u => u?.avatarUrl && setAvatarUrl(u.avatarUrl))
+      .catch(() => {});
+  }, []);
 
   async function handleLogout() {
     await fetch("/api/evjf/auth/logout", { method: "POST" });
@@ -24,7 +33,6 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
 
   return (
     <>
-      {/* Desktop sidebar / Mobile top bar */}
       <nav className="bg-white border-b border-pink-100 shadow-sm sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex items-center justify-between h-14">
@@ -69,9 +77,13 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
 
             {/* User + logout */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 hidden sm:block">
-                Salut <span className="font-semibold text-pink-600">{userName}</span> 👋
-              </span>
+              <div className="hidden sm:flex items-center gap-2">
+                <EvjfAvatar name={userName} avatarUrl={avatarUrl} size={28} />
+                <span className="text-sm text-gray-500">
+                  <span className="font-semibold text-pink-600">{userName}</span>
+                  {role === "ORGANIZER" && <span className="ml-1 text-xs">👑</span>}
+                </span>
+              </div>
               <button
                 onClick={handleLogout}
                 title="Se déconnecter"
@@ -98,6 +110,11 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden border-t border-pink-100 bg-white px-4 py-3 flex flex-col gap-1">
+            <div className="flex items-center gap-2 px-3 py-2 mb-1">
+              <EvjfAvatar name={userName} avatarUrl={avatarUrl} size={32} />
+              <span className="text-sm font-semibold text-pink-600">{userName}</span>
+              {role === "ORGANIZER" && <span className="text-xs">👑</span>}
+            </div>
             {navLinks.map((l) => (
               <Link
                 key={l.href}

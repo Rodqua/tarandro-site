@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     },
     orderBy: { createdAt: "desc" },
     include: {
-      author: { select: { id: true, name: true } },
+      author: { select: { id: true, name: true, avatarUrl: true } },
       votes: { select: { id: true, userId: true, type: true } },
       comments: {
         orderBy: { createdAt: "asc" },
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       authorId: session.sub,
     },
     include: {
-      author: { select: { id: true, name: true } },
+      author: { select: { id: true, name: true, avatarUrl: true } },
       votes: true,
       comments: true,
     },

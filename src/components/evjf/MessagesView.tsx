@@ -1,5 +1,7 @@
 "use client";
 
+import EvjfAvatar from "@/components/evjf/EvjfAvatar";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 
 type Reaction = {
@@ -13,17 +15,11 @@ type Message = {
   content: string;
   isPinned: boolean;
   createdAt: string;
-  author: { id: string; name: string; role: string };
+  author: { id: string; name: string; role: string; avatarUrl?: string | null };
   reactions: Reaction[];
 };
 
 const QUICK_EMOJIS = ["❤️", "😂", "🔥", "👏", "🥂", "💜"];
-const AVATAR_COLORS = [
-  "bg-fuchsia-400", "bg-pink-400", "bg-rose-400",
-  "bg-purple-400", "bg-amber-400", "bg-teal-400", "bg-blue-400",
-];
-
-function getAvatarColor(name: string) {
   let hash = 0;
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_COLORS.length;
   return AVATAR_COLORS[hash];
@@ -157,14 +153,11 @@ export default function MessagesView({
         {regular.map((msg) => {
           const isMe = msg.author.id === currentUserId;
           const grouped = groupReactions(msg.reactions);
-          const avatarColor = getAvatarColor(msg.author.name);
 
           return (
             <div key={msg.id} className={`flex gap-2 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full ${avatarColor} text-white flex items-center justify-center text-sm font-bold shrink-0 mt-1`}>
-                {msg.author.name[0].toUpperCase()}
-              </div>
+              <EvjfAvatar name={msg.author.name} avatarUrl={msg.author.avatarUrl} size={32} className="mt-1" />
 
               <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-0.5`}>
                 {/* Nom + heure */}

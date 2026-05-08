@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const message = await prisma.evjfMessage.update({
     where: { id: params.id },
     data: { isPinned },
-    include: { author: { select: { id: true, name: true, role: true } }, reactions: { include: { user: { select: { id: true, name: true } } } } },
+    include: { author: { select: { id: true, name: true, role: true, avatarUrl: true } }, reactions: { include: { user: { select: { id: true, name: true } } } } },
   });
 
   return NextResponse.json(message);

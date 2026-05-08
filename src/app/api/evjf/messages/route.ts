@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   const messages = await prisma.evjfMessage.findMany({
     include: {
-      author: { select: { id: true, name: true, role: true } },
+      author: { select: { id: true, name: true, role: true, avatarUrl: true } },
       reactions: {
         include: { user: { select: { id: true, name: true } } },
       },
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const message = await prisma.evjfMessage.create({
     data: { content: content.trim(), authorId: session.sub },
     include: {
-      author: { select: { id: true, name: true, role: true } },
+      author: { select: { id: true, name: true, role: true, avatarUrl: true } },
       reactions: { include: { user: { select: { id: true, name: true } } } },
     },
   });
