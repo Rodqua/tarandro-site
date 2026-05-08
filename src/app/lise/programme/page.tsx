@@ -3,13 +3,14 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import EvjfNav from "@/components/evjf/EvjfNav";
 import ProgrammeView from "@/components/evjf/ProgrammeView";
+import type { Attachment } from "@/components/evjf/AttachmentUpload";
 
 export default async function ProgrammePage() {
   const session = await getEvjfSession();
   if (!session) redirect("/lise/login");
 
   const blocks = await prisma.evjfProgramBlock.findMany({
-    orderBy: [{ day: "asc" }, { order: "asc" }, { startTime: "asc" }],
+    orderBy: [{ day: "asc" }, { startTime: "asc" }, { order: "asc" }],
   });
 
   return (
@@ -33,7 +34,7 @@ export default async function ProgrammePage() {
           )}
         </div>
         <ProgrammeView
-          initialBlocks={blocks}
+          initialBlocks={blocks.map(b => ({ ...b, attachments: (b.attachments ?? null) as Attachment[] | null }))}
           isOrganizer={session.role === "ORGANIZER"}
         />
       </main>
