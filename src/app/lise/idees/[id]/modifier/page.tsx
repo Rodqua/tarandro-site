@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/evjf/ImageUpload";
+import AttachmentUpload, { Attachment } from "@/components/evjf/AttachmentUpload";
 
 const CATEGORIES = [
   { value: "ACTIVITY",      label: "Activité",    emoji: "🎉" },
@@ -23,12 +24,13 @@ export default function ModifierIdeePage() {
   });
   const [loadingIdea, setLoadingIdea] = useState(true);
   const [error, setError] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/evjf/ideas")
       .then(r => r.json())
-      .then((ideas: { id: string; title: string; description: string | null; category: string; estimatedBudget: number | null; referenceUrl: string | null; imageUrl: string | null }[]) => {
+      .then((ideas: { id: string; title: string; description: string | null; category: string; estimatedBudget: number | null; referenceUrl: string | null; imageUrl: string | null; attachments: Attachment[] | null }[]) => {
         const idea = ideas.find((i) => i.id === id);
         if (idea) {
           setForm({
@@ -39,6 +41,7 @@ export default function ModifierIdeePage() {
             referenceUrl: idea.referenceUrl ?? "",
             imageUrl: idea.imageUrl ?? "",
           });
+          if (idea.attachments) setAttachments(idea.attachments as Attachment[]);
         }
         setLoadingIdea(false);
       });
@@ -58,6 +61,7 @@ export default function ModifierIdeePage() {
         estimatedBudget: form.estimatedBudget ? Number(form.estimatedBudget) : null,
         referenceUrl: form.referenceUrl || null,
         imageUrl: form.imageUrl || null,
+        attachments: attachments.length > 0 ? attachments : null,
       }),
     });
     if (res.ok) { router.push("/lise/idees"); }

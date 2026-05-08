@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/evjf/ImageUpload";
+import AttachmentUpload, { Attachment } from "@/components/evjf/AttachmentUpload";
 
 const CATEGORIES = [
   { value: "ACTIVITY",      label: "Activité",    emoji: "🎉" },
@@ -20,6 +21,7 @@ export default function NouvelleIdeePage() {
     title: "", description: "", category: "ACTIVITY",
     estimatedBudget: "", referenceUrl: "", imageUrl: "",
   });
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +38,7 @@ export default function NouvelleIdeePage() {
           estimatedBudget: form.estimatedBudget ? Number(form.estimatedBudget) : null,
           referenceUrl: form.referenceUrl || null,
           imageUrl: form.imageUrl || null,
+          attachments: attachments.length > 0 ? attachments : null,
         }),
       });
       if (!res.ok) { setError((await res.json()).error || "Erreur"); return; }
@@ -121,6 +124,15 @@ export default function NouvelleIdeePage() {
                   value={form.referenceUrl} onChange={e => setForm(f => ({ ...f, referenceUrl: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl border-2 border-pink-100 focus:border-pink-400 focus:outline-none bg-pink-50 text-gray-800 placeholder-gray-300" />
               </div>
+            </div>
+
+            {/* Pièces jointes */}
+            <div className="border-t border-pink-100 pt-4">
+              <AttachmentUpload
+                value={attachments}
+                onChange={setAttachments}
+                label="Pièces jointes (PDF, images, Word…)"
+              />
             </div>
 
             {error && <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm">{error}</div>}

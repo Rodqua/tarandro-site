@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import EvjfAvatar from "@/components/evjf/EvjfAvatar";
+import AttachmentList from "@/components/evjf/AttachmentList";
+import { Attachment } from "@/components/evjf/AttachmentUpload";
 
 type Vote = { id: string; userId: string; type: "POSITIVE" | "VETO" };
 type Comment = { id: string; content: string; createdAt: string; user: { id: string; name: string } };
@@ -22,6 +24,7 @@ type Idea = {
   authorId?: string;
   votes: Vote[];
   comments: Comment[];
+  attachments: Attachment[] | null;
   createdAt: string;
 };
 
@@ -207,6 +210,11 @@ export default function IdeesList({
                 )}
                 <span className="text-xs text-gray-300">{new Date(idea.createdAt).toLocaleDateString("fr-FR")}</span>
               </div>
+
+              {/* Pièces jointes */}
+              {idea.attachments && idea.attachments.length > 0 && (
+                <AttachmentList attachments={idea.attachments} />
+              )}
 
               {/* Actions vote */}
               <div className="flex items-center gap-2 flex-wrap">

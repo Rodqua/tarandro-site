@@ -137,6 +137,7 @@ model EvjfIdea {
   estimatedBudget Float?
   referenceUrl    String?
   imageUrl       String?
+  attachments    Json?          // [{ url, name, size, type }]
   status          EvjfIdeaStatus @default(PENDING)
   authorId        String
   author          EvjfUser       @relation(fields: [authorId], references: [id])
@@ -209,6 +210,7 @@ model EvjfProgramBlock {
   location    String?
   locationUrl String?
   imageUrl    String?
+  attachments Json?   // [{ url, name, size, type }]
   paidById    String?
   paidBy      EvjfUser?    @relation("ProgramBlockPaidBy", fields: [paidById], references: [id])
   isPaid      Boolean      @default(false)

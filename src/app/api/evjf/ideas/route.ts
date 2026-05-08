@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const body = await req.json();
-  const { title, description, category, estimatedBudget, referenceUrl, imageUrl } = body;
+  const { title, description, category, estimatedBudget, referenceUrl, imageUrl, attachments } = body;
 
   if (!title?.trim() || !category) {
     return NextResponse.json({ error: "Titre et catégorie requis" }, { status: 400 });
@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       estimatedBudget: estimatedBudget ? Number(estimatedBudget) : null,
       referenceUrl: referenceUrl?.trim() || null,
       imageUrl: imageUrl?.trim() || null,
+      attachments: attachments ?? null,
       authorId: session.sub,
     },
     include: {

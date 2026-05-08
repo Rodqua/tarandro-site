@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import AttachmentList from "@/components/evjf/AttachmentList";
+import { Attachment } from "@/components/evjf/AttachmentUpload";
 
 import { useState, useCallback } from "react";
 
@@ -17,6 +19,7 @@ type Block = {
   notes: string | null;
   budget: number | null;
   order: number;
+  attachments: Attachment[] | null;
   day: number;
 };
 
@@ -361,6 +364,9 @@ export default function ProgrammeView({
                                   <div className="mt-2 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 text-xs text-amber-700">
                                     <span className="font-semibold">Note interne :</span> {block.notes}
                                   </div>
+                                )}
+                                {block.attachments && block.attachments.length > 0 && (
+                                  <AttachmentList attachments={block.attachments} />
                                 )}
                               </div>
                               {/* Actions organisateur */}

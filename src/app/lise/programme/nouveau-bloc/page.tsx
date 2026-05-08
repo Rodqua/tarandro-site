@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/evjf/ImageUpload";
+import AttachmentUpload, { Attachment } from "@/components/evjf/AttachmentUpload";
 
 const CATEGORIES = [
   { value: "ACTIVITY",      label: "Activité",    emoji: "🎉" },
@@ -57,6 +58,7 @@ function NouveauBlocForm() {
         location: form.location || null,
         locationUrl: form.locationUrl || null,
         imageUrl: form.imageUrl || null,
+        attachments: attachments.length > 0 ? attachments : null,
         budget: form.budget ? Number(form.budget) : null,
         paidById: form.paidById || null,
         isPaid: form.isPaid,

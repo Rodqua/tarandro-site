@@ -24,6 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(body.budget !== undefined && { budget: body.budget ? Number(body.budget) : null }),
       ...(body.order !== undefined && { order: body.order }),
       ...(body.day !== undefined && { day: Number(body.day) }),
+      ...(body.attachments !== undefined && { attachments: body.attachments ?? [] }),
     },
   });
   return NextResponse.json(block);
