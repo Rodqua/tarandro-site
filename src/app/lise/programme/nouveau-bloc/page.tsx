@@ -35,6 +35,7 @@ function NouveauBlocForm() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const fromIdea = searchParams.get("ideaId");
 
