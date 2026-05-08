@@ -122,7 +122,8 @@ model EvjfUser {
   votes     EvjfVote[]
   comments  EvjfComment[]
   messages  EvjfMessage[]
-  reactions EvjfReaction[]
+  reactions   EvjfReaction[]
+  budgetItems EvjfBudgetItem[]
 
   @@map("evjf_users")
 }
