@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useState, useCallback } from "react";
 
 type Block = {
@@ -11,6 +13,7 @@ type Block = {
   category: string;
   location: string | null;
   locationUrl: string | null;
+  imageUrl: string | null;
   notes: string | null;
   budget: number | null;
   order: number;
@@ -277,6 +280,11 @@ export default function ProgrammeView({
                                     <span className="text-xs text-gray-400 block">{block.endTime}</span>
                                   </div>
                                 </div>
+                                {block.imageUrl && (
+                                  <div className="relative w-full h-32 rounded-xl overflow-hidden mt-2">
+                                    <Image src={block.imageUrl} alt={block.title} fill className="object-cover" sizes="400px" />
+                                  </div>
+                                )}
                                 {block.description && (
                                   <p className="text-gray-500 text-sm mt-1.5">{block.description}</p>
                                 )}

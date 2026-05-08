@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ImageUpload from "@/components/evjf/ImageUpload";
 
 const CATEGORIES = [
   { value: "ACTIVITY",      label: "Activité",    emoji: "🎉" },
@@ -24,6 +25,7 @@ export default function NouveauBlocPage() {
     location: "",
     locationUrl: "",
     notes: "",
+    imageUrl: "",
     budget: "",
     day: "1",
   });
@@ -72,6 +74,16 @@ export default function NouveauBlocPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-sm border border-pink-100 p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Photo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Photo de présentation</label>
+              <ImageUpload
+                value={form.imageUrl}
+                onChange={url => setForm(f => ({ ...f, imageUrl: url }))}
+                label="Ajouter une photo pour ce bloc"
+              />
+            </div>
+
             {/* Titre */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">Titre <span className="text-pink-500">*</span></label>

@@ -135,6 +135,7 @@ model EvjfIdea {
   category        EvjfCategory
   estimatedBudget Float?
   referenceUrl    String?
+  imageUrl       String?
   status          EvjfIdeaStatus @default(PENDING)
   authorId        String
   author          EvjfUser       @relation(fields: [authorId], references: [id])
@@ -206,6 +207,7 @@ model EvjfProgramBlock {
   category    EvjfCategory
   location    String?
   locationUrl String?
+  imageUrl    String?
   notes       String?      @db.Text
   budget      Float?
   order       Int          @default(0)
