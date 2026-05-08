@@ -1,8 +1,7 @@
 "use client";
 
-import EvjfAvatar from "@/components/evjf/EvjfAvatar";
-
 import { useState, useEffect, useRef, useCallback } from "react";
+import EvjfAvatar from "@/components/evjf/EvjfAvatar";
 
 type Reaction = {
   id: string;
@@ -20,15 +19,11 @@ type Message = {
 };
 
 const QUICK_EMOJIS = ["❤️", "😂", "🔥", "👏", "🥂", "💜"];
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[hash];
-}
 
-function groupReactions(reactions: Reaction[]): Record<string, { count: number; users: string[]; hasMe: boolean }> {
-  const groups: Record<string, { count: number; users: string[]; hasMe: boolean }> = {};
+function groupReactions(reactions: Reaction[]): Record<string, { count: number; users: string[] }> {
+  const groups: Record<string, { count: number; users: string[] }> = {};
   for (const r of reactions) {
-    if (!groups[r.emoji]) groups[r.emoji] = { count: 0, users: [], hasMe: false };
+    if (!groups[r.emoji]) groups[r.emoji] = { count: 0, users: [] };
     groups[r.emoji].count++;
     groups[r.emoji].users.push(r.user.name);
   }
@@ -160,14 +155,12 @@ export default function MessagesView({
               <EvjfAvatar name={msg.author.name} avatarUrl={msg.author.avatarUrl} size={32} className="mt-1" />
 
               <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-0.5`}>
-                {/* Nom + heure */}
                 {!isMe && (
                   <span className="text-xs text-gray-400 px-1">
                     {msg.author.name} {msg.author.role === "ORGANIZER" && "👑"}
                   </span>
                 )}
 
-                {/* Bulle */}
                 <div
                   className={`relative group rounded-2xl px-4 py-2.5 shadow-sm cursor-pointer ${
                     isMe
@@ -178,8 +171,7 @@ export default function MessagesView({
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
 
-                  {/* Actions au hover */}
-                  <div className={`absolute top-1 ${isMe ? "left-0 -translate-x-full pl-0 pr-1" : "right-0 translate-x-full pl-1"} hidden group-hover:flex items-center gap-1`}>
+                  <div className={`absolute top-1 ${isMe ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} hidden group-hover:flex items-center gap-1`}>
                     {isOrganizer && (
                       <button onClick={(e) => { e.stopPropagation(); pinMessage(msg); }}
                         className="text-xs bg-white border border-gray-200 rounded-lg px-1.5 py-0.5 text-gray-500 hover:text-amber-500 shadow-sm">
@@ -195,7 +187,6 @@ export default function MessagesView({
                   </div>
                 </div>
 
-                {/* Picker emoji */}
                 {reactionTarget === msg.id && (
                   <div className="flex gap-1 bg-white border border-pink-100 rounded-full px-2 py-1 shadow-lg">
                     {QUICK_EMOJIS.map(e => (
@@ -204,7 +195,6 @@ export default function MessagesView({
                   </div>
                 )}
 
-                {/* Réactions */}
                 {Object.keys(grouped).length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {Object.entries(grouped).map(([emoji, { count, users }]) => (
@@ -248,7 +238,7 @@ export default function MessagesView({
             disabled={!input.trim() || sending}
             className="w-11 h-11 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white flex items-center justify-center shadow hover:opacity-90 transition disabled:opacity-40 shrink-0"
           >
-            {sending ? "..." : "→"}
+            {sending ? "…" : "→"}
           </button>
         </form>
         <p className="text-xs text-gray-300 mt-1 text-center">Cliquer sur un message pour réagir · Maj+Entrée pour nouvelle ligne</p>
