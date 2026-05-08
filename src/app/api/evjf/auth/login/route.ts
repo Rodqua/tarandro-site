@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Prénom non reconnu. Contacte l'organisatrice !" },
+        { error: "Prénom non reconnu. Contacte Bibi !" },
         { status: 404 }
       );
     }
@@ -45,6 +45,10 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (err) {
     console.error("[EVJF login]", err);
+    const msg = err instanceof Error ? err.message : "Erreur serveur";
+    if (msg.includes("EVJF_JWT_SECRET")) {
+      return NextResponse.json({ error: "Configuration manquante (JWT secret)" }, { status: 500 });
+    }
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

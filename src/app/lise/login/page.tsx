@@ -101,7 +101,7 @@ function LoginForm() {
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-6">
-            Tu n&apos;as pas reçu le mot de passe ? Contacte l&apos;organisatrice 💌
+            Tu n&apos;as pas reçu le mot de passe ? Contacte Bibi 💌
           </p>
         </div>
       </div>
