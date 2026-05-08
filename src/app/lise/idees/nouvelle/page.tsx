@@ -59,7 +59,7 @@ export default function NouvelleIdeePage() {
       <div className="bg-white border-b border-pink-100 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/lise/idees" className="text-gray-400 hover:text-pink-500 transition-colors">← Retour</Link>
-          <span className="text-lg font-bold text-pink-600" style={{ fontFamily: "var(--font-playfair)" }}>
+          <span className="text-lg font-bold text-pink-600" style={{ fontFamily: "var(--font-outfit)" }}>
             💡 Proposer une idée
           </span>
         </div>

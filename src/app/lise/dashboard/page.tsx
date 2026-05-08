@@ -50,7 +50,7 @@ export default async function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <p className="text-pink-100 text-sm font-medium mb-1">Espace secret EVJF 🤫</p>
-              <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
+              <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "var(--font-outfit)" }}>
                 Salut {session.name} 🥂
               </h1>
               <p className="text-pink-100 text-sm">On prépare quelque chose de mémorable pour Lise !</p>

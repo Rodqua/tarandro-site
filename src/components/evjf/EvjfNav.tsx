@@ -32,7 +32,7 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
             <Link href="/lise/dashboard" className="flex items-center gap-2">
               <span className="text-2xl">💍</span>
               <span className="font-bold text-pink-600 hidden sm:block"
-                    style={{ fontFamily: "var(--font-playfair)" }}>
+                    style={{ fontFamily: "var(--font-outfit)" }}>
                 EVJF Lise
               </span>
             </Link>
@@ -74,9 +74,15 @@ export default function EvjfNav({ userName, role }: { userName: string; role: st
               </span>
               <button
                 onClick={handleLogout}
-                className="text-xs text-gray-400 hover:text-red-400 transition-colors px-2 py-1 rounded-lg hover:bg-red-50"
+                title="Se déconnecter"
+                className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-400 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
               >
-                Déco
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span className="hidden sm:inline">Déco</span>
               </button>
               {/* Mobile hamburger */}
               <button

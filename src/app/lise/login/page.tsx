@@ -46,7 +46,7 @@ function LoginForm() {
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">💍</div>
             <h1 className="text-3xl font-bold text-pink-600 mb-1"
-                style={{ fontFamily: "var(--font-playfair)" }}>
+                style={{ fontFamily: "var(--font-outfit)" }}>
               Bienvenue !
             </h1>
             <p className="text-gray-500 text-sm">

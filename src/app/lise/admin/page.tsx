@@ -15,7 +15,7 @@ export default async function AdminPage() {
     <div className="min-h-screen">
       <EvjfNav userName={session.name} role={session.role} />
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "var(--font-playfair)" }}>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6" style={{ fontFamily: "var(--font-outfit)" }}>
           ⚙️ Administration EVJF
         </h1>
         <AdminPanel users={users} />

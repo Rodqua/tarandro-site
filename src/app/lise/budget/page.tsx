@@ -12,7 +12,7 @@ export default async function BudgetPage() {
       <EvjfNav userName={session.name} role={session.role} />
       <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800" style={{ fontFamily: "var(--font-playfair)" }}>
+          <h1 className="text-2xl font-bold text-gray-800" style={{ fontFamily: "var(--font-outfit)" }}>
             💰 Budget EVJF
           </h1>
           <p className="text-gray-500 text-sm mt-1">Suivi des dépenses et répartition par personne</p>

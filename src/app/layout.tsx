@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,7 +10,7 @@ import StructuredData from "@/components/StructuredData";
 import ConditionalMainLayout from "@/components/evjf/ConditionalMainLayout";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", weight: ["400", "500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tarandro.org"),
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="fr" className={`${inter.variable} ${outfit.variable}`}>
       <head>
         <link rel="canonical" href="https://tarandro.org" />
       </head>
