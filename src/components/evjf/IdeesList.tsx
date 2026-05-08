@@ -164,7 +164,7 @@ export default function IdeesList({
 
             {/* Image de présentation */}
             {idea.imageUrl && (
-              <div className="relative w-full h-48 sm:h-56">
+              <div className="relative w-full aspect-[16/7]">
                 <Image src={idea.imageUrl} alt={idea.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 700px" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-3 left-4">
