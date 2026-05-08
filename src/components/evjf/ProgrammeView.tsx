@@ -174,7 +174,7 @@ export default function ProgrammeView({
             {days.length > 1 && (
               <div className="flex items-center gap-3 mb-5">
                 <div className="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow">
-                  Jour {day}
+                  {day === 1 ? "Jour 1 — Vendredi 19 juin" : day === 2 ? "Jour 2 — Samedi 20 juin" : day === 3 ? "Jour 3 — Dimanche 21 juin" : `Jour ${day}`}
                 </div>
                 <div className="flex-1 h-px bg-pink-200" />
               </div>

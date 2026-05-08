@@ -137,9 +137,9 @@ function NouveauBlocForm() {
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Jour</label>
                 <select value={form.day} onChange={e => setForm(f => ({ ...f, day: e.target.value }))}
                   className="w-full px-3 py-3 rounded-xl border-2 border-pink-100 focus:border-pink-400 focus:outline-none bg-pink-50 text-gray-800">
-                  <option value="1">Jour 1 — Jeudi</option>
-                  <option value="2">Jour 2 — Vendredi</option>
-                  <option value="3">Jour 3 — Samedi</option>
+                  <option value="1">Jour 1 — Vendredi 19 juin</option>
+                  <option value="2">Jour 2 — Samedi 20 juin</option>
+                  <option value="3">Jour 3 — Dimanche 21 juin</option>
                 </select>
               </div>
               <div>
