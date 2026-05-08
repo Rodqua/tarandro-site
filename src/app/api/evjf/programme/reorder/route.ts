@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   const session = await getEvjfSessionFromRequest(req);
   if (!session || session.role !== "ORGANIZER") {
-    return NextResponse.json({ error: "Réservé à l'organisateur·ice" }, { status: 403 });
+    return NextResponse.json({ error: "Réservé à l'organisateur" }, { status: 403 });
   }
   const { orderedIds } = await req.json();
   if (!Array.isArray(orderedIds)) {

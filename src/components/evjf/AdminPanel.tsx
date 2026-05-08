@@ -32,7 +32,7 @@ export default function AdminPanel({ users }: { users: User[] }) {
 
       {/* Infos */}
       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-        <p className="text-sm text-amber-700 font-medium">💡 Pour ajouter des participantes</p>
+        <p className="text-sm text-amber-700 font-medium">💡 Pour ajouter des participants</p>
         <p className="text-xs text-amber-600 mt-1">
           Lance <code className="bg-amber-100 px-1 rounded">npx tsx prisma/seed-evjf.ts</code> avec la liste des prénoms à ajouter dans le fichier de seed.
         </p>

@@ -213,3 +213,19 @@ model EvjfProgramBlock {
 
   @@map("evjf_program_blocks")
 }
+
+model EvjfBudgetItem {
+  id         String       @id @default(cuid())
+  label      String
+  amount     Float
+  category   EvjfCategory
+  paidById   String?
+  paidBy     EvjfUser?    @relation(fields: [paidById], references: [id])
+  splitCount Int          @default(7)
+  isPaid     Boolean      @default(false)
+  note       String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@map("evjf_budget_items")
+}

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getEvjfSessionFromRequest(req);
   if (!session || session.role !== "ORGANIZER") {
-    return NextResponse.json({ error: "Réservé à l'organisateur·ice" }, { status: 403 });
+    return NextResponse.json({ error: "Réservé à l'organisateur" }, { status: 403 });
   }
 
   const body = await req.json();

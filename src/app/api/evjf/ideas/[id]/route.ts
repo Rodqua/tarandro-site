@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getEvjfSessionFromRequest(req);
   if (!session || session.role !== "ORGANIZER") {
-    return NextResponse.json({ error: "Réservé à l'organisatrice" }, { status: 403 });
+    return NextResponse.json({ error: "Réservé à l'organisateur" }, { status: 403 });
   }
   const { id } = await params;
   await prisma.evjfIdea.delete({ where: { id } });

@@ -126,7 +126,7 @@ export default function ProgrammeView({
         <p className="text-gray-400 mb-6">
           {isOrganizer
             ? "Commence à construire le planning en ajoutant des blocs !"
-            : "L'organisateur·ice n'a pas encore défini le programme. Reviens bientôt !"}
+            : "L'organisateur n'a pas encore défini le programme. Reviens bientôt !"}
         </p>
         {isOrganizer && (
           <a
