@@ -39,7 +39,7 @@ jobs:
 
       - name: 🗄️ Migration Prisma
         if: ${{ inputs.action == 'migrate-and-seed' || inputs.action == 'migrate-only' }}
-        run: npx prisma migrate deploy
+        run: npx prisma db push --accept-data-loss
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
