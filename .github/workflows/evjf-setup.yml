@@ -13,6 +13,9 @@ on:
           - migrate-only
           - seed-only
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   evjf-setup:
     name: 🌸 Setup EVJF
@@ -44,7 +47,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
-      - name: 🌱 Seed participantes EVJF
+      - name: 🌱 Seed participants EVJF
         if: ${{ inputs.action == 'migrate-and-seed' || inputs.action == 'seed-only' }}
         run: npx tsx prisma/seed-evjf.ts
         env:
