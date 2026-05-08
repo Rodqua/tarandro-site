@@ -227,7 +227,7 @@ export default function ProgrammeView({
 
             {/* Ligne verticale de timeline */}
             <div className="relative">
-              <div className="absolute left-[52px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-300 to-fuchsia-200 hidden sm:block" />
+              <div className="absolute left-[36px] sm:left-[52px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-300 to-fuchsia-200" />
 
               <div className="space-y-4">
                 {dayBlocks.map((block, idx) => {
@@ -249,13 +249,13 @@ export default function ProgrammeView({
                       } ${isDragOver ? "scale-102" : ""}`}
                     >
                       {/* Heure */}
-                      <div className="hidden sm:flex flex-col items-center w-[52px] flex-shrink-0 pt-4">
-                        <span className="text-xs font-bold text-pink-500 leading-none">{block.startTime}</span>
-                        <span className="text-xs text-gray-300 leading-none mt-0.5">{block.endTime}</span>
+                      <div className="flex flex-col items-center w-[36px] sm:w-[52px] flex-shrink-0 pt-3">
+                        <span className="text-[10px] sm:text-xs font-bold text-pink-500 leading-none">{block.startTime}</span>
+                        <span className="text-[9px] sm:text-xs text-gray-300 leading-none mt-0.5">{block.endTime}</span>
                       </div>
 
                       {/* Dot sur la timeline */}
-                      <div className={`hidden sm:flex absolute left-[46px] top-5 w-3.5 h-3.5 rounded-full bg-gradient-to-br ${cat.color} border-2 border-white shadow-md z-10`} />
+                      <div className={`absolute left-[30px] sm:left-[46px] top-4 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-gradient-to-br ${cat.color} border-2 border-white shadow-md z-10`} />
 
                       {/* Carte */}
                       <div className={`flex-1 bg-white rounded-2xl border-2 shadow-sm overflow-hidden transition-all ${
