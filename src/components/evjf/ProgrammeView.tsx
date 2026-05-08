@@ -199,7 +199,7 @@ export default function ProgrammeView({
       {days.map((day) => {
         const dayBlocks = blocks
           .filter((b) => b.day === day)
-          .sort((a, b) => a.order - b.order || a.startTime.localeCompare(b.startTime));
+          .sort((a, b) => a.startTime.localeCompare(b.startTime) || a.order - b.order);
 
         return (
           <div key={day} className="mb-10">
@@ -319,63 +319,71 @@ export default function ProgrammeView({
                           </div>
                         ) : (
                           /* ── Mode lecture ── */
-                          <div className="p-5">
+                          <div className="p-3 sm:p-4">
                             <div className="flex items-start gap-3">
                               {/* Icône catégorie */}
-                              <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-xl shadow-sm`}>
+                              <div className={`flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-lg shadow-sm`}>
                                 {cat.emoji}
                               </div>
+
+                              {/* Contenu principal */}
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2 flex-wrap">
-                                  <div>
-                                    <h3 className="font-bold text-gray-800 text-base leading-tight">{block.title}</h3>
+                                {/* Titre + heure mobile */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <h3 className="font-bold text-gray-800 text-sm sm:text-base leading-tight truncate">{block.title}</h3>
                                     <span className="text-xs text-gray-400">{cat.label}</span>
                                   </div>
-                                  {/* Heure mobile */}
-                                  <div className="sm:hidden text-right">
-                                    <span className="text-sm font-bold text-pink-500">{block.startTime}</span>
-                                    <span className="text-xs text-gray-400 block">{block.endTime}</span>
+                                  <div className="sm:hidden text-right flex-shrink-0">
+                                    <span className="text-xs font-bold text-pink-500 block">{block.startTime}</span>
+                                    <span className="text-xs text-gray-300">{block.endTime}</span>
                                   </div>
                                 </div>
-                                {block.imageUrl && (
-                                  <div className="relative w-full h-32 rounded-xl overflow-hidden mt-2">
-                                    <Image src={block.imageUrl} alt={block.title} fill className="object-cover" sizes="400px" />
-                                  </div>
-                                )}
-                                {block.description && (
-                                  <p className="text-gray-500 text-sm mt-1.5">{block.description}</p>
-                                )}
-                                <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
-                                  {block.location && (
-                                    <span className="flex items-center gap-1">
-                                      📍{" "}
-                                      {block.locationUrl ? (
-                                        <a href={block.locationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                                          {block.location}
-                                        </a>
-                                      ) : (
-                                        block.location
-                                      )}
-                                    </span>
+
+                                {/* Image vignette + description */}
+                                <div className="flex gap-3 mt-2">
+                                  {block.imageUrl && (
+                                    <div className="relative flex-shrink-0 w-20 h-16 sm:w-28 sm:h-20 rounded-lg overflow-hidden border border-gray-100">
+                                      <Image src={block.imageUrl} alt={block.title} fill className="object-cover" sizes="112px" />
+                                    </div>
                                   )}
-                                  {block.budget && <span>💰 ~{block.budget}€</span>}
+                                  <div className="flex-1 min-w-0 space-y-1">
+                                    {block.description && (
+                                      <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{block.description}</p>
+                                    )}
+                                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400">
+                                      {block.location && (
+                                        <span className="flex items-center gap-0.5">
+                                          📍{block.locationUrl ? (
+                                            <a href={block.locationUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{block.location}</a>
+                                          ) : block.location}
+                                        </span>
+                                      )}
+                                      {block.budget != null && block.budget > 0 && <span>💰 ~{block.budget}€</span>}
+                                    </div>
+                                  </div>
                                 </div>
+
+                                {/* Note interne */}
                                 {block.notes && isOrganizer && (
-                                  <div className="mt-2 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 text-xs text-amber-700">
-                                    <span className="font-semibold">Note interne :</span> {block.notes}
+                                  <div className="mt-2 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5 text-xs text-amber-700">
+                                    🔒 {block.notes}
                                   </div>
                                 )}
+
+                                {/* PJ */}
                                 {block.attachments && block.attachments.length > 0 && (
                                   <AttachmentList attachments={block.attachments} />
                                 )}
                               </div>
-                              {/* Actions organisateur */}
+
+                              {/* Actions organisateur — colonne droite */}
                               {isOrganizer && (
-                                <div className="flex flex-col gap-1 ml-1">
-                                  <button onClick={() => startEdit(block)} className="p-1.5 rounded-lg hover:bg-pink-50 text-gray-400 hover:text-pink-500 transition-colors" title="Modifier">✏️</button>
-                                  <button onClick={() => duplicateBlock(block)} disabled={duplicatingId === block.id} className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors" title="Dupliquer">{duplicatingId === block.id ? "⏳" : "📋"}</button>
-                                  <button onClick={() => deleteBlock(block.id)} disabled={deletingId === block.id} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Supprimer">🗑️</button>
-                                  <div className="p-1.5 text-gray-300 cursor-grab" title="Glisser pour réordonner">⠿</div>
+                                <div className="flex flex-col gap-0.5 flex-shrink-0">
+                                  <button onClick={() => startEdit(block)} className="p-1.5 rounded-lg hover:bg-pink-50 text-gray-300 hover:text-pink-500 transition-colors text-sm" title="Modifier">✏️</button>
+                                  <button onClick={() => duplicateBlock(block)} disabled={duplicatingId === block.id} className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-300 hover:text-blue-500 transition-colors text-sm" title="Dupliquer">{duplicatingId === block.id ? "⏳" : "📋"}</button>
+                                  <button onClick={() => deleteBlock(block.id)} disabled={deletingId === block.id} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors text-sm" title="Supprimer">🗑️</button>
+                                  <div className="p-1.5 text-gray-200 cursor-grab text-sm" title="Réordonner">⠿</div>
                                 </div>
                               )}
                             </div>

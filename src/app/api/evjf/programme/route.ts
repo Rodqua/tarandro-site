@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const blocks = await prisma.evjfProgramBlock.findMany({
-    orderBy: [{ day: "asc" }, { order: "asc" }, { startTime: "asc" }],
+    orderBy: [{ day: "asc" }, { startTime: "asc" }, { order: "asc" }],
     include: { paidBy: { select: { id: true, name: true } } },
   });
 
