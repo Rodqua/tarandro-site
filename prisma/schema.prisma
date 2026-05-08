@@ -194,3 +194,22 @@ model EvjfReaction {
   @@unique([messageId, userId, emoji])
   @@map("evjf_reactions")
 }
+
+model EvjfProgramBlock {
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  startTime   String       // "HH:MM" format
+  endTime     String       // "HH:MM" format
+  category    EvjfCategory
+  location    String?
+  locationUrl String?
+  notes       String?      @db.Text
+  budget      Float?
+  order       Int          @default(0)
+  day         Int          @default(1) // jour 1, 2, etc. si EVJF sur plusieurs jours
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("evjf_program_blocks")
+}

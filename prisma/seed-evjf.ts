@@ -1,30 +1,24 @@
 /**
- * Seed EVJF — Ajouter/mettre à jour les participantes
- *
- * Usage :
- *   npx tsx prisma/seed-evjf.ts
- *
- * Modifie le tableau PARTICIPANTS ci-dessous avant de lancer.
+ * Seed EVJF — Participantes & Organisateur
+ * Usage : npx tsx prisma/seed-evjf.ts
  */
 
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// ─── À MODIFIER : liste des participantes ─────────────────────────────────────
 const PARTICIPANTS: { name: string; role?: "ORGANIZER" | "PARTICIPANT" }[] = [
-  // 👑 Organisatrice principale — met ton prénom ici
-  { name: "Quentin", role: "ORGANIZER" },
+  // 👑 Organisateur principal
+  { name: "Bibite", role: "ORGANIZER" },
 
-  // 🥂 Participantes — ajoute autant de prénoms que nécessaire
-  { name: "Marie" },
-  { name: "Sophie" },
-  { name: "Camille" },
-  { name: "Léa" },
-  { name: "Julie" },
-  // ...
+  // 🥂 Participantes
+  { name: "Alexiane" },
+  { name: "Louis" },
+  { name: "Iyad" },
+  { name: "Marion" },
+  { name: "Simon" },
+  { name: "Sylvain" },
 ];
-// ─────────────────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log("🌸 Seeding EVJF users...\n");
@@ -40,10 +34,7 @@ async function main() {
     }
 
     const user = await prisma.evjfUser.create({
-      data: {
-        name: p.name,
-        role: p.role ?? "PARTICIPANT",
-      },
+      data: { name: p.name, role: p.role ?? "PARTICIPANT" },
     });
     console.log(`  ✅ ${user.name} créé (${user.role})`);
   }
