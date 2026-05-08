@@ -171,14 +171,27 @@ export default function ProgrammeView({
 
         return (
           <div key={day} className="mb-10">
-            {days.length > 1 && (
-              <div className="flex items-center gap-3 mb-5">
-                <div className="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow">
-                  {day === 1 ? "Jour 1 — Vendredi 19 juin" : day === 2 ? "Jour 2 — Samedi 20 juin" : day === 3 ? "Jour 3 — Dimanche 21 juin" : `Jour ${day}`}
+            {(() => {
+              const DAY_INFO: Record<number, { label: string; date: string; emoji: string; gradient: string; bg: string }> = {
+                1: { label: "Jour 1", date: "Vendredi 19 juin", emoji: "🌅", gradient: "from-orange-400 to-pink-500", bg: "bg-orange-50 border-orange-200" },
+                2: { label: "Jour 2", date: "Samedi 20 juin",   emoji: "☀️", gradient: "from-pink-500 to-fuchsia-500", bg: "bg-pink-50 border-pink-200" },
+                3: { label: "Jour 3", date: "Dimanche 21 juin", emoji: "🌙", gradient: "from-fuchsia-500 to-purple-600", bg: "bg-fuchsia-50 border-fuchsia-200" },
+              };
+              const info = DAY_INFO[day] ?? { label: `Jour ${day}`, date: "", emoji: "📅", gradient: "from-gray-400 to-gray-500", bg: "bg-gray-50 border-gray-200" };
+              return (
+                <div className={`flex items-center gap-4 mb-6 p-4 rounded-2xl border-2 ${info.bg}`}>
+                  <div className={`flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br ${info.gradient} flex flex-col items-center justify-center text-white shadow-md`}>
+                    <span className="text-xl leading-none">{info.emoji}</span>
+                    <span className="text-xs font-bold leading-none mt-0.5">{info.label}</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-800 text-lg leading-tight">{info.label}</p>
+                    <p className="text-sm text-gray-500 font-medium">{info.date}</p>
+                  </div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-current to-transparent opacity-20 ml-2" />
                 </div>
-                <div className="flex-1 h-px bg-pink-200" />
-              </div>
-            )}
+              );
+            })()}
 
             {/* Ligne verticale de timeline */}
             <div className="relative">

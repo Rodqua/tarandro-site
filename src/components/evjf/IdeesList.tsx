@@ -151,7 +151,8 @@ export default function IdeesList({
         </div>
       )}
 
-      {/* Cartes idées */}
+      {/* Cartes idées — mosaïque */}
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
       {filtered.map((idea) => {
         const cat = CATEGORIES[idea.category] ?? CATEGORIES.OTHER;
         const st = STATUSES[idea.status] ?? STATUSES.PENDING;
@@ -160,7 +161,7 @@ export default function IdeesList({
         const isExpanded = expandedId === idea.id;
 
         return (
-          <div key={idea.id} className="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+          <div key={idea.id} className="break-inside-avoid mb-4 bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
 
             {/* Image de présentation */}
             {idea.imageUrl && (
@@ -289,6 +290,7 @@ export default function IdeesList({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
