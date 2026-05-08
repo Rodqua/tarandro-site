@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import EvjfNav from "@/components/evjf/EvjfNav";
 import Countdown from "@/components/evjf/Countdown";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function DashboardPage() {
   const session = await getEvjfSession();
@@ -46,16 +47,41 @@ export default async function DashboardPage() {
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
 
         {/* Hero */}
-        <div className="bg-gradient-to-r from-pink-500 to-fuchsia-500 rounded-3xl p-8 text-white shadow-lg">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <p className="text-pink-100 text-sm font-medium mb-1">Espace secret EVJF 🤫</p>
-              <h1 className="text-3xl font-bold mb-1" style={{ fontFamily: "var(--font-outfit)" }}>
+        <div className="bg-gradient-to-r from-pink-500 to-fuchsia-500 rounded-3xl p-6 sm:p-8 text-white shadow-lg overflow-hidden relative">
+          {/* Cercles décoratifs */}
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full" />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-full" />
+
+          <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+            {/* Photo de Lise */}
+            <div className="flex-shrink-0 flex justify-center sm:justify-start">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28">
+                <div className="absolute inset-0 rounded-full bg-white/30 scale-110" />
+                <div className="absolute inset-0 rounded-full bg-white/20 scale-125" />
+                <Image
+                  src="/evjf/avatars/lise.jpg"
+                  alt="Lise"
+                  fill
+                  className="object-cover rounded-full border-4 border-white shadow-xl"
+                  sizes="112px"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-white rounded-full w-8 h-8 flex items-center justify-center text-lg shadow-md">
+                  👑
+                </div>
+              </div>
+            </div>
+
+            {/* Texte */}
+            <div className="flex-1 text-center sm:text-left">
+              <p className="text-pink-100 text-xs font-medium mb-0.5">Espace secret EVJF 🤫</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{ fontFamily: "var(--font-outfit)" }}>
                 Salut {session.name} 🥂
               </h1>
-              <p className="text-pink-100 text-sm">On prépare quelque chose de mémorable pour Lise !</p>
+              <p className="text-pink-100 text-sm">On prépare quelque chose de mémorable pour <span className="font-bold text-white">Lise</span> !</p>
             </div>
-            <div className="text-center bg-white/20 rounded-2xl p-4 backdrop-blur-sm min-w-[180px]">
+
+            {/* Countdown */}
+            <div className="text-center bg-white/20 rounded-2xl p-4 backdrop-blur-sm min-w-[170px] self-center">
               {partyDate ? (
                 <>
                   <p className="text-pink-100 text-xs mb-2 font-medium">Avant le grand jour 🎉</p>
