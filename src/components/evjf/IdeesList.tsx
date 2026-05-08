@@ -19,6 +19,7 @@ type Idea = {
   score: number;
   userVote: "POSITIVE" | "VETO" | null;
   author: { id: string; name: string; avatarUrl?: string | null };
+  authorId?: string;
   votes: Vote[];
   comments: Comment[];
   createdAt: string;
@@ -228,6 +229,21 @@ export default function IdeesList({
                   className="ml-auto flex items-center gap-1 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-pink-50 transition-colors">
                   💬 {idea.comments.length} {isExpanded ? "▲" : "▼"}
                 </button>
+                {/* Bouton modifier (auteur ou orga) */}
+                {(idea.author.id === currentUserId || currentUserRole === "ORGANIZER") && (
+                  <Link href={`/lise/idees/${idea.id}/modifier`}
+                    className="flex items-center gap-1 text-xs px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-500 hover:border-pink-300 hover:text-pink-500 transition">
+                    ✏️ Modifier
+                  </Link>
+                )}
+                {/* Transformer en bloc programme (orga) */}
+                {currentUserRole === "ORGANIZER" && (
+                  <Link
+                    href={`/lise/programme/nouveau-bloc?ideaId=${idea.id}&title=${encodeURIComponent(idea.title)}&category=${idea.category}&budget=${idea.estimatedBudget ?? ""}&imageUrl=${encodeURIComponent(idea.imageUrl ?? "")}&description=${encodeURIComponent(idea.description ?? "")}`}
+                    className="flex items-center gap-1 text-xs px-3 py-2 rounded-xl bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-600 hover:bg-fuchsia-100 transition">
+                    📅 → Programme
+                  </Link>
+                )}
                 {currentUserRole==="ORGANIZER" && (
                   <div className="flex gap-1 flex-wrap">
                     <select value={idea.status} onChange={e => handleStatusChange(idea.id, e.target.value)}

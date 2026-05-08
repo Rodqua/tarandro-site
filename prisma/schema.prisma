@@ -123,7 +123,8 @@ model EvjfUser {
   comments  EvjfComment[]
   messages  EvjfMessage[]
   reactions   EvjfReaction[]
-  budgetItems EvjfBudgetItem[]
+  budgetItems  EvjfBudgetItem[]
+  programPaid  EvjfProgramBlock[] @relation("ProgramBlockPaidBy")
 
   @@map("evjf_users")
 }
@@ -208,6 +209,9 @@ model EvjfProgramBlock {
   location    String?
   locationUrl String?
   imageUrl    String?
+  paidById    String?
+  paidBy      EvjfUser?    @relation("ProgramBlockPaidBy", fields: [paidById], references: [id])
+  isPaid      Boolean      @default(false)
   notes       String?      @db.Text
   budget      Float?
   order       Int          @default(0)
