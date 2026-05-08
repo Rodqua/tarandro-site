@@ -43,6 +43,7 @@ export default function ProgrammeView({
   const [editForm, setEditForm] = useState<Partial<Block>>({});
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [printMode, setPrintMode] = useState(false);
 
   // Grouper par jour
@@ -112,6 +113,34 @@ export default function ProgrammeView({
     await fetch(`/api/evjf/programme/${id}`, { method: "DELETE" });
     setBlocks((prev) => prev.filter((b) => b.id !== id));
     setDeletingId(null);
+  }
+
+  // ── Duplicate ───────────────────────────────────────────────────────────────
+  async function duplicateBlock(block: Block) {
+    setDuplicatingId(block.id);
+    const res = await fetch("/api/evjf/programme", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: `${block.title} (copie)`,
+        description: block.description,
+        startTime: block.startTime,
+        endTime: block.endTime,
+        category: block.category,
+        location: block.location,
+        locationUrl: block.locationUrl,
+        imageUrl: block.imageUrl,
+        notes: block.notes,
+        budget: block.budget,
+        day: block.day,
+        order: block.order + 1,
+      }),
+    });
+    if (res.ok) {
+      const newBlock = await res.json();
+      setBlocks((prev) => [...prev, newBlock]);
+    }
+    setDuplicatingId(null);
   }
 
   // ── Refresh depuis le serveur ───────────────────────────────────────────────
@@ -338,6 +367,7 @@ export default function ProgrammeView({
                               {isOrganizer && (
                                 <div className="flex flex-col gap-1 ml-1">
                                   <button onClick={() => startEdit(block)} className="p-1.5 rounded-lg hover:bg-pink-50 text-gray-400 hover:text-pink-500 transition-colors" title="Modifier">✏️</button>
+                                  <button onClick={() => duplicateBlock(block)} disabled={duplicatingId === block.id} className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-500 transition-colors" title="Dupliquer">{duplicatingId === block.id ? "⏳" : "📋"}</button>
                                   <button onClick={() => deleteBlock(block.id)} disabled={deletingId === block.id} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Supprimer">🗑️</button>
                                   <div className="p-1.5 text-gray-300 cursor-grab" title="Glisser pour réordonner">⠿</div>
                                 </div>
