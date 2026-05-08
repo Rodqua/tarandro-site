@@ -152,7 +152,7 @@ export default function IdeesList({
       )}
 
       {/* Cartes idées — mosaïque */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 items-start">
       {filtered.map((idea) => {
         const cat = CATEGORIES[idea.category] ?? CATEGORIES.OTHER;
         const st = STATUSES[idea.status] ?? STATUSES.PENDING;
@@ -161,11 +161,11 @@ export default function IdeesList({
         const isExpanded = expandedId === idea.id;
 
         return (
-          <div key={idea.id} className="break-inside-avoid mb-4 bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+          <div key={idea.id} className="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
 
             {/* Image de présentation */}
             {idea.imageUrl && (
-              <div className="relative w-full aspect-[16/7]">
+              <div className="relative w-full aspect-[4/3] sm:aspect-[16/7]">
                 <Image src={idea.imageUrl} alt={idea.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 700px" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-3 left-4">
@@ -174,10 +174,10 @@ export default function IdeesList({
               </div>
             )}
 
-            <div className="p-4 sm:p-5">
+            <div className="p-2.5 sm:p-5">
               {/* Catégorie + Score */}
               <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   {!idea.imageUrl && (
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${st.className}`}>{st.label}</span>
                   )}
@@ -187,11 +187,11 @@ export default function IdeesList({
               </div>
 
               {/* Titre */}
-              <h3 className="font-bold text-gray-800 text-lg leading-snug mb-2">{idea.title}</h3>
+              <h3 className="font-bold text-gray-800 text-sm sm:text-lg leading-snug mb-1 sm:mb-2">{idea.title}</h3>
 
               {/* Description complète */}
               {idea.description && (
-                <p className="text-gray-600 text-sm leading-relaxed mb-3 whitespace-pre-wrap">{idea.description}</p>
+                <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 whitespace-pre-wrap line-clamp-4 sm:line-clamp-none">{idea.description}</p>
               )}
 
               {/* Meta */}
