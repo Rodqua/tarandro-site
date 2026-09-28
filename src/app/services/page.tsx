@@ -189,6 +189,34 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* Outil gratuit : test DISC */}
+      <section className="pb-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="flex-1">
+              <div className="inline-flex items-center bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-xs font-semibold mb-3">
+                Outil gratuit
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                Test DISC complet en ligne
+              </h2>
+              <p className="text-gray-700">
+                Passez le questionnaire DISC en choix forcé et obtenez immédiatement votre
+                profil comportemental commenté, avec vos trois graphiques et vos axes de
+                développement. Gratuit, sans inscription, 10 minutes.
+              </p>
+            </div>
+            <Link
+              href="/analyse-disc"
+              className="bg-primary-600 text-white px-8 py-4 rounded-lg hover:bg-primary-700 transition-all shadow-lg font-semibold inline-flex items-center justify-center group flex-shrink-0"
+            >
+              Passer le test DISC
+              <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
