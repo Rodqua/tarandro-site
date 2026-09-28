@@ -23,6 +23,7 @@ import {
   computeDiscResult,
   countCompleted,
   createEmptyAnswers,
+  type DiscAnswer,
   type DiscAnswers,
 } from "@/lib/disc/scoring";
 import { DiscBarChart, DiscQuadrant, DiscScoreTable } from "./DiscCharts";
@@ -42,6 +43,10 @@ export default function DiscTest() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<DiscAnswers>(() => createEmptyAnswers());
   const [restored, setRestored] = useState(false);
+  /** Groupe dont le dernier clic vient de compléter la paire (déclenche l'avance auto) */
+  const [autoAdvanceFrom, setAutoAdvanceFrom] = useState<number | null>(null);
+  /** Adjectif dont la définition est actuellement dépliée */
+  const [openHelp, setOpenHelp] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   /* Reprise d'un test interrompu -------------------------------------------- */
@@ -85,29 +90,38 @@ export default function DiscTest() {
 
   const select = useCallback(
     (kind: "most" | "least", dimension: DiscDimension) => {
-      setAnswers((previous) => {
-        const answer = previous[question.id];
-        const other = kind === "most" ? "least" : "most";
-        const next = {
-          ...answer,
-          [kind]: answer[kind] === dimension ? null : dimension,
-          // Un même adjectif ne peut pas être à la fois « le plus » et « le moins »
-          [other]: answer[other] === dimension ? null : answer[other],
-        };
-        return { ...previous, [question.id]: next };
-      });
+      const answer = answers[question.id];
+      const other = kind === "most" ? "least" : "most";
+      const next: DiscAnswer = {
+        ...answer,
+        [kind]: answer[kind] === dimension ? null : dimension,
+        // Un même adjectif ne peut pas être à la fois « le plus » et « le moins »
+        [other]: answer[other] === dimension ? null : answer[other],
+      };
+
+      // Le passage automatique ne se déclenche que si ce clic vient de compléter
+      // un groupe qui ne l'était pas : revenir sur un groupe déjà répondu, ou y
+      // corriger un choix, ne doit jamais faire avancer tout seul.
+      const wasComplete = Boolean(answer.most && answer.least);
+      const isNowComplete = Boolean(next.most && next.least);
+      setAutoAdvanceFrom(!wasComplete && isNowComplete ? question.id : null);
+
+      setAnswers((previous) => ({ ...previous, [question.id]: next }));
     },
-    [question.id],
+    [answers, question.id],
   );
 
   /* Passage automatique à la question suivante une fois les deux choix faits */
   useEffect(() => {
     if (step !== "test") return;
-    if (!current?.most || !current?.least) return;
+    if (autoAdvanceFrom !== question.id) return;
     if (index >= TOTAL_QUESTIONS - 1) return;
-    const timer = window.setTimeout(() => setIndex((i) => Math.min(i + 1, TOTAL_QUESTIONS - 1)), 260);
+    const timer = window.setTimeout(() => {
+      setAutoAdvanceFrom(null);
+      setIndex((i) => Math.min(i + 1, TOTAL_QUESTIONS - 1));
+    }, 260);
     return () => window.clearTimeout(timer);
-  }, [current?.most, current?.least, index, step]);
+  }, [autoAdvanceFrom, question.id, index, step]);
 
   const result = useMemo(() => (isComplete ? computeDiscResult(answers) : null), [answers, isComplete]);
 
@@ -246,7 +260,9 @@ export default function DiscTest() {
           Dans ce groupe, qu&apos;est-ce qui vous ressemble le plus et le moins&nbsp;?
         </h2>
         <p className="text-gray-600 mb-6 text-sm">
-          Un seul choix dans chaque colonne. Les deux sont obligatoires.
+          Un seul choix dans chaque colonne, les deux sont obligatoires. Un doute sur un mot&nbsp;?
+          Le <span className="font-semibold text-primary-700">?</span> en donne la définition et un
+          exemple.
         </p>
 
         <div className="grid grid-cols-[auto_1fr_auto] md:grid-cols-[110px_1fr_110px] gap-x-3 md:gap-x-4 items-center mb-2">
@@ -263,10 +279,11 @@ export default function DiscTest() {
           {question.words.map((word) => {
             const isMost = current?.most === word.dimension;
             const isLeast = current?.least === word.dimension;
+            const helpOpen = openHelp === word.id;
             return (
               <div
                 key={word.id}
-                className={`grid grid-cols-[auto_1fr_auto] md:grid-cols-[110px_1fr_110px] gap-x-3 md:gap-x-4 items-center rounded-xl border-2 px-3 py-2 transition-colors ${
+                className={`rounded-xl border-2 px-3 py-2 transition-colors ${
                   isMost
                     ? "border-emerald-500 bg-emerald-50"
                     : isLeast
@@ -274,33 +291,70 @@ export default function DiscTest() {
                       : "border-gray-200"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => select("most", word.dimension)}
-                  aria-pressed={isMost}
-                  aria-label={`« ${word.label} » me ressemble le plus`}
-                  className={`w-11 h-11 md:w-full md:h-10 rounded-lg border-2 font-semibold transition-all inline-flex items-center justify-center ${
-                    isMost
-                      ? "bg-emerald-600 border-emerald-600 text-white"
-                      : "border-gray-300 text-gray-400 hover:border-emerald-500 hover:text-emerald-600"
-                  }`}
-                >
-                  +
-                </button>
-                <span className="text-lg text-gray-900 text-center font-medium">{word.label}</span>
-                <button
-                  type="button"
-                  onClick={() => select("least", word.dimension)}
-                  aria-pressed={isLeast}
-                  aria-label={`« ${word.label} » me ressemble le moins`}
-                  className={`w-11 h-11 md:w-full md:h-10 rounded-lg border-2 font-semibold transition-all inline-flex items-center justify-center ${
-                    isLeast
-                      ? "bg-gray-700 border-gray-700 text-white"
-                      : "border-gray-300 text-gray-400 hover:border-gray-600 hover:text-gray-700"
-                  }`}
-                >
-                  −
-                </button>
+                <div className="grid grid-cols-[auto_1fr_auto] md:grid-cols-[110px_1fr_110px] gap-x-3 md:gap-x-4 items-center">
+                  <button
+                    type="button"
+                    onClick={() => select("most", word.dimension)}
+                    aria-pressed={isMost}
+                    aria-label={`« ${word.label} » me ressemble le plus`}
+                    className={`w-11 h-11 md:w-full md:h-10 rounded-lg border-2 font-semibold transition-all inline-flex items-center justify-center ${
+                      isMost
+                        ? "bg-emerald-600 border-emerald-600 text-white"
+                        : "border-gray-300 text-gray-400 hover:border-emerald-500 hover:text-emerald-600"
+                    }`}
+                  >
+                    +
+                  </button>
+                  <div className="flex items-center justify-center gap-2 min-w-0">
+                    <span className="text-lg text-gray-900 text-center font-medium">
+                      {word.label}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setOpenHelp(helpOpen ? null : word.id)}
+                      aria-expanded={helpOpen}
+                      aria-controls={`${word.id}-aide`}
+                      aria-label={`Définition et exemple pour « ${word.label} »`}
+                      title={`Définition de « ${word.label} »`}
+                      className={`w-7 h-7 rounded-full border text-sm font-bold transition-all inline-flex items-center justify-center flex-shrink-0 ${
+                        helpOpen
+                          ? "bg-primary-600 border-primary-600 text-white"
+                          : "border-gray-300 text-gray-500 hover:border-primary-500 hover:text-primary-600"
+                      }`}
+                    >
+                      ?
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => select("least", word.dimension)}
+                    aria-pressed={isLeast}
+                    aria-label={`« ${word.label} » me ressemble le moins`}
+                    className={`w-11 h-11 md:w-full md:h-10 rounded-lg border-2 font-semibold transition-all inline-flex items-center justify-center ${
+                      isLeast
+                        ? "bg-gray-700 border-gray-700 text-white"
+                        : "border-gray-300 text-gray-400 hover:border-gray-600 hover:text-gray-700"
+                    }`}
+                  >
+                    −
+                  </button>
+                </div>
+
+                {helpOpen && (
+                  <div
+                    id={`${word.id}-aide`}
+                    className="mt-2 rounded-lg bg-white border border-primary-100 p-4 text-sm animate-fadeIn"
+                  >
+                    <p className="text-gray-800">
+                      <span className="font-semibold text-primary-700">Définition — </span>
+                      {word.definition}
+                    </p>
+                    <p className="text-gray-600 mt-2">
+                      <span className="font-semibold text-primary-700">Exemple — </span>
+                      {word.example}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })}

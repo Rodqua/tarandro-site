@@ -9,6 +9,8 @@
  * ce qui garantit l'équilibre du questionnaire : 28 occurrences par dimension.
  */
 
+import { DISC_WORD_HELP } from "./definitions";
+
 export type DiscDimension = "D" | "I" | "S" | "C";
 
 export interface DiscWord {
@@ -16,6 +18,10 @@ export interface DiscWord {
   id: string;
   label: string;
   dimension: DiscDimension;
+  /** Définition neutre de l'adjectif, affichée à la demande */
+  definition: string;
+  /** Situation professionnelle illustrant l'adjectif */
+  example: string;
 }
 
 export interface DiscQuestion {
@@ -62,11 +68,20 @@ const ORDER: DiscDimension[] = ["D", "I", "S", "C"];
  * pas systématiquement en première position (biais de position).
  */
 export const DISC_QUESTIONS: DiscQuestion[] = RAW_GROUPS.map((group, index) => {
-  const words: DiscWord[] = group.map((label, position) => ({
-    id: `q${index + 1}-${ORDER[position]}`,
-    label,
-    dimension: ORDER[position],
-  }));
+  const words: DiscWord[] = group.map((label, position) => {
+    const help = DISC_WORD_HELP[label];
+    if (!help) {
+      // Garde-fou : un adjectif sans définition serait affiché sans aide.
+      throw new Error(`Définition manquante pour l'adjectif « ${label} »`);
+    }
+    return {
+      id: `q${index + 1}-${ORDER[position]}`,
+      label,
+      dimension: ORDER[position],
+      definition: help.definition,
+      example: help.example,
+    };
+  });
 
   const offset = index % 4;
   const rotated = [...words.slice(offset), ...words.slice(0, offset)];
